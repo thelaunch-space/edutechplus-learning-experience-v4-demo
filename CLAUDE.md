@@ -73,13 +73,14 @@
   - Fallback: Web Speech API (browser-based, free but less accurate)
 
 - **TTS (Text-to-Speech):**
-  - OpenAI TTS API (uses same API key as GPT-4o-mini)
-  - Voice: 'Alloy' or 'Nova' (natural, kid-friendly)
-  - Cost: ~$15/1M characters (~$0.50-0.75 per 1000 sessions)
-  - Latency: 500-1000ms with streaming
+  - Deepgram Aura TTS API (primary)
+  - Voice: `aura-asteria-en` (warm, friendly female voice for kids)
+  - Fallback: Browser Web Speech API (if Deepgram unavailable)
+  - Latency: 500-1000ms
+  - Cost: ~$0.59/1M characters (~$0.30-0.50 per 1000 sessions)
 
 - **Response Generation:**
-  - GPT-4o-mini with guardrailed prompts for contextual one-liner responses
+  - OpenRouter GPT-4.1-nano with guardrailed prompts for contextual one-liner responses
   - System prompt enforces: max 15 words, simple English (Asian kids), encouraging tone
   - Latency: 300-600ms
   - Fallback: If LLM times out (>3s) or kid silent → "Great! Let's continue!"
@@ -421,17 +422,99 @@ const response = await openai.chat.completions.create({
 **Assumptions:** 7 interactions per session, ~30 seconds total audio per session, ~100 words of LLM responses per session
 
 - **STT:** $0.25-0.50 (Deepgram: ~$0.0048/min for 3.5 min total listening)
-- **TTS:** $0.50-0.75 (OpenAI TTS: ~$15/1M chars, ~500 chars per session)
-- **LLM:** $0.10-0.20 (GPT-4o-mini: $0.15/1M input + $0.60/1M output tokens)
+- **TTS:** $0.30-0.50 (Deepgram Aura: ~$0.59/1M chars, ~500 chars per session)
+- **LLM:** $0.10-0.20 (OpenRouter GPT-4.1-nano: $0.15/1M input + $0.60/1M output tokens)
 
-**Total per 1000 sessions:** $0.85-1.45
+**Total per 1000 sessions:** $0.65-1.20
 
 **Cost Breakdown:**
-- STT: ~30%
-- TTS: ~50%
-- LLM: ~20%
+- STT: ~35%
+- TTS: ~40%
+- LLM: ~25%
 
 **Note:** This is significantly cheaper than the original ElevenLabs approach ($2-4/1000 sessions) while providing truly conversational responses.
+
+---
+
+## Bugs Fixed During Development
+
+### Bug 1: Duplicate Greeting Message
+**Issue:** Math Mate said the greeting "Hi! I'm Math Mate, your friend! What's your name?" twice - once during GREETING phase (correct) and again during PRE_CHALLENGE phase (incorrect).
+
+**Root Cause:** Challenge #1's `preScript` in `src/config/challenges.ts` was hardcoded to the greeting text instead of an introduction to the first video. When the app transitioned to PRE_CHALLENGE, it spoke the challenge's preScript, which was the greeting.
+
+**Solution:** Updated `challenges.ts` line 11 to use contextually appropriate pre-script for each challenge:
+```typescript
+// Before (wrong):
+preScript: "Hi! I'm Math Mate, your friend! What's your name?",
+
+// After (correct):
+preScript: "Let's start our first challenge! Watch this video about fractions.",
+```
+
+---
+
+### Bug 2: App Not Advancing After Post-Challenge
+**Issue:** After the student answered the post-challenge question and Math Mate responded, the app got stuck and did not advance to the next challenge.
+
+**Root Cause:** The `goToNextChallenge()` function in `useSessionStore.ts` was setting both `currentChallengeIndex` AND `phase` atomically in a single Zustand update. Due to React's rendering behavior with async functions, the state change wasn't reliably triggering the useEffect that starts the next pre-challenge phase.
+
+**Solution:** Separated concerns - `goToNextChallenge()` now only updates `currentChallengeIndex` and returns a boolean. Explicit phase setting happens in `useVoiceInteraction.ts`:
+
+**Changes in `src/store/sessionStore.ts` (lines 49-57):**
+```typescript
+// Before:
+goToNextChallenge: () => set((state) => { ... /* atomic update */ }),
+
+// After:
+goToNextChallenge: () => {
+  const state = get();
+  const nextIndex = state.currentChallengeIndex + 1;
+  const isComplete = nextIndex >= state.challenges.length;
+  if (!isComplete) {
+    set({ currentChallengeIndex: nextIndex });
+  }
+  return isComplete;
+},
+```
+
+**Changes in `src/hooks/useVoiceInteraction.ts` (lines 246-254):**
+```typescript
+// Explicitly set phase after advancing
+const isComplete = goToNextChallenge();
+if (isComplete) {
+  setPhase('COMPLETE');
+} else {
+  setPhase('PRE_CHALLENGE');
+}
+```
+
+---
+
+### Bug 3: Premature "Challenge X Done!" in Greeting
+**Issue:** When Math Mate greeted the student, it said "Hi Gautam! We have 7 fun challenges today. Let's start and have fun! Challenge 1 done!" - the "Challenge 1 done!" was inappropriate since no challenge had been completed yet.
+
+**Root Cause:** The `MATH_MATE_SYSTEM_PROMPT` in `src/config/prompts.ts` contained the rule: "End with 'Challenge {challengeNum} done!' if completing a challenge". This rule was included in ALL LLM calls, including the greeting. The LLM incorrectly applied this rule during the welcome message.
+
+**Solution:** Created a separate greeting-specific system prompt without the "challenge done" rule.
+
+**Changes in `src/config/prompts.ts` (lines 39-49):**
+```typescript
+export const GREETING_SYSTEM_PROMPT = `You are Math Mate, an encouraging AI tutor for Grade 4 students learning fractions.
+
+RULES FOR THIS GREETING:
+1. Generate EXACTLY ONE sentence (max 15 words)
+2. Use VERY simple English (for Asian kids, English is second language)
+3. Welcome the student by name
+4. Tell them we have 7 fun challenges today
+5. Be excited and warm
+6. Do NOT mention anything about challenges being "done" - we haven't started yet!
+
+EXAMPLE: "Hi Maya! We have 7 fun challenges today. Let's go!"`;
+```
+
+**Changes in `src/services/openrouter.ts` (line 104):**
+Used `GREETING_SYSTEM_PROMPT` instead of `MATH_MATE_SYSTEM_PROMPT` in the greeting generation function.
 
 ---
 
