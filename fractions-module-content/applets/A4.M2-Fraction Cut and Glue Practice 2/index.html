@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title id="html_title"></title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="./css/style.css" />
+  </head>
+  <body>
+    <div class="applet-container">
+      <div class="titleBar">
+        <h1 id="main_title_text"></h1>
+        <p id="subtitle_text"></p>
+      </div>
+
+      <div class="main-layout">
+        <!-- Left Panel: Character and Speech Bubble -->
+        <div class="left-panel-anchor">
+          <div class="speech-bubble-container">
+            <div class="contextBox" id="contextBox">
+              <div class="context-section">
+                <!-- Instruction text injected by JS -->
+              </div>
+            </div>
+          </div>
+          <div class="character-display">
+            <img
+              src="./assets/Cavy.png"
+              alt="Character"
+              id="characterImageElement"
+            />
+          </div>
+          <div class="lowerControls">
+            <button
+              class="btn btn-secondary"
+              id="prevButton"
+              style="display: none"
+              disabled
+            ></button>
+            <div class="step-counter" id="stepCounter"></div>
+            <button class="btn btn-primary" id="nextButton"></button>
+          </div>
+        </div>
+
+        <!-- Middle Panel: Tools/Equipment -->
+        <!-- Right Panel: Main working area -->
+        <div class="right-panel-content">
+          <div class="workingArea-container">
+            <div class="equipment-area" id="equipment-area">
+              <!-- Tools like scissors and glue gun injected by JS -->
+            </div>
+            <div class="workingArea" id="activity-area">
+              <!-- Paper pieces and other elements injected by JS -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FTUE Hand Cursor Element -->
+    <div id="hand-ftue">
+      <img id="hand-ftue-img" src="" alt="Hand Cursor" />
+    </div>
+
+    <script src="js/texts.js"></script>
+    <script src="js/app.js"></script>
+  </body>
+</html>

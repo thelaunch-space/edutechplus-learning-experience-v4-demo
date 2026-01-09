@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title id="html_title">Understanding Unit Fractions</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="./css/style.css" />
+  </head>
+  <body>
+    <div class="applet-container">
+      <div class="titleBar">
+        <h1 id="main_title_text">
+          <span class="blue-highlight" id="fractions_text">Fractions</span> <span id="help_text">help us show</span> 
+          <span class="pink-highlight" id="parts_text">parts of a whole</span><span id="period_text">.</span>
+        </h1>
+      </div>
+      <div class="main-layout">
+        <div class="left-panel-anchor">
+          <div class="statements-container">
+            <div class="statement" id="statement1">
+              <span id="statement1_text">We can have a </span>
+              <button class="statement-button" id="wholeCakeButton" data-step="1">
+                <span id="whole_cake_text">whole cake</span>
+              </button>
+              <span>.</span>
+            </div>
+            
+            <div class="statement" id="statement2">
+              <span id="statement2_text">Which can be cut into </span>
+              <button class="statement-button" id="equalPartsButton" data-step="2">
+                <span id="equal_parts_text">equal parts</span>
+              </button>
+              <span>.</span>
+            </div>
+            
+            <div class="statement" id="statement3">
+              <span id="statement3_text">Each part is a </span>
+              <button class="statement-button" id="unitFractionButton" data-step="3">
+                <span id="unit_fraction_text">unit fraction</span>
+              </button>
+              <span>.</span>
+            </div>
+            
+            <div class="statement" id="statement4">
+              <span id="statement4_text">We </span>
+              <button class="statement-button" id="representButton" data-step="4">
+                <span id="represent_text">represent</span>
+              </button>
+              <span id="statement4_end"> unit fractions this way.</span>
+            </div>
+          </div>
+        </div>
+        <div class="right-panel-content">
+          <div class="image-container">
+            <img id="fractionImage" class="fraction-image fade-in" 
+                 src="" 
+                 alt="Unit fraction visualization" />
+          </div>
+          <div class="text-container">
+            <p id="imageText" class="image-text"></p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="hand-ftue">
+      <img id="hand-ftue-img" src="" alt="Hand Cursor" />
+    </div>
+    <script src="js/texts.js"></script>
+    <script src="js/app.js"></script>
+  </body>
+</html>

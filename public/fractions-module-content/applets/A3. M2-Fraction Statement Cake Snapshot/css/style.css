@@ -1,0 +1,339 @@
+/********************************************
+ * 1) GLOBAL & BODY STYLES
+ *********************************************/
+:root {
+  --bg-color: #e0f7fa; /* Light Cyan */
+  --panel-bg: #ffffff;
+  --text-dark: #fafafa; /* Blue Grey 800 */
+  --text-light: #546e7a;
+  --text-accent: #10adf6; /* Blue Grey 600 */
+  --blue-highlight: #67c9fe; /* Blue */
+  --pink-highlight: #fc69f2; /* Pink */
+  --primary-accent: #ffb74d; /* Orange 300 */
+  --primary-shadow: #e65100; /* Orange 900 */
+  --secondary-accent: #81c784; /* Green 300 */
+  --secondary-shadow: #2e7d32; /* Green 800 */
+  --incorrect-accent: #e57373; /* Red 300 */
+  --incorrect-shadow: #c62828; /* Red 800 */
+  --highlight-glow: #ffc977; /* Yellow Glow */
+}
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+body {
+  font-family: "Roboto", "Segoe UI", sans-serif;
+  background-color: var(--bg-color);
+  color: var(--text-dark);
+  line-height: 1.5;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+/********************************************
+ * 2) APPLET CONTAINER & LAYOUT
+ *********************************************/
+.applet-container {
+  aspect-ratio: 16 / 9;
+  max-width: 100%;
+  max-height: 100vh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  margin: 0 auto;
+  overflow: hidden;
+  box-shadow: 0 1vh 3vw rgba(0, 0, 0, 0.15);
+  background-image: url("../assets/DarkBG.jpg");
+  background-repeat: no-repeat;
+  background-size: cover;
+  position: relative;
+  gap: 1vw;
+  padding: 1vw;
+}
+.titleBar {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 8vh;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 1.5vw;
+  margin-bottom: 1vh;
+  box-shadow: 0 0.5vw 1vw rgba(0, 0, 0, 0.1);
+  border: 0.2vh solid rgb(179, 229, 252, 0.2);
+}
+.titleBar h1 {
+  font-size: calc(0.25rem + 2vw);
+  color: #ffffff;
+  font-weight: 700;
+  text-align: center;
+}
+.blue-highlight {
+  color: var(--pink-highlight);
+  text-shadow: 0 0 10px rgba(239, 8, 189, 0.5);
+}
+.pink-highlight {
+  color: var(--blue-highlight);
+  text-shadow: 0 0 10px rgba(33, 198, 243, 0.5);
+}
+.main-layout {
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+  overflow: hidden;
+  gap: 2vw;
+}
+/********************************************
+ * 3) LEFT PANEL - STATEMENTS (50% width)
+ *********************************************/
+.left-panel-anchor {
+  width: 50%;
+  display: flex;
+  flex-direction: column;
+  gap: 2vh;
+  justify-content: center;
+  min-width: 300px;
+  /* Frosted glass effect */
+  background: rgba(10, 25, 47, 0.25);
+  -webkit-backdrop-filter: blur(0.1vw);
+  backdrop-filter: blur(0.1vw);
+  border-radius: 1.5vw;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  margin: 1vw;
+  padding: 2vw;
+}
+.statements-container {
+  display: flex;
+  flex-direction: column;
+  gap: 2vh;
+  height: 100%;
+  justify-content: center;
+}
+.statement {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  font-size: calc(0.5rem + 1.5vw);
+  color: #ffffff;
+  font-weight: 500;
+  line-height: 1.4;
+  margin-bottom: 1vh;
+}
+.statement span {
+  color: #ffffff;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+}
+.statement-button {
+  padding: 1vh 2vw;
+  border: none;
+  border-radius: 2vw;
+  font-size: calc(0.4rem + 1.2vw);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: white;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+  background: linear-gradient(145deg, var(--primary-accent), #f57c00);
+  box-shadow: 0 0.3vh 0px #bf360c;
+  margin: 0 0.5vw;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  line-height: 1.2;
+  min-height: 5vh;
+}
+.statement-button:hover:not([disabled]) {
+  transform: translateY(-2px);
+  filter: brightness(1.05);
+}
+.statement-button:active {
+  transform: translateY(0);
+  box-shadow: 0 0.1vh 0px #bf360c;
+}
+.statement-button.completed {
+  background: linear-gradient(145deg, var(--secondary-accent), #66bb6a);
+  box-shadow: 0 0.3vh 0px var(--secondary-shadow);
+}
+.statement-button.completed:hover:not([disabled]) {
+  transform: translateY(-2px);
+  filter: brightness(1.05);
+}
+.statement-button[disabled] {
+  cursor: not-allowed;
+  transform: none;
+  opacity: 0.5;
+  filter: grayscale(50%);
+}
+/********************************************
+ * 4) RIGHT PANEL - IMAGE DISPLAY (50% width)
+ *********************************************/
+.right-panel-content {
+  width: 50%;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  gap: 1vh;
+}
+.image-container {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2vw;
+  overflow: hidden;
+  /* Frosted glass effect */
+  background: rgba(10, 25, 47, 0.25);
+  -webkit-backdrop-filter: blur(0.1vw);
+  backdrop-filter: blur(0.1vw);
+  border-radius: 1.5vw;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  margin: 1vw 1vw 0.5vw 1vw;
+  padding: 2vw;
+}
+.text-container {
+  height: 8vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* Frosted glass effect */
+  background: rgba(10, 25, 47, 0.25);
+  -webkit-backdrop-filter: blur(0.1vw);
+  backdrop-filter: blur(0.1vw);
+  border-radius: 1.5vw;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  margin: 0.5vw 1vw 1vw 1vw;
+  padding: 1vw 2vw;
+}
+.image-text {
+  font-size: calc(0.5rem + 1.5vw);
+  color: #ffffff;
+  font-weight: 600;
+  text-align: center;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+  transition: all 0.5s ease;
+}
+.image-text.fade-in {
+  opacity: 1;
+  transform: scale(1);
+}
+.image-text.fade-out {
+  opacity: 0;
+  transform: scale(0.95);
+}
+.fraction-image {
+  max-width: 90%;
+  max-height: 90%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  transition: all 0.5s ease;
+}
+.fraction-image.fade-in {
+  opacity: 1;
+  transform: scale(1);
+}
+.fraction-image.fade-out {
+  opacity: 0;
+  transform: scale(0.95);
+}
+/********************************************
+ * 5) FTUE & ANIMATIONS
+ *********************************************/
+#hand-ftue {
+  position: fixed;
+  width: 5vw;
+  height: auto;
+  z-index: 10000;
+  pointer-events: none;
+  opacity: 0;
+  display: none;
+  transform: translate(-30%, -20%);
+  transition: top 0.3s ease, left 0.3s ease, opacity 0.3s;
+}
+#hand-ftue img {
+  width: 100%;
+}
+.hand-animating {
+  display: block !important;
+  animation: hand-tap-animation 1.5s ease-in-out infinite;
+}
+@keyframes hand-tap-animation {
+  0%,
+  100% {
+    opacity: 0;
+    transform: translate(-30%, -20%) scale(1.1);
+  }
+  20%,
+  80% {
+    opacity: 1;
+    transform: translate(-30%, -20%) scale(1.1);
+  }
+  50% {
+    transform: translate(-30%, -20%) scale(0.95);
+  }
+}
+/********************************************
+ * 6) IMAGE ANIMATION CLASSES
+ *********************************************/
+.image-highlight {
+  animation: image-glow 2s ease-in-out;
+}
+@keyframes image-glow {
+  0%,
+  100% {
+    filter: brightness(1);
+  }
+  50% {
+    filter: brightness(1.1) drop-shadow(0 0 10px rgba(33, 150, 243, 0.5));
+  }
+}
+/********************************************
+ * 7) RESPONSIVE ADJUSTMENTS
+ *********************************************/
+@media (max-width: 768px) {
+  .main-layout {
+    flex-direction: column;
+    gap: 1vh;
+    .image-text {
+      font-size: calc(0.4rem + 1.2vw);
+    }
+
+    .text-container {
+      height: 6vh;
+      margin: 0.5vw 1vw 1vw 1vw;
+      padding: 0.5vw 1.5vw;
+    }
+
+    .left-panel-anchor {
+      width: 100%;
+      order: 2;
+      min-height: 40vh;
+    }
+
+    .right-panel-content {
+      width: 100%;
+      order: 1;
+      height: 40vh;
+    }
+
+    .statements-container {
+      gap: 1.5vh;
+    }
+
+    .statement {
+      font-size: calc(0.4rem + 1.2vw);
+      margin-bottom: 0.5vh;
+    }
+
+    .statement-button {
+      font-size: calc(0.35rem + 1vw);
+      padding: 0.8vh 1.5vw;
+      min-height: 4vh;
+    }
+  }
+}

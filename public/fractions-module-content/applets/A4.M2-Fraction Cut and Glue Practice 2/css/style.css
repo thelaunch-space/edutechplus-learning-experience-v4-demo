@@ -1,0 +1,654 @@
+/********************************************
+ * 1) GLOBAL & BODY STYLES
+ *********************************************/
+:root {
+  --bg-color: #e0f7fa; /* Light Cyan */
+  --panel-bg: #ffffff;
+  --text-dark: #fafafa; /* Blue Grey 800 */
+  --text-light: #546e7a; /* Blue Grey 600 */
+  --primary-accent: #ffb74d; /* Orange 300 */
+  --primary-shadow: #e65100; /* Orange 900 */
+  --secondary-accent: #81c784; /* Green 300 */
+  --secondary-shadow: #2e7d32; /* Green 800 */
+  --paper-color: #eb910bff; /* Pink 300 */
+  --highlight-glow: #db820d; /* Yellow */
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: "Roboto", "Segoe UI", sans-serif;
+  background-color: var(--bg-color);
+  color: var(--text-dark);
+  line-height: 1.5;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+.titleBar {
+  display: none;
+}
+
+/********************************************
+ * 2) APPLET CONTAINER & LAYOUT
+ *********************************************/
+.applet-container {
+  aspect-ratio: 16 / 9;
+  max-width: 100%;
+  max-height: 100vh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  margin: 0 auto;
+  overflow: hidden;
+  box-shadow: 0 1vh 3vw rgba(0, 0, 0, 0.15);
+  background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%);
+  background-image: url("../assets/DarkBG.jpg");
+  background-repeat: no-repeat;
+  background-size: cover;
+  position: relative;
+  gap: 1vw;
+  padding: 1vw;
+}
+
+.main-layout {
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+  overflow: hidden;
+  gap: 4vw;
+}
+
+/* Panels */
+.left-panel-anchor {
+  width: 30%;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 1vh;
+  justify-content: flex-end;
+}
+.equipment-area {
+  width: 20%;
+  height: 90%;
+  display: flex;
+  align-self: center;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2vw;
+  position: relative;
+  z-index: 10;
+
+  background: linear-gradient(180deg, #132a462f 0%, #102c5a62 100%);
+  border: 0.5vh dashed #95b1ff52;
+  border-radius: 1vw;
+}
+.right-panel-content {
+  width: 70%;
+  padding: 1vh;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  -webkit-backdrop-filter: blur(0.1vw);
+  backdrop-filter: blur(0.1vw);
+  border-radius: 2vw;
+  overflow: hidden;
+}
+
+/* Initial State: Character centered */
+.initial-state .right-panel-content,
+.initial-state .equipment-area {
+  display: none;
+}
+.initial-state .main-layout {
+  justify-content: center;
+  align-items: center;
+}
+.initial-state .left-panel-anchor {
+  width: 60%;
+  max-width: 60vw;
+  height: 100%;
+  justify-content: center;
+  flex-direction: row;
+  align-items: center;
+}
+.initial-state .speech-bubble-container {
+  max-height: 60%;
+  width: 40%;
+  transform: scale(1.1);
+}
+.initial-state .character-display {
+  height: 60%;
+  width: 60%;
+}
+.initial-state .contextBox::after {
+  top: 15%;
+  right: -2vw;
+  rotate: -90deg;
+}
+.initial-state .equipment-area {
+  display: none !important;
+}
+.initial-state .right-panel-content {
+  display: none !important;
+}
+.initial-state .lowerControls {
+    position: absolute;
+    bottom: 8vh;
+    left: 0;
+    width: 100%;
+    justify-content: center;
+}
+/********************************************
+ * 3) CHARACTER & SPEECH BUBBLE
+ *********************************************/
+.character-display {
+  width: 100%;
+  height: 44%;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  margin-bottom: -2vh;
+}
+#characterImageElement {
+  height: 100%;
+  max-width: 100%;
+  object-fit: contain;
+}
+.speech-bubble-container {
+  width: 100%;
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  max-height: 48%;
+}
+.contextBox {
+  background: rgba(255, 255, 255, 0.95);
+  padding: 2vh 1.5vw;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  border-radius: 1.5vw;
+  box-shadow: 0 0.5vw 1vw rgba(0, 0, 0, 0.1);
+  border: 3px solid #b3e5fc; /* Light Blue Border */
+  transition: all 0.3s ease;
+}
+.contextBox::after {
+  content: "";
+  position: absolute;
+  bottom: -2.5vh;
+  right: 45%;
+  width: 0;
+  height: 0;
+  border: 1.5vw solid transparent;
+  border-top-color: #b3e5fc;
+  border-bottom: 0;
+  transition: all 0.3s ease;
+}
+.contextBox.correct {
+  background: #e8f5e9; /* Light Green */
+  border-color: #81c784;
+}
+.contextBox.correct::after {
+  border-top-color: #81c784;
+}
+.contextBox.incorrect {
+  background: #ffebee; /* Light Red */
+  border-color: #e57373;
+}
+.contextBox.incorrect::after {
+  border-top-color: #e57373;
+}
+.contextBox .context-section h2 {
+  font-size: calc(0.25rem + 1.5vw);
+  color: #0277bd; /* Dark Blue */
+  margin-bottom: 1vh;
+  font-weight: 700;
+}
+.contextBox .context-section p {
+  font-size: calc(0.25rem + 1.2vw);
+  color: var(--text-light);
+}
+
+/********************************************
+ * 4) WORKING AREA & CONTROLS
+ *********************************************/
+.workingArea-container {
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+}
+#activity-area {
+  flex: 1;
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  justify-content: center;
+  overflow: visible;
+  padding: 2vh 1vw;
+  gap: 2vw;
+}
+.lowerControls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 1.5vh 1.5vw;
+  min-height: 8vh;
+}
+
+/********************************************
+ * 5) APPLET SPECIFIC ELEMENTS
+ *********************************************/
+/* --- Tools (Scissors, Glue Gun) --- */
+.tool-item {
+  position: absolute;
+  width: 6vw;
+  cursor: pointer;
+  transition: transform 0.2s ease-out, filter 0.2s ease-out, top 0.8s ease,
+    left 0.8s ease;
+  filter: drop-shadow(0.2vw 0.2vw 0.1vw rgba(61, 61, 61, 0.322));
+  z-index: 100;
+}
+.tool-item img {
+  width: 100%;
+  filter: hue-rotate(310deg) contrast(1.1);
+}
+.tool-item.selected,
+.paper-piece.selected {
+  transform: scale(1);
+}
+.tool-item.disabled {
+  pointer-events: none;
+  opacity: 1;
+  filter: grayscale(100%) brightness(0.8);
+}
+
+/* --- Paper Pieces --- */
+.paper-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25vw; /* Small gap to show the cut */
+}
+
+.paper-piece {
+  background-color: var(--paper-color);
+  background-image: url("../assets/paper.png");
+  background-blend-mode: overlay;
+  background-size: auto;
+  opacity: 1;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  filter: drop-shadow(0.2vw 0.2vw 0.1vw rgba(61, 61, 61, 0.322));
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+}
+.paper-piece:hover:not(.disabled) {
+  transform: scale(1);
+  filter: drop-shadow(0.1vw 0.1vw 0.1vw var(--highlight-glow));
+}
+
+.cut-line {
+  position: absolute;
+  background-color: #333;
+  z-index: 100;
+  transition: all 0.5s ease-out;
+}
+
+/* --- Color Palette --- */
+.color-palette-container {
+  position: relative;
+  background: rgba(255, 255, 255, 0.7);
+  padding: 1vh 1vw;
+  border-radius: 1vw;
+  display: flex;
+  gap: 1vw;
+  box-shadow: 0 0.5vw 1vw rgba(0, 0, 0, 0.1);
+}
+.color-swatch {
+  width: 5vw;
+  height: 4vw;
+  border-radius: 1vw;
+  cursor: pointer;
+  border: 0.2vw solid white;
+  box-shadow: 0 0.2vw 0.4vw rgba(0, 0, 0, 0.2);
+  transition: all 0.2s ease;
+  background-image: url(../assets/paper.png);
+  background-blend-mode: overlay;
+  background-size: auto;
+}
+.color-swatch:hover {
+  transform: scale(1.1);
+}
+.color-swatch.selected {
+  border-color: var(--highlight-glow);
+  transform: scale(1.2);
+}
+.color-swatch.disabled {
+  -webkit-user-select: none;
+  user-select: none;
+  pointer-events: none;
+}
+
+/* --- Fraction Display --- */
+.fraction-display-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1vh;
+  font-size: 2vw;
+  font-weight: 600;
+  color: var(--text-dark);
+  border-radius: 1vw;
+  width: 100%; /* Take full width of its container */
+}
+.fraction-part {
+  display: flex;
+  align-items: center;
+  gap: 2vw;
+  width: 100%;
+}
+.fraction-label {
+  flex-basis: 80%;
+  text-align: right;
+  font-weight: 400;
+  font-size: calc(0.25rem + 1.5vw);
+}
+.fraction-number-box {
+  flex-basis: 20%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 5vw;
+  height: 4vw;
+  font-size: 3.5vw;
+  border: 2px dashed #90a4ae;
+  border-radius: 0.5vw;
+}
+.fraction-number-box.filled {
+  border-style: solid;
+  border-color: transparent;
+}
+.fraction-line {
+  width: 30%;
+  height: 0.3vw;
+  background-color: var(--text-dark);
+  margin: 1vh 0;
+  border-radius: 1vw;
+  /* Aligns the line under the number box label */
+  transform: translateX(calc(((70% + 1vw) - 30%) / 2));
+}
+
+/********************************************
+ * 6) BUTTONS & CONTROLS
+ *********************************************/
+.btn {
+  padding: 1.2vh 3vw;
+  border: none;
+  border-radius: 3vw;
+  font-size: calc(0.5rem + 1.25vw);
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: white;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+}
+.btn:hover:not([disabled]) {
+  transform: translateY(-3px);
+  filter: brightness(1.05);
+}
+.btn-primary {
+  background: linear-gradient(145deg, var(--primary-accent), #f57c00);
+  box-shadow: 0 0.5vh 0px #bf360c;
+}
+.btn[disabled] {
+  cursor: not-allowed;
+  transform: none;
+  opacity: 0.5;
+  filter: grayscale(50%);
+}
+#start-button-container {
+  margin-top: 2vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  bottom: 8vh;
+  left: 42%;
+}
+.mcq-option-container {
+  display: flex;
+  gap: 1vw;
+  margin-top: 2vh;
+  justify-content: center;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+.mcq-btn {
+  font-size: calc(0.25rem + 1.25vw);
+  font-weight: 500;
+  padding: 1vh 2vw;
+  background: #4fc3f7;
+  box-shadow: 0 0.4vh 0px #0277bd;
+}
+.mcq-btn.correct {
+  background: var(--secondary-accent);
+  box-shadow: 0 0.4vh 0px var(--secondary-shadow);
+}
+.mcq-btn.incorrect {
+  background: #e57373; /* Red 300 */
+  box-shadow: 0 0.4vh 0px #c62828; /* Red 800 */
+  animation: shake 0.5s ease-in-out;
+}
+
+/********************************************
+ * 7) FTUE & ANIMATIONS
+ *********************************************/
+@keyframes shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-8px);
+  }
+  50% {
+    transform: translateX(8px);
+  }
+  75% {
+    transform: translateX(-8px);
+  }
+}
+
+#hand-ftue {
+  position: fixed;
+  width: 5vw;
+  height: auto;
+  z-index: 10000;
+  pointer-events: none;
+  opacity: 0;
+  display: none;
+  transform: translate(-30%, -20%);
+  transition: top 0.3s ease, left 0.3s ease, opacity 0.3s;
+}
+#hand-ftue img {
+  width: 100%;
+}
+.hand-animating {
+  display: block !important;
+  animation: hand-tap-animation 1.5s ease-in-out infinite;
+}
+@keyframes hand-tap-animation {
+  0%,
+  100% {
+    opacity: 0;
+    transform: translate(-30%, -20%) scale(1.1);
+  }
+  20%,
+  80% {
+    opacity: 1;
+    transform: translate(-30%, -20%) scale(1.1);
+  }
+  50% {
+    transform: translate(-30%, -20%) scale(0.95);
+  }
+}
+
+/********************************************
+ * 8) FINAL PHASE LAYOUT
+ *********************************************/
+
+/* When this class is active, layout switches to top-down */
+.final-phase-layout .main-layout {
+  flex-direction: column;
+  gap: 0.5vw;
+}
+
+/* Top bar containing character and context */
+.final-phase-layout .left-panel-anchor {
+  width: 100%;
+  height: 25%;
+  max-width: 100%;
+  flex-direction: row-reverse;
+  align-items: center;
+  justify-content: flex-start;
+  flex-basis: 15%;
+  gap: 1.5vw;
+}
+
+/* Character head is now on the left of the top bar */
+.final-phase-layout .character-display {
+  height: 100%;
+  width: auto;
+  flex-basis: 7%;
+  align-items: center;
+  justify-content: flex-end;
+}
+.final-phase-layout #characterImageElement {
+  height: 90%; 
+}
+
+/* Speech bubble takes the rest of the top bar */
+.final-phase-layout .speech-bubble-container {
+  flex: 1;
+  max-height: 100%;
+  height: 100%;
+}
+.final-phase-layout .contextBox {
+  height: 100%;
+}
+.final-phase-layout .contextBox::after {
+  display: none; /* No tail needed in this layout */
+}
+
+/* The right panel becomes the bottom panel, taking remaining space */
+.final-phase-layout .right-panel-content {
+  width: 100%;
+  flex: 1; /* Fills remaining vertical space */
+}
+
+/* Ensure the activity area inside is set up for two panes */
+.final-phase-layout #activity-area {
+  flex-direction: row;
+  justify-content: space-around;
+  gap: 1vw;
+}
+.final-phase-layout .workingArea-container {
+  background-image: none;
+  flex-direction: column;
+}
+
+.final-phase-layout .fraction-builder-area,
+.final-phase-layout .paper-display {
+  height: 100%;
+  width: 48%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.final-phase-layout #nextButton {
+  position: absolute;
+  bottom: 4vh;
+  left: 22%;
+}
+
+/* FIX: Ensure builder area can stack its children (display + MCQs) */
+.final-phase-layout .fraction-builder-area {
+  flex-direction: column;
+  gap: 2vh;
+}
+.final-phase-layout .paper-piece {
+  border: 0.4vh var(--paper-color) solid;
+}
+/********************************************
+ * 9) FINAL FRACTION FORM STYLES
+ *********************************************/
+
+.fraction-display-area.final-form {
+  flex-direction: row;
+  gap: 2vw;
+  align-items: center;
+  justify-content: center;
+}
+
+.fraction-column {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5vh;
+}
+
+.fraction-column .fraction-label,
+.fraction-column .fraction-number-box {
+  text-align: center;
+  flex-basis: auto;
+  width: auto;
+}
+
+.fraction-column .fraction-line {
+  width: 100%;
+  min-width: 4vw;
+  height: 0.3vw;
+  background: var(--text-dark);
+  border-radius: 1vw;
+  margin: 0.5vh 0;
+  transform: none; 
+}
+
+.equals-sign {
+  font-size: 4vw;
+  color: var(--text-dark);
+  font-weight: bold;
+}
+
+.vertical-fraction {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: inherit;
+  margin: 0 0.5vw;
+  vertical-align: middle;
+  font-weight: bold;
+}
+.vertical-fraction::before {
+  content: attr(data-numerator);
+  border-bottom: 2px solid currentColor;
+  padding-bottom: 0.25vw;
+  line-height: 1;
+}
+.vertical-fraction::after {
+  content: attr(data-denominator);
+  padding-top: 0.25vw;
+  line-height: 1;
+}
