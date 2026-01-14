@@ -7,9 +7,11 @@ interface VoiceInteractionProps {
   voiceState: VoiceState;
   message: string;
   onStart?: () => void;
+  onPTTStart?: () => void;
+  onPTTEnd?: () => void;
 }
 
-export function VoiceInteraction({ voiceState, message, onStart }: VoiceInteractionProps) {
+export function VoiceInteraction({ voiceState, message, onStart, onPTTStart, onPTTEnd }: VoiceInteractionProps) {
   // Auto-start the interaction when component mounts
   useEffect(() => {
     if (onStart && voiceState === 'IDLE') {
@@ -52,12 +54,36 @@ export function VoiceInteraction({ voiceState, message, onStart }: VoiceInteract
           </div>
         )}
 
-        {voiceState === 'STUDENT_RECORDING' && (
-          <div className={styles.recordingIndicator}>
-            <div className={styles.recordingDot} />
-            <div className={styles.recordingDot} />
-            <div className={styles.recordingDot} />
-          </div>
+        {/* PTT Button - shown when waiting for student or recording */}
+        {(voiceState === 'WAITING_FOR_STUDENT' || voiceState === 'STUDENT_RECORDING') && (
+          <button
+            className={`${styles.pttButton} ${voiceState === 'STUDENT_RECORDING' ? styles.pttActive : ''}`}
+            onMouseDown={onPTTStart}
+            onMouseUp={onPTTEnd}
+            onMouseLeave={onPTTEnd}
+            onTouchStart={(e) => {
+              e.preventDefault();
+              onPTTStart?.();
+            }}
+            onTouchEnd={(e) => {
+              e.preventDefault();
+              onPTTEnd?.();
+            }}
+          >
+            <span className={styles.pttIcon}>🎤</span>
+            <span className={styles.pttText}>
+              {voiceState === 'STUDENT_RECORDING' ? 'Listening...' : 'Hold to Talk'}
+            </span>
+            {voiceState === 'STUDENT_RECORDING' && (
+              <div className={styles.waveformContainer}>
+                <div className={styles.waveformBar} />
+                <div className={styles.waveformBar} />
+                <div className={styles.waveformBar} />
+                <div className={styles.waveformBar} />
+                <div className={styles.waveformBar} />
+              </div>
+            )}
+          </button>
         )}
       </div>
     </div>

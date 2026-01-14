@@ -24,6 +24,12 @@ interface SessionState {
   // Conversation history per challenge
   conversationHistory: Record<string, Message[]>;
   addMessage: (challengeId: string, message: Message) => void;
+  getConversationHistory: (challengeId: string) => Message[];
+
+  // Turn tracking for multi-turn conversations
+  currentTurn: number;
+  resetTurn: () => void;
+  incrementTurn: () => void;
 
   // Error handling
   lastError: string | null;
@@ -72,6 +78,12 @@ export const useSessionStore = create<SessionState>((set, get) => ({
       [challengeId]: [...(state.conversationHistory[challengeId] || []), message]
     }
   })),
+  getConversationHistory: (challengeId) => get().conversationHistory[challengeId] || [],
+
+  // Turn tracking
+  currentTurn: 0,
+  resetTurn: () => set({ currentTurn: 0 }),
+  incrementTurn: () => set((state) => ({ currentTurn: state.currentTurn + 1 })),
 
   // Error handling
   lastError: null,
@@ -84,6 +96,7 @@ export const useSessionStore = create<SessionState>((set, get) => ({
     phase: 'GREETING',
     voiceState: 'IDLE',
     conversationHistory: {},
+    currentTurn: 0,
     lastError: null
   }),
   skipToChallenge: (index) => set({

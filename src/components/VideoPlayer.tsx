@@ -46,6 +46,15 @@ export function VideoPlayer({ src, onComplete }: VideoPlayerProps) {
     onComplete();
   };
 
+  const handleSkip = () => {
+    console.log('⏭️ Video: Skip button clicked');
+    const video = videoRef.current;
+    if (video) {
+      video.pause();
+    }
+    onComplete();
+  };
+
   return (
     <div className={styles.container}>
       {!isReady && (
@@ -63,6 +72,11 @@ export function VideoPlayer({ src, onComplete }: VideoPlayerProps) {
         controls={false}
         style={{ opacity: isReady ? 1 : 0 }}
       />
+      {isReady && (
+        <button className={styles.skipButton} onClick={handleSkip}>
+          Skip →
+        </button>
+      )}
     </div>
   );
 }

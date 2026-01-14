@@ -4,98 +4,297 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 24px;
+  padding: 20px;
+  position: relative;
 }
 
 .content {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 24px;
-  max-width: 400px;
+  gap: 20px;
+  max-width: 380px;
   text-align: center;
+  animation: slideUp 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
+/* Status bubble - playful pill shape */
 .statusBubble {
-  background: rgba(255, 255, 255, 0.15);
-  backdrop-filter: blur(10px);
-  padding: 12px 24px;
-  border-radius: 20px;
-  animation: fadeIn 0.3s ease-out;
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(12px);
+  padding: 10px 24px;
+  border-radius: 100px;
+  border: 2px solid rgba(255,255,255,0.3);
+  animation: fadeIn 0.4s ease-out;
 }
 
 .statusText {
-  font-size: 18px;
-  font-weight: 500;
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 600;
   color: #fff;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }
 
+/* Message bubble - speech bubble style */
 .messageBubble {
-  background: rgba(255, 255, 255, 0.95);
-  padding: 20px 28px;
-  border-radius: 20px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
-  animation: slideUp 0.4s ease-out;
+  position: relative;
+  background: #fff;
+  padding: 20px 24px;
+  border-radius: 24px;
+  box-shadow:
+    0 8px 0 rgba(0,0,0,0.08),
+    0 16px 40px rgba(0,0,0,0.15);
+  animation: popIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  max-width: 320px;
+}
+
+/* Speech bubble tail */
+.messageBubble::after {
+  content: '';
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 14px solid transparent;
+  border-right: 14px solid transparent;
+  border-bottom: 14px solid #fff;
 }
 
 .message {
-  font-size: 20px;
+  font-family: var(--font-body);
+  font-size: clamp(18px, 5vw, 22px);
   line-height: 1.5;
-  color: #1e1b4b;
+  color: var(--text-dark);
   margin: 0;
+  font-weight: 600;
 }
 
-.recordingIndicator {
+/* ===== PTT BUTTON - THE STAR OF THE SHOW ===== */
+
+.pttButton {
+  position: relative;
   display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   gap: 8px;
-  padding: 16px;
-}
-
-.recordingDot {
-  width: 12px;
-  height: 12px;
-  background: #ef4444;
+  width: clamp(160px, 45vw, 200px);
+  height: clamp(160px, 45vw, 200px);
   border-radius: 50%;
-  animation: pulse 0.6s ease-in-out infinite;
+  border: none;
+  background: linear-gradient(145deg, var(--mint) 0%, #10b981 100%);
+  box-shadow:
+    0 10px 0 #059669,
+    0 15px 30px rgba(16, 185, 129, 0.4),
+    inset 0 -10px 30px rgba(0,0,0,0.1),
+    inset 0 10px 30px rgba(255,255,255,0.2);
+  cursor: pointer;
+  transition: all 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
+  animation: breathe 2s ease-in-out infinite;
 }
 
-.recordingDot:nth-child(2) {
-  animation-delay: 0.2s;
+@keyframes breathe {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.03); }
 }
 
-.recordingDot:nth-child(3) {
-  animation-delay: 0.4s;
+/* Shiny highlight on button */
+.pttButton::before {
+  content: '';
+  position: absolute;
+  top: 12%;
+  left: 18%;
+  width: 35%;
+  height: 25%;
+  background: rgba(255,255,255,0.35);
+  border-radius: 50%;
+  transform: rotate(-30deg);
+  pointer-events: none;
 }
+
+/* Outer glow ring */
+.pttButton::after {
+  content: '';
+  position: absolute;
+  top: -8px;
+  left: -8px;
+  right: -8px;
+  bottom: -8px;
+  border-radius: 50%;
+  border: 3px dashed rgba(255,255,255,0.3);
+  animation: spin 15s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.pttButton:hover {
+  transform: scale(1.05);
+  box-shadow:
+    0 12px 0 #059669,
+    0 20px 40px rgba(16, 185, 129, 0.5),
+    inset 0 -10px 30px rgba(0,0,0,0.1),
+    inset 0 10px 30px rgba(255,255,255,0.2);
+}
+
+/* Active state - pressed down */
+.pttButton:active,
+.pttActive {
+  transform: scale(0.95) translateY(6px);
+  box-shadow:
+    0 4px 0 #059669,
+    0 8px 20px rgba(16, 185, 129, 0.4),
+    inset 0 -10px 30px rgba(0,0,0,0.15),
+    inset 0 10px 30px rgba(255,255,255,0.2);
+  animation: none;
+}
+
+.pttActive {
+  background: linear-gradient(145deg, var(--coral-light) 0%, var(--coral) 100%);
+  box-shadow:
+    0 4px 0 var(--coral-dark),
+    0 8px 20px rgba(255, 107, 107, 0.4),
+    inset 0 -10px 30px rgba(0,0,0,0.15),
+    inset 0 10px 30px rgba(255,255,255,0.2);
+}
+
+.pttActive::after {
+  border-color: rgba(255,255,255,0.5);
+  animation: spin 3s linear infinite;
+}
+
+.pttIcon {
+  font-size: clamp(48px, 12vw, 64px);
+  filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2));
+}
+
+.pttText {
+  font-family: var(--font-display);
+  font-size: clamp(14px, 4vw, 18px);
+  font-weight: 700;
+  color: #fff;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.pttActive .pttIcon {
+  animation: pulse 0.3s ease-in-out infinite;
+}
+
+/* Waveform inside PTT button when recording */
+.waveformContainer {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 5px;
+  height: 40px;
+  margin-top: 4px;
+}
+
+.waveformBar {
+  width: 8px;
+  background: rgba(255,255,255,0.9);
+  border-radius: 4px;
+  animation: wave 0.4s ease-in-out infinite alternate;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+.waveformBar:nth-child(1) { animation-delay: 0s; height: 16px; }
+.waveformBar:nth-child(2) { animation-delay: 0.08s; height: 28px; }
+.waveformBar:nth-child(3) { animation-delay: 0.16s; height: 36px; }
+.waveformBar:nth-child(4) { animation-delay: 0.24s; height: 28px; }
+.waveformBar:nth-child(5) { animation-delay: 0.32s; height: 16px; }
+
+/* Legacy elements - kept for compatibility */
+.speakPrompt {
+  display: none;
+}
+
+.micIcon {
+  font-size: 32px;
+}
+
+.speakText {
+  font-size: 16px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+/* ===== KEYFRAMES ===== */
 
 @keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes slideUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes popIn {
+  from { opacity: 0; transform: scale(0.8) translateY(20px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
 }
 
 @keyframes pulse {
-  0%, 100% {
-    transform: scale(1);
-    opacity: 1;
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.15); }
+}
+
+@keyframes wave {
+  from { transform: scaleY(0.5); }
+  to { transform: scaleY(1.3); }
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+@keyframes pttPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.4); }
+  50% { box-shadow: 0 0 0 20px rgba(76, 175, 80, 0); }
+}
+
+/* Responsive */
+@media (max-width: 380px) {
+  .content {
+    gap: 16px;
   }
-  50% {
-    transform: scale(1.2);
-    opacity: 0.7;
+
+  .messageBubble {
+    padding: 16px 20px;
+  }
+
+  .pttButton {
+    width: 150px;
+    height: 150px;
+  }
+}
+
+/* Landscape mode adjustments */
+@media (max-height: 500px) {
+  .content {
+    gap: 12px;
+  }
+
+  .pttButton {
+    width: 120px;
+    height: 120px;
+  }
+
+  .pttIcon {
+    font-size: 40px;
+  }
+
+  .pttText {
+    font-size: 12px;
   }
 }

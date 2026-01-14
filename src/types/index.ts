@@ -13,6 +13,15 @@ export type VoiceState =
   | 'PROCESSING'
   | 'ERROR';
 
+// Socratic scaffolding for turn-aware teaching
+export interface Scaffolding {
+  probe1: string;      // Turn 1: Probing question
+  probe2: string;      // Turn 2: Different probe angle
+  hint: string;        // Turn 3: Directional hint
+  scaffold: string;    // Turn 4: Strong scaffold (fill-in-blank)
+  reveal: string;      // Turn 5: Warm answer reveal
+}
+
 export interface Challenge {
   id: string;
   number: number;
@@ -23,6 +32,16 @@ export interface Challenge {
   preScript: string;
   postQuestion: string;
   contextInfo: string;
+  // Iteration 2: Multi-turn conversation support
+  correctnessFilter: string;
+  scaffolding: Scaffolding;
+  maxTurns: number;
+}
+
+export interface EvaluationResult {
+  response: string;
+  isCorrect: boolean;
+  shouldEnd: boolean;
 }
 
 export interface Message {
@@ -52,6 +71,12 @@ export interface SessionState {
   // Conversation history per challenge
   conversationHistory: Record<string, Message[]>;
   addMessage: (challengeId: string, message: Message) => void;
+  getConversationHistory: (challengeId: string) => Message[];
+
+  // Turn tracking for multi-turn conversations
+  currentTurn: number;
+  resetTurn: () => void;
+  incrementTurn: () => void;
 
   // Error handling
   lastError: string | null;

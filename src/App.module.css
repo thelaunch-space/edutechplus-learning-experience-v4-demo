@@ -1,50 +1,126 @@
+/* ===== APP LAYOUT - CANDY LAND CONTAINER ===== */
+
 .container {
   width: 100%;
   height: 100%;
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  position: relative;
 }
 
+/* Header with playful glass effect */
 .header {
-  padding: 12px 16px;
-  background: rgba(0, 0, 0, 0.2);
+  padding: 10px 16px;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(12px);
+  border-bottom: 2px solid rgba(255, 255, 255, 0.15);
   flex-shrink: 0;
+  position: relative;
+  z-index: 10;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
 }
 
+/* Subtle shimmer on header */
+.header::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.4),
+    transparent
+  );
+  animation: headerShimmer 3s ease-in-out infinite;
+}
+
+@keyframes headerShimmer {
+  0%, 100% { opacity: 0.3; transform: translateX(-100%); }
+  50% { opacity: 1; transform: translateX(100%); }
+}
+
+/* Main content area */
 .main {
   flex: 1;
   display: flex;
   flex-direction: column;
   overflow: hidden;
   position: relative;
+  z-index: 1;
 }
 
-/* Debug panel */
+/* ===== DEBUG PANEL - DEVELOPER MODE ===== */
 .debug {
   position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
-  background: rgba(0, 0, 0, 0.9);
-  padding: 8px 12px;
+  background: rgba(0, 0, 0, 0.95);
+  backdrop-filter: blur(10px);
+  padding: 10px 16px;
   display: flex;
   gap: 12px;
   align-items: center;
   flex-wrap: wrap;
-  font-size: 12px;
-  color: #fff;
+  font-family: 'SF Mono', Monaco, 'Courier New', monospace;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.8);
   z-index: 1000;
+  border-top: 2px solid rgba(168, 85, 247, 0.4);
+}
+
+.debug::before {
+  content: '🛠️';
+  font-size: 14px;
 }
 
 .debug button {
-  padding: 4px 8px;
-  font-size: 11px;
-  background: #6366f1;
+  padding: 6px 12px;
+  font-family: var(--font-display);
+  font-size: 12px;
+  font-weight: 600;
+  background: linear-gradient(135deg, var(--purple) 0%, #8B5CF6 100%);
   color: #fff;
-  border-radius: 4px;
+  border-radius: 100px;
+  box-shadow: 0 2px 0 #7C3AED;
+  transition: all 0.15s ease;
 }
 
 .debug button:hover {
-  background: #818cf8;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 0 #7C3AED;
+  background: linear-gradient(135deg, #9333EA 0%, #A855F7 100%);
+}
+
+.debug button:active {
+  transform: translateY(1px);
+  box-shadow: 0 1px 0 #7C3AED;
+}
+
+/* Responsive adjustments */
+@media (max-width: 380px) {
+  .header {
+    padding: 8px 12px;
+  }
+
+  .debug {
+    padding: 8px 12px;
+    gap: 8px;
+  }
+
+  .debug button {
+    padding: 5px 10px;
+    font-size: 11px;
+  }
+}
+
+/* Landscape mode */
+@media (max-height: 500px) {
+  .header {
+    padding: 6px 12px;
+  }
 }

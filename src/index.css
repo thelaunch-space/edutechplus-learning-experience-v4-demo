@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800&display=swap');
+
 * {
   margin: 0;
   padding: 0;
@@ -5,15 +7,38 @@
 }
 
 :root {
-  --primary: #6366f1;
-  --primary-light: #818cf8;
-  --secondary: #f59e0b;
-  --success: #10b981;
-  --danger: #ef4444;
-  --bg-dark: #1e1b4b;
-  --bg-card: #312e81;
-  --text-light: #ffffff;
-  --text-muted: #c7d2fe;
+  /* Playful Candy-Land Palette */
+  --coral: #FF6B6B;
+  --coral-light: #FF8E8E;
+  --coral-dark: #E85555;
+  --sunshine: #FFE66D;
+  --sunshine-light: #FFF0A3;
+  --teal: #4ECDC4;
+  --teal-light: #7EDED7;
+  --teal-dark: #3DBDB5;
+  --purple: #A855F7;
+  --purple-light: #C084FC;
+  --pink: #F472B6;
+  --sky: #38BDF8;
+  --mint: #34D399;
+
+  /* Backgrounds */
+  --bg-primary: #FFF5F5;
+  --bg-gradient-start: #667eea;
+  --bg-gradient-end: #764ba2;
+
+  /* Text */
+  --text-dark: #2D1B4E;
+  --text-medium: #5B4478;
+  --text-light: #FFFFFF;
+
+  /* Shadows */
+  --shadow-playful: 0 8px 0 rgba(0,0,0,0.1);
+  --shadow-float: 0 10px 40px rgba(0,0,0,0.15);
+
+  /* Fonts */
+  --font-display: 'Fredoka', 'Comic Sans MS', cursive;
+  --font-body: 'Nunito', 'Arial Rounded MT Bold', sans-serif;
 }
 
 html, body, #root {
@@ -23,19 +48,66 @@ html, body, #root {
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-  background: linear-gradient(135deg, var(--bg-dark) 0%, #312e81 100%);
+  font-family: var(--font-body);
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
   color: var(--text-light);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  position: relative;
+}
+
+/* Floating background shapes */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image:
+    radial-gradient(circle at 10% 20%, rgba(255,255,255,0.1) 0%, transparent 20%),
+    radial-gradient(circle at 90% 80%, rgba(255,255,255,0.08) 0%, transparent 25%),
+    radial-gradient(circle at 50% 50%, rgba(255,255,255,0.05) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Animated floating bubbles */
+body::after {
+  content: '✨ 🌟 ⭐ 💫 ✨ 🌟 ⭐';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  font-size: 24px;
+  opacity: 0.15;
+  pointer-events: none;
+  z-index: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  align-content: space-around;
+  padding: 20px;
+  animation: twinkle 3s ease-in-out infinite;
+}
+
+@keyframes twinkle {
+  0%, 100% { opacity: 0.1; }
+  50% { opacity: 0.2; }
 }
 
 button {
-  font-family: inherit;
+  font-family: var(--font-display);
   cursor: pointer;
   border: none;
   outline: none;
   -webkit-tap-highlight-color: transparent;
+  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+button:active {
+  transform: scale(0.95) !important;
 }
 
 /* Disable text selection on mobile */
@@ -46,24 +118,64 @@ button {
 
 /* Large touch targets */
 .touch-target {
-  min-height: 44px;
-  min-width: 44px;
+  min-height: 48px;
+  min-width: 48px;
 }
 
-/* Animations */
-@keyframes pulse {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.05); }
+/* ===== PLAYFUL ANIMATIONS ===== */
+
+@keyframes float {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  25% { transform: translateY(-10px) rotate(2deg); }
+  75% { transform: translateY(5px) rotate(-2deg); }
+}
+
+@keyframes wiggle {
+  0%, 100% { transform: rotate(-3deg); }
+  50% { transform: rotate(3deg); }
+}
+
+@keyframes pop {
+  0% { transform: scale(0); opacity: 0; }
+  50% { transform: scale(1.2); }
+  100% { transform: scale(1); opacity: 1; }
 }
 
 @keyframes bounce {
   0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
+  50% { transform: translateY(-15px); }
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.08); }
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px) rotate(-5deg); }
+  75% { transform: translateX(5px) rotate(5deg); }
+}
+
+@keyframes rainbow {
+  0% { filter: hue-rotate(0deg); }
+  100% { filter: hue-rotate(360deg); }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 @keyframes spin {
@@ -71,18 +183,18 @@ button {
   to { transform: rotate(360deg); }
 }
 
-.animate-pulse {
-  animation: pulse 2s ease-in-out infinite;
+@keyframes jelly {
+  0%, 100% { transform: scale(1, 1); }
+  25% { transform: scale(0.95, 1.05); }
+  50% { transform: scale(1.05, 0.95); }
+  75% { transform: scale(0.98, 1.02); }
 }
 
-.animate-bounce {
-  animation: bounce 1s ease-in-out infinite;
-}
-
-.animate-fade-in {
-  animation: fadeIn 0.3s ease-out;
-}
-
-.animate-spin {
-  animation: spin 1s linear infinite;
-}
+.animate-float { animation: float 3s ease-in-out infinite; }
+.animate-wiggle { animation: wiggle 0.5s ease-in-out infinite; }
+.animate-pop { animation: pop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
+.animate-bounce { animation: bounce 1s ease-in-out infinite; }
+.animate-pulse { animation: pulse 2s ease-in-out infinite; }
+.animate-shake { animation: shake 0.5s ease-in-out; }
+.animate-spin { animation: spin 1s linear infinite; }
+.animate-jelly { animation: jelly 0.6s ease-in-out; }

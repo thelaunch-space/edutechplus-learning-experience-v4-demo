@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { useSessionStore } from './store/sessionStore';
 import { useVoiceInteraction } from './hooks/useVoiceInteraction';
+import { useMicrophone } from './hooks/useMicrophone';
 import { WelcomeScreen } from './components/WelcomeScreen';
 import { VoiceInteraction } from './components/VoiceInteraction';
 import { VideoPlayer } from './components/VideoPlayer';
@@ -23,10 +24,15 @@ function App() {
   const {
     voiceState,
     lastResponse,
+    displayedText,
     runGreetingInteraction,
     runPreChallengeInteraction,
     runPostChallengeInteraction,
+    handlePTTStart,
+    handlePTTEnd,
   } = useVoiceInteraction();
+
+  const { requestPermission } = useMicrophone();
 
   const [isWelcome, setIsWelcome] = useState(true);
 
@@ -38,7 +44,10 @@ function App() {
   const challenge = getCurrentChallenge();
 
   // Handle welcome screen start
-  const handleStart = () => {
+  const handleStart = async () => {
+    // Request mic permission upfront
+    console.log('🎤 App: Requesting microphone permission...');
+    await requestPermission();
     setIsWelcome(false);
     setPhase('GREETING');
   };
@@ -119,7 +128,9 @@ function App() {
         {(phase === 'GREETING' || phase === 'PRE_CHALLENGE' || phase === 'POST_CHALLENGE') && (
           <VoiceInteraction
             voiceState={voiceState}
-            message={lastResponse}
+            message={displayedText || lastResponse}
+            onPTTStart={handlePTTStart}
+            onPTTEnd={handlePTTEnd}
           />
         )}
 

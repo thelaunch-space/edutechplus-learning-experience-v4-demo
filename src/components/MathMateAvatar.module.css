@@ -3,21 +3,51 @@
   flex-direction: column;
   align-items: center;
   gap: 12px;
+  animation: pop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .face {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  background: linear-gradient(145deg, var(--sunshine) 0%, var(--coral) 100%);
   border-radius: 50%;
-  box-shadow: 0 8px 32px rgba(99, 102, 241, 0.4);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  box-shadow:
+    0 8px 0 rgba(0,0,0,0.15),
+    0 12px 40px rgba(255, 107, 107, 0.3),
+    inset 0 -8px 20px rgba(0,0,0,0.1),
+    inset 0 8px 20px rgba(255,255,255,0.3);
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Cute highlight on face */
+.face::before {
+  content: '';
+  position: absolute;
+  top: 15%;
+  left: 20%;
+  width: 25%;
+  height: 20%;
+  background: rgba(255,255,255,0.4);
+  border-radius: 50%;
+  transform: rotate(-30deg);
+}
+
+/* Cheek blush */
+.face::after {
+  content: '';
+  position: absolute;
+  bottom: 30%;
+  width: 90%;
+  height: 15%;
+  background: radial-gradient(ellipse, rgba(255,150,150,0.3) 0%, transparent 70%);
+  pointer-events: none;
 }
 
 .small .face {
-  width: 60px;
-  height: 60px;
+  width: 64px;
+  height: 64px;
 }
 
 .medium .face {
@@ -32,6 +62,8 @@
 
 .emoji {
   user-select: none;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+  z-index: 1;
 }
 
 .small .emoji {
@@ -47,57 +79,105 @@
 }
 
 .name {
-  font-size: 16px;
+  font-family: var(--font-display);
+  font-size: 18px;
   font-weight: 600;
   color: #fff;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  background: linear-gradient(135deg, var(--teal) 0%, var(--teal-dark) 100%);
+  padding: 6px 16px;
+  border-radius: 100px;
+  box-shadow: 0 4px 0 rgba(0,0,0,0.15);
 }
 
-/* States */
+/* ===== AVATAR STATES ===== */
+
+/* Speaking - happy bouncing */
 .speaking .face {
-  animation: pulse 0.5s ease-in-out infinite;
+  background: linear-gradient(145deg, var(--teal-light) 0%, var(--teal) 100%);
+  box-shadow:
+    0 8px 0 var(--teal-dark),
+    0 12px 40px rgba(78, 205, 196, 0.4),
+    inset 0 -8px 20px rgba(0,0,0,0.1),
+    inset 0 8px 20px rgba(255,255,255,0.3);
+  animation: speak 0.3s ease-in-out infinite;
 }
 
+@keyframes speak {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+/* Listening - attentive bounce */
 .listening .face {
-  animation: bounce 0.6s ease-in-out infinite;
-  background: linear-gradient(135deg, #10b981 0%, #34d399 100%);
-  box-shadow: 0 8px 32px rgba(16, 185, 129, 0.4);
+  background: linear-gradient(145deg, var(--mint) 0%, #10b981 100%);
+  box-shadow:
+    0 8px 0 #059669,
+    0 12px 40px rgba(52, 211, 153, 0.4),
+    inset 0 -8px 20px rgba(0,0,0,0.1),
+    inset 0 8px 20px rgba(255,255,255,0.3);
+  animation: listen 0.6s ease-in-out infinite;
 }
 
+@keyframes listen {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  25% { transform: translateY(-5px) rotate(-3deg); }
+  75% { transform: translateY(-5px) rotate(3deg); }
+}
+
+/* Thinking - gentle wobble */
 .thinking .face {
-  animation: spin 2s linear infinite;
-  background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%);
-  box-shadow: 0 8px 32px rgba(245, 158, 11, 0.4);
+  background: linear-gradient(145deg, var(--sunshine-light) 0%, var(--sunshine) 100%);
+  box-shadow:
+    0 8px 0 #E5B800,
+    0 12px 40px rgba(255, 230, 109, 0.4),
+    inset 0 -8px 20px rgba(0,0,0,0.1),
+    inset 0 8px 20px rgba(255,255,255,0.3);
+  animation: think 1.5s ease-in-out infinite;
 }
 
+@keyframes think {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(-5deg); }
+  75% { transform: rotate(5deg); }
+}
+
+/* Error - worried shake */
 .error .face {
-  background: linear-gradient(135deg, #ef4444 0%, #f87171 100%);
-  box-shadow: 0 8px 32px rgba(239, 68, 68, 0.4);
+  background: linear-gradient(145deg, var(--coral-light) 0%, var(--coral) 100%);
+  box-shadow:
+    0 8px 0 var(--coral-dark),
+    0 12px 40px rgba(255, 107, 107, 0.4),
+    inset 0 -8px 20px rgba(0,0,0,0.1),
+    inset 0 8px 20px rgba(255,255,255,0.3);
+  animation: error 0.5s ease-in-out;
+}
+
+@keyframes error {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-5px); }
+  40%, 80% { transform: translateX(5px); }
+}
+
+/* ===== KEYFRAMES ===== */
+
+@keyframes pop {
+  0% { transform: scale(0); opacity: 0; }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); opacity: 1; }
 }
 
 @keyframes pulse {
-  0%, 100% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.1);
-  }
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
 }
 
 @keyframes bounce {
-  0%, 100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-8px);
-  }
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
 }
 
-@keyframes spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+@keyframes gentlePulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.03); opacity: 0.9; }
 }
