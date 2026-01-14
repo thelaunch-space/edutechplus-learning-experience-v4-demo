@@ -1,5 +1,7 @@
 # Implementation Plan: Iteration 2
 
+> **Status: COMPLETE** - All features implemented and merged to main.
+
 **Goal:** Transform single-turn "traffic controller" into multi-turn "tutor" with depth of conversation.
 
 ---

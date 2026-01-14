@@ -8,9 +8,10 @@ EdutechPlus B2G math content (videos + applets) needs engagement layer for B2C m
 
 **Math Mate** - AI voice companion that guides students through 7 learning challenges with:
 - Two-way voice interaction at content transitions
-- Multi-turn teaching conversations (not just single-turn acknowledgments)
-- Correctness evaluation with follow-up teaching if wrong
-- Graceful fallbacks for silence or errors
+- Multi-turn Socratic teaching conversations
+- Correctness evaluation with scaffolded follow-up if wrong
+- Hold-to-talk (PTT) for natural conversation flow
+- Playful, kid-friendly UI designed for grade 4 students
 
 Inspired by Synthesis AI's scripted lessons, but with actual LLM-powered teaching intelligence.
 
@@ -20,23 +21,22 @@ Inspired by Synthesis AI's scripted lessons, but with actual LLM-powered teachin
 
 **Iteration 1 (Complete):** Single-turn voice interaction, auto-progression. Worked, but felt like a traffic controller, not a tutor.
 
-**Iteration 2 (In Progress):** Multi-turn conversations with depth. See `IMPLEMENTATION-PLAN-ITERATION-2.md` for full plan.
+**Iteration 2 (Complete):** Multi-turn conversations with Socratic teaching depth.
 
-Key changes for Iteration 2:
-- Tap-to-speak (replaces 5-sec auto-recording)
-- Multi-turn: Greeting 3-4 turns, Post-asset 5-6 turns
-- Streaming STT/LLM/TTS for <1s latency
-- LLM returns structured JSON: `{ response, isCorrect, shouldEnd }`
-- Visual feedback: waveform + mascot animations
-- Skip buttons on content assets
+Key features implemented:
+- **Hold-to-Talk (PTT):** Press and hold to speak, release to send - like a walkie-talkie
+- **Socratic Scaffolding:** Turn-aware teaching with probing questions, hints, and scaffolds
+- **Structured LLM Response:** Returns `{ response, isCorrect, shouldEnd }` for conversation control
+- **Conversation History:** Context preserved across turns for coherent dialogue
+- **Playful UI:** Candy-Land theme with Fredoka + Nunito fonts, bouncy animations
 
 ---
 
 ## Tech Stack
 
-- **Frontend:** React + Vite, Zustand
-- **STT:** Deepgram (WebSocket streaming)
-- **LLM:** OpenRouter GPT-4.1-nano
+- **Frontend:** React 18 + Vite + TypeScript, Zustand state management
+- **STT:** Deepgram Nova-2
+- **LLM:** OpenRouter GPT-4.1-nano (with JSON response format)
 - **TTS:** Deepgram Aura (`aura-asteria-en`)
 
 ---
@@ -45,31 +45,78 @@ Key changes for Iteration 2:
 
 | Purpose | Location |
 |---------|----------|
-| Iteration 2 plan | `IMPLEMENTATION-PLAN-ITERATION-2.md` |
-| Iteration 1 feedback | `feedback/feedback-iteration-1.md` |
-| Challenge definitions | `src/config/challenges.ts` |
-| LLM prompts | `src/config/prompts.ts` |
-| Voice interaction logic | `src/hooks/useVoiceInteraction.ts` |
-| Session state | `src/store/sessionStore.ts` |
+| Challenge definitions + scaffolding | `src/config/challenges.ts` |
+| LLM prompts (Socratic evaluation) | `src/config/prompts.ts` |
+| Voice interaction + PTT logic | `src/hooks/useVoiceInteraction.ts` |
+| OpenRouter service | `src/services/openrouter.ts` |
+| Session state + conversation history | `src/store/sessionStore.ts` |
+| Type definitions | `src/types/index.ts` |
+
+### UI Components (CSS Modules)
+
+| Component | Style |
+|-----------|-------|
+| Global theme | `src/index.css` |
+| Welcome screen | `src/components/WelcomeScreen.module.css` |
+| Math Mate avatar | `src/components/MathMateAvatar.module.css` |
+| Voice interaction + PTT | `src/components/VoiceInteraction.module.css` |
+| Progress bar | `src/components/ProgressBar.module.css` |
+| Completion screen | `src/components/CompletionScreen.module.css` |
 
 ---
 
-## Bugs Fixed (Iteration 1)
+## Conversation Flow
 
-### Duplicate Greeting
-**Issue:** Math Mate said greeting twice.
-**Cause:** Challenge #1's `preScript` was hardcoded to greeting text.
-**Fix:** Updated `src/config/challenges.ts` with proper intro for each challenge.
+### Greeting Phase
+1. Math Mate introduces itself, asks student's name
+2. Student responds via PTT
+3. Personalized welcome, transition to first challenge
 
-### App Stuck After Post-Challenge
-**Issue:** App didn't advance after post-challenge response.
-**Cause:** Atomic state update in `goToNextChallenge()` wasn't triggering React effects.
-**Fix:** Separated concerns - function returns boolean, explicit phase setting in hook.
+### Per-Challenge Flow
+1. **PRE_CHALLENGE:** Math Mate introduces the content
+2. **IN_CHALLENGE:** Student watches video or uses applet (skip button available)
+3. **POST_CHALLENGE:** Multi-turn Socratic conversation
+   - Math Mate asks comprehension question
+   - Student responds via PTT
+   - If correct: celebrate and advance
+   - If wrong: scaffolded teaching (probe → hint → scaffold → reveal)
+   - Max 5 turns per challenge
 
-### Premature "Challenge Done" in Greeting
-**Issue:** Greeting said "Challenge 1 done!" before any challenge completed.
-**Cause:** System prompt rule applied to all LLM calls including greeting.
-**Fix:** Created separate `GREETING_SYSTEM_PROMPT` without the challenge-done rule.
+### Socratic Scaffolding (per turn)
+| Turn | Strategy | Example |
+|------|----------|---------|
+| 1 | Probe | "Hmm, what do you think the top number shows?" |
+| 2 | Different angle | "Think about counting pieces - which number tells how many you have?" |
+| 3 | Hint | "The top number starts with 'N' and means 'number of parts'..." |
+| 4 | Strong scaffold | "The top number is the _____ator. Can you fill in the blank?" |
+| 5 | Warm reveal | "It's called the numerator! It counts our pieces." |
+
+---
+
+## Running the App
+
+```bash
+npm install
+npm run dev
+```
+
+Requires environment variables:
+- `VITE_DEEPGRAM_API_KEY`
+- `VITE_OPENROUTER_API_KEY`
+
+---
+
+## Historical Notes
+
+### Bugs Fixed (Iteration 1)
+- Duplicate greeting (preScript issue)
+- App stuck after post-challenge (state update timing)
+- Premature "Challenge done" (greeting prompt leak)
+
+### Bugs Fixed (Iteration 2)
+- LLM returning plain text instead of JSON (added `response_format`)
+- Conversation not recognizing correct answers (added client-side backup check)
+- Awkward 5-second recording wait (replaced with PTT)
 
 ---
 
