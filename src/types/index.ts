@@ -27,6 +27,7 @@ export interface Challenge {
   number: number;
   type: 'video' | 'applet';
   path: string;
+  youtubeId?: string;  // For video type challenges (YouTube embed)
   title: string;
   duration: string;
   preScript: string;

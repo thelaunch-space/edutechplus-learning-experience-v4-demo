@@ -5,6 +5,7 @@ import { useMicrophone } from './hooks/useMicrophone';
 import { WelcomeScreen } from './components/WelcomeScreen';
 import { VoiceInteraction } from './components/VoiceInteraction';
 import { VideoPlayer } from './components/VideoPlayer';
+import { YouTubePlayer } from './components/YouTubePlayer';
 import { AppletContainer } from './components/AppletContainer';
 import { ProgressBar } from './components/ProgressBar';
 import { CompletionScreen } from './components/CompletionScreen';
@@ -138,10 +139,17 @@ function App() {
         {phase === 'IN_CHALLENGE' && challenge && (
           <>
             {challenge.type === 'video' ? (
-              <VideoPlayer
-                src={challenge.path}
-                onComplete={handleChallengeComplete}
-              />
+              challenge.youtubeId ? (
+                <YouTubePlayer
+                  videoId={challenge.youtubeId}
+                  onComplete={handleChallengeComplete}
+                />
+              ) : (
+                <VideoPlayer
+                  src={challenge.path}
+                  onComplete={handleChallengeComplete}
+                />
+              )
             ) : (
               <AppletContainer
                 src={challenge.path}
@@ -152,17 +160,6 @@ function App() {
         )}
       </main>
 
-      {/* Debug panel (hidden in production) */}
-      {import.meta.env.DEV && (
-        <div className={styles.debug}>
-          <span>Phase: {phase}</span>
-          <span>Challenge: {currentChallengeIndex + 1}/{challenges.length}</span>
-          <span>Voice: {voiceState}</span>
-          <button onClick={() => setPhase('PRE_CHALLENGE')}>Skip Voice</button>
-          <button onClick={() => setPhase('IN_CHALLENGE')}>Skip to Content</button>
-          <button onClick={handleRestart}>Reset</button>
-        </div>
-      )}
     </div>
   );
 }
