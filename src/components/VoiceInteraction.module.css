@@ -4,7 +4,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 20px;
+  padding: clamp(12px, 4vw, 20px);
   position: relative;
 }
 
@@ -13,7 +13,8 @@
   flex-direction: column;
   align-items: center;
   gap: 20px;
-  max-width: 380px;
+  max-width: min(380px, calc(100vw - 32px));
+  width: 100%;
   text-align: center;
   animation: slideUp 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
@@ -46,7 +47,7 @@
     0 8px 0 rgba(0,0,0,0.08),
     0 16px 40px rgba(0,0,0,0.15);
   animation: popIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-  max-width: 320px;
+  max-width: min(320px, calc(100vw - 48px));
 }
 
 /* Speech bubble tail */
@@ -70,6 +71,8 @@
   color: var(--text-dark);
   margin: 0;
   font-weight: 600;
+  word-break: break-word;
+  overflow-wrap: break-word;
 }
 
 /* ===== PTT BUTTON - THE STAR OF THE SHOW ===== */
@@ -276,6 +279,26 @@
   .pttButton {
     width: 150px;
     height: 150px;
+  }
+}
+
+/* Ultra-narrow screens (iPhone SE, old Android) */
+@media (max-width: 320px) {
+  .pttButton {
+    width: 130px;
+    height: 130px;
+  }
+
+  .messageBubble {
+    padding: 12px 16px;
+  }
+
+  .pttIcon {
+    font-size: 40px;
+  }
+
+  .pttText {
+    font-size: 12px;
   }
 }
 

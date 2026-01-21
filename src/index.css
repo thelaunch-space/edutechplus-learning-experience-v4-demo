@@ -39,12 +39,21 @@
   /* Fonts */
   --font-display: 'Fredoka', 'Comic Sans MS', cursive;
   --font-body: 'Nunito', 'Arial Rounded MT Bold', sans-serif;
+
+  /* Responsive spacing */
+  --spacing-xs: 8px;
+  --spacing-sm: 12px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --container-padding: var(--spacing-md);
+  --safe-area-inset-bottom: env(safe-area-inset-bottom, 0px);
 }
 
 html, body, #root {
   height: 100%;
   width: 100%;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 body {
