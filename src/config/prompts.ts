@@ -60,7 +60,7 @@ export const getEvaluationPrompt = (
 
 RESPOND WITH ONLY THIS JSON:
 {
-  "response": "Your response (max 20 words)",
+  "response": "Your response (max 30 words)",
   "isCorrect": true or false,
   "shouldEnd": true or false
 }
@@ -73,18 +73,24 @@ IF CORRECT:
 - Say "Great job, ${studentName}!" + brief praise
 - Set isCorrect=true, shouldEnd=true
 
-IF WRONG - USE THE EXACT SCAFFOLDING FOR THIS TURN:
-${turnNumber === 0 ? `- Turn 1 (PROBE): "${scaffolding.probe1}"` : ''}
-${turnNumber === 1 ? `- Turn 2 (PROBE): "${scaffolding.probe2}"` : ''}
-${turnNumber === 2 ? `- Turn 3 (HINT): "${scaffolding.hint}"` : ''}
-${turnNumber === 3 ? `- Turn 4 (SCAFFOLD): "${scaffolding.scaffold}"` : ''}
-${turnNumber >= 4 ? `- Turn 5 (REVEAL): "${scaffolding.reveal}" - Set shouldEnd=true` : ''}
+IF WRONG - FOLLOW THESE TWO STEPS:
+1. FIRST: Acknowledge their answer kindly but clearly indicate it's not right (e.g., "Hmm, not quite." or "Good try, but that's not it.")
+2. THEN: Use this scaffolding text for Turn ${turnNumber + 1}:
+
+IF OFF-TOPIC/UNEXPECTED (e.g., random comment, unrelated story):
+1. FIRST: Briefly acknowledge what they said warmly (e.g., "Ha! That's funny!" or "I hear you!")
+2. THEN: Gently redirect: "Now, thinking about fractions..." + ask the question again
+- Set isCorrect=false, shouldEnd=false
+${turnNumber === 0 ? `   "${scaffolding.probe1}"` : ''}
+${turnNumber === 1 ? `   "${scaffolding.probe2}"` : ''}
+${turnNumber === 2 ? `   "${scaffolding.hint}"` : ''}
+${turnNumber === 3 ? `   "${scaffolding.scaffold}"` : ''}
+${turnNumber >= 4 ? `   "${scaffolding.reveal}" - Set shouldEnd=true` : ''}
 
 RULES:
-- Use the EXACT scaffolding text shown above for this turn
-- You may add a brief acknowledgment like "Hmm..." or "Good try!" before it
-- Keep total response under 20 words
-- Be warm and encouraging
+- ALWAYS do BOTH steps: acknowledge wrong + scaffolding
+- Keep total response under 30 words
+- Be warm but honest - don't say "good thinking" for wrong answers
 - Do NOT reveal the answer before Turn 5`;
 
 export const FALLBACK_RESPONSES = {

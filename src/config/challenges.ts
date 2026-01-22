@@ -36,8 +36,8 @@ export const challenges: Challenge[] = [
     scaffolding: {
       probe1: "If you share a chocolate bar with your friend, would it be fair if one piece is big and one tiny?",
       probe2: "When we share equally, what must be true about each piece?",
-      hint: "For fair sharing, pieces must be the _____ size?",
-      scaffold: "The word rhymes with 'game' - s___e size!",
+      hint: "For fair sharing, pieces must be what kind of size?",
+      scaffold: "Think about the word 'same' - same size means equal!",
       reveal: "Same size! For fractions, all pieces must be equal - same size. Nice effort!"
     },
     maxTurns: 5
@@ -57,7 +57,7 @@ export const challenges: Challenge[] = [
       probe1: "If you cut a cake into 4 slices vs 6 slices, which way makes more pieces?",
       probe2: "Look at the bottom numbers - 4 and 6. Which number is bigger?",
       hint: "More cuts = more pieces. Does 1/4 or 1/6 have more cuts?",
-      scaffold: "6 is bigger than 4, so 1/___ has more pieces!",
+      scaffold: "6 is bigger than 4. So which fraction has more pieces - 1/4 or 1/6?",
       reveal: "1/6 has more pieces! 6 is more than 4. Good thinking!"
     },
     maxTurns: 5
@@ -77,7 +77,7 @@ export const challenges: Challenge[] = [
       probe1: "In 3/4, the 3 is on top. It counts how many pieces you have. What's its special name?",
       probe2: "The top number has a fancy math name. It starts with 'N'...",
       hint: "It rhymes with 'later' and starts with 'numer'...",
-      scaffold: "Numer-___-tor!",
+      scaffold: "Say it with me: numer-AY-tor. What's the word?",
       reveal: "It's the numerator! The top number that counts your pieces. Great job trying!"
     },
     maxTurns: 5
@@ -98,7 +98,7 @@ export const challenges: Challenge[] = [
       probe1: "Look at 2/4. The top number is 2. What does that 2 tell us?",
       probe2: "If the top number is 2, how many pieces do you have?",
       hint: "The answer is the same as the top number...",
-      scaffold: "It's a small number - t___!",
+      scaffold: "The top number is 2. How many pieces is that?",
       reveal: "Two pieces! The 2 on top means you have 2 pieces. Well done!"
     },
     maxTurns: 5
@@ -118,7 +118,7 @@ export const challenges: Challenge[] = [
       probe1: "You colored 3 pieces. Total is 5 pieces. How do we write that?",
       probe2: "Remember: colored pieces go on TOP, total pieces go on BOTTOM. What do you get?",
       hint: "It's 3 over 5. How do we write that as a fraction?",
-      scaffold: "Three over five is written as 3/_____",
+      scaffold: "Three on top, five on bottom. Say the fraction!",
       reveal: "It's 3/5! Three pieces out of five. Excellent effort!"
     },
     maxTurns: 5
@@ -139,7 +139,7 @@ export const challenges: Challenge[] = [
       probe1: "In 3/4, the 4 is on the bottom. It shows total pieces. What's its name?",
       probe2: "The bottom number has a name that starts with 'D'...",
       hint: "It sounds like 'de-NOM-in-ator'...",
-      scaffold: "Denom-___-tor!",
+      scaffold: "Say it with me: de-NOM-in-ator. What's the word?",
       reveal: "It's the denominator! The bottom number showing total pieces. Amazing work today!"
     },
     maxTurns: 5

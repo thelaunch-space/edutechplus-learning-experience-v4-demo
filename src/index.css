@@ -81,31 +81,6 @@ body::before {
   z-index: 0;
 }
 
-/* Animated floating bubbles */
-body::after {
-  content: '✨ 🌟 ⭐ 💫 ✨ 🌟 ⭐';
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  font-size: 24px;
-  opacity: 0.15;
-  pointer-events: none;
-  z-index: 0;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-around;
-  align-content: space-around;
-  padding: 20px;
-  animation: twinkle 3s ease-in-out infinite;
-}
-
-@keyframes twinkle {
-  0%, 100% { opacity: 0.1; }
-  50% { opacity: 0.2; }
-}
-
 button {
   font-family: var(--font-display);
   cursor: pointer;

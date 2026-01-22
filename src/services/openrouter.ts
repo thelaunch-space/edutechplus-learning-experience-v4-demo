@@ -225,10 +225,29 @@ export async function generateEvaluatedResponse(
       return fallbackResult;
     }
 
-    // Client-side correctness check using the filter regex
+    // Client-side correctness check using word boundaries and negation detection
     const filterPatterns = correctnessFilter.split('|').map(p => p.trim().toLowerCase());
     const studentLower = studentResponse.toLowerCase();
-    const clientSideCorrect = filterPatterns.some(pattern => studentLower.includes(pattern));
+
+    // Negation words to check for
+    const negationWords = ['not', 'no', "isn't", "isnt", "don't", "dont", "never", "wrong"];
+
+    const clientSideCorrect = filterPatterns.some(pattern => {
+      // Escape special regex characters
+      const escapedPattern = pattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const regex = new RegExp(`\\b${escapedPattern}\\b`, 'i');
+
+      if (!regex.test(studentLower)) {
+        return false;
+      }
+
+      // Check for negation before the pattern
+      const matchIndex = studentLower.search(regex);
+      const textBefore = studentLower.substring(Math.max(0, matchIndex - 15), matchIndex);
+      const hasNegation = negationWords.some(neg => textBefore.includes(neg));
+
+      return !hasNegation;
+    });
     console.log('🔍 Client-side correctness check:', { studentResponse, filterPatterns, clientSideCorrect });
 
     // Parse JSON from response

@@ -1,0 +1,99 @@
+.container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 100px;
+  padding: 16px;
+}
+
+.medium {
+  height: 60px;
+  gap: 4px;
+}
+
+.large {
+  height: 120px;
+  gap: 8px;
+}
+
+.bar {
+  width: 20px;
+  min-height: 10px;
+  border-radius: 999px;
+  transition: height 0.05s ease-out;
+}
+
+.medium .bar {
+  width: 12px;
+}
+
+.large .bar {
+  width: 28px;
+}
+
+/* Idle - gentle purple gradient */
+.idle .bar {
+  background: linear-gradient(to top, rgba(168, 85, 247, 0.4), rgba(168, 85, 247, 0.6));
+}
+
+/* Waiting - pulsing teal */
+.waiting .bar {
+  background: linear-gradient(to top, var(--teal), var(--teal-light));
+  box-shadow: 0 0 10px rgba(78, 205, 196, 0.3);
+  animation: waitingPulse 1.5s ease-in-out infinite;
+}
+
+/* Speaking - vibrant teal waves */
+.speaking .bar {
+  background: linear-gradient(to top, var(--teal-dark), var(--teal-light));
+  box-shadow: 0 0 15px rgba(78, 205, 196, 0.4);
+}
+
+.speaking .bar:nth-child(odd) {
+  background: linear-gradient(to top, var(--sky), #7dd3fc);
+}
+
+/* Recording - coral/coral gradient */
+.recording .bar {
+  background: linear-gradient(to top, var(--coral-dark), var(--coral-light));
+  box-shadow: 0 0 15px rgba(255, 107, 107, 0.4);
+}
+
+.recording .bar:nth-child(even) {
+  background: linear-gradient(to top, var(--pink), #f9a8d4);
+}
+
+@keyframes waitingPulse {
+  0%, 100% {
+    opacity: 0.7;
+    transform: scaleY(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scaleY(1.1);
+  }
+}
+
+/* Responsive sizing */
+@media (max-width: 600px) {
+  .large {
+    height: 80px;
+    gap: 5px;
+  }
+
+  .large .bar {
+    width: 18px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .large {
+    height: 150px;
+    gap: 10px;
+  }
+
+  .large .bar {
+    width: 35px;
+  }
+}

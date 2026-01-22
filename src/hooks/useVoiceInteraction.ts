@@ -1,7 +1,7 @@
 import { useCallback, useState, useRef } from 'react';
 import { useMicrophone } from './useMicrophone';
 import { transcribeAudio } from '../services/deepgram';
-import { speakText } from '../services/tts';
+import { speakText, type TTSResult } from '../services/tts';
 import { generateResponse, generateGreeting, generateEvaluatedResponse } from '../services/openrouter';
 import { useSessionStore } from '../store/sessionStore';
 import type { VoiceState } from '../types';
@@ -74,9 +74,12 @@ export function useVoiceInteraction(): UseVoiceInteractionReturn {
     incrementTurn,
     addMessage,
     getConversationHistory,
+    addChatMessage,
+    triggerConfetti,
+    waitForConfetti,
   } = useSessionStore();
 
-  // Speak text using TTS with word-by-word reveal
+  // Speak text using TTS with word-by-word reveal synchronized to audio
   const speak = useCallback(async (text: string): Promise<void> => {
     try {
       console.log('🎤 Voice: Math Mate speaking:', text.substring(0, 50) + '...');
@@ -84,20 +87,36 @@ export function useVoiceInteraction(): UseVoiceInteractionReturn {
       setLastResponse(text);
       setDisplayedText(''); // Clear previous text
 
+      // DON'T add to chat history here - wait until speaking is done
+      // to avoid duplicate display (word-by-word + full message)
+
       const words = text.split(' ');
-      const avgWordDuration = 280; // ~280ms per word for natural TTS pace
 
-      // Start TTS playback (don't await yet)
-      const ttsPromise = speakText(text);
+      // Start TTS and wait for audio to BEGIN playing (returns when audio starts)
+      const { duration, playbackDone }: TTSResult = await speakText(text);
 
-      // Progressively reveal words
+      // Calculate word duration based on actual audio length
+      // Use minimum 100ms per word to ensure readability even for fast audio
+      const wordDuration = duration > 0
+        ? Math.max(100, (duration * 1000) / words.length)
+        : 280; // Fallback to 280ms if no duration available
+
+      console.log(`📝 Typewriter: ${words.length} words, ${duration.toFixed(2)}s audio, ${wordDuration.toFixed(0)}ms/word`);
+
+      // Progressively reveal words in sync with audio
       for (let i = 0; i < words.length; i++) {
         setDisplayedText(words.slice(0, i + 1).join(' '));
-        await new Promise(resolve => setTimeout(resolve, avgWordDuration));
+        await new Promise(resolve => setTimeout(resolve, wordDuration));
       }
 
-      // Wait for TTS to finish
-      await ttsPromise;
+      // Wait for audio to finish playing
+      await playbackDone;
+
+      // NOW add to chat history (after word-by-word reveal is complete)
+      addChatMessage('assistant', text);
+
+      // Clear displayedText since it's now in allMessages
+      setDisplayedText('');
 
       console.log('✅ Voice: Math Mate finished speaking');
       setVoiceState('IDLE');
@@ -106,7 +125,7 @@ export function useVoiceInteraction(): UseVoiceInteractionReturn {
       setVoiceState('ERROR');
       setError('Failed to play audio');
     }
-  }, []);
+  }, [addChatMessage]);
 
   // Helper to stop PTT recording (used by both handlePTTEnd and safety timeout)
   const stopPTTRecording = useCallback(async (): Promise<void> => {
@@ -221,6 +240,11 @@ export function useVoiceInteraction(): UseVoiceInteractionReturn {
       const transcript = await listenAndTranscribe();
       console.log('📝 Greeting: Got transcript:', transcript);
 
+      // Add student's response to chat history
+      if (transcript.trim()) {
+        addChatMessage('user', transcript);
+      }
+
       // Extract name from transcript (handles "I'm Krishna Gautam" -> "Krishna")
       const name = extractName(transcript);
       console.log('✅ Greeting: Extracted name:', name);
@@ -249,7 +273,7 @@ export function useVoiceInteraction(): UseVoiceInteractionReturn {
       setStudentName('Friend');
       setPhase('PRE_CHALLENGE');
     }
-  }, [speak, listenAndTranscribe, setStudentName, setPhase]);
+  }, [speak, listenAndTranscribe, setStudentName, setPhase, addChatMessage]);
 
   // Pre-challenge interaction (Math Mate introduces the challenge)
   const runPreChallengeInteraction = useCallback(async (): Promise<void> => {
@@ -321,6 +345,11 @@ export function useVoiceInteraction(): UseVoiceInteractionReturn {
         const transcript = await listenAndTranscribe();
         console.log('📝 Got transcript:', transcript);
 
+        // Add student's response to unified chat history
+        if (transcript.trim()) {
+          addChatMessage('user', transcript);
+        }
+
         // Get conversation history for context
         const conversationHistory = getConversationHistory(challenge.id);
 
@@ -363,9 +392,14 @@ export function useVoiceInteraction(): UseVoiceInteractionReturn {
         }
       }
 
-      // Pause before moving to next challenge
-      console.log('⏱️ Waiting 1000ms before moving to next challenge...');
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Trigger celebration confetti and wait for it to complete
+      console.log('🎉 Triggering celebration confetti!');
+      triggerConfetti();
+
+      // Wait for confetti animation to complete (5 seconds)
+      console.log('⏱️ Waiting for confetti to complete...');
+      await waitForConfetti();
+      console.log('✅ Confetti complete!');
 
       console.log('✅ === POST-CHALLENGE COMPLETE === Moving to next challenge');
       const isComplete = goToNextChallenge();
@@ -383,7 +417,7 @@ export function useVoiceInteraction(): UseVoiceInteractionReturn {
       const isComplete = goToNextChallenge();
       setPhase(isComplete ? 'COMPLETE' : 'PRE_CHALLENGE');
     }
-  }, [speak, listenAndTranscribe, getCurrentChallenge, studentName, goToNextChallenge, setPhase, resetTurn, incrementTurn, addMessage, getConversationHistory]);
+  }, [speak, listenAndTranscribe, getCurrentChallenge, studentName, goToNextChallenge, setPhase, resetTurn, incrementTurn, addMessage, getConversationHistory, addChatMessage, triggerConfetti, waitForConfetti]);
 
   // Listen and generate response (for custom interactions)
   const listenAndRespond = useCallback(async (

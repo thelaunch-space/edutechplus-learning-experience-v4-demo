@@ -21,7 +21,7 @@ export function WelcomeScreen({ onStart }: WelcomeScreenProps) {
   return (
     <div className={styles.container}>
       <div className={styles.content}>
-        <MathMateAvatar state="IDLE" size="large" />
+        <MathMateAvatar state="IDLE" size="large" showBranding={true} />
 
         <h1 className={styles.title}>Learn Fractions!</h1>
         <p className={styles.subtitle}>

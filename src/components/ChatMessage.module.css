@@ -1,0 +1,105 @@
+/* Chat Message Wrapper */
+.messageWrapper {
+  display: flex;
+  width: 100%;
+  margin-bottom: 12px;
+  animation: slideIn 0.3s ease-out;
+}
+
+/* User messages - right aligned */
+.user {
+  justify-content: flex-end;
+}
+
+/* Assistant messages - left aligned */
+.assistant {
+  justify-content: flex-start;
+}
+
+/* Message bubble */
+.bubble {
+  max-width: 85%;
+  padding: 12px 16px;
+  border-radius: 18px;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* User bubble - WhatsApp-style green */
+.user .bubble {
+  background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
+  color: #fff;
+  border-bottom-right-radius: 6px;
+}
+
+/* Assistant bubble - white */
+.assistant .bubble {
+  background: #fff;
+  color: var(--text-dark, #1a1a2e);
+  border-bottom-left-radius: 6px;
+  border: 2px solid rgba(168, 85, 247, 0.2);
+}
+
+/* Current message being spoken - subtle pulse */
+.current {
+  animation: pulse 2s ease-in-out infinite;
+}
+
+/* Avatar for Math Mate */
+.avatar {
+  font-size: 18px;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+/* Message content */
+.content {
+  margin: 0;
+  font-family: var(--font-body, 'Nunito', sans-serif);
+  font-size: 15px;
+  line-height: 1.4;
+  word-break: break-word;
+}
+
+.user .content {
+  font-weight: 500;
+}
+
+.assistant .content {
+  font-weight: 600;
+}
+
+/* Animations */
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+  50% {
+    box-shadow: 0 2px 16px rgba(168, 85, 247, 0.3);
+  }
+}
+
+/* Mobile adjustments */
+@media (max-width: 767px) {
+  .bubble {
+    max-width: 90%;
+    padding: 10px 14px;
+  }
+
+  .content {
+    font-size: 14px;
+  }
+}

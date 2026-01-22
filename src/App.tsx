@@ -3,12 +3,15 @@ import { useSessionStore } from './store/sessionStore';
 import { useVoiceInteraction } from './hooks/useVoiceInteraction';
 import { useMicrophone } from './hooks/useMicrophone';
 import { WelcomeScreen } from './components/WelcomeScreen';
-import { VoiceInteraction } from './components/VoiceInteraction';
+import { MathMateAvatar } from './components/MathMateAvatar';
 import { VideoPlayer } from './components/VideoPlayer';
 import { YouTubePlayer } from './components/YouTubePlayer';
 import { AppletContainer } from './components/AppletContainer';
 import { ProgressBar } from './components/ProgressBar';
 import { CompletionScreen } from './components/CompletionScreen';
+import { ChatPane } from './components/ChatPane';
+import { LandscapePrompt } from './components/LandscapePrompt';
+import { Confetti } from './components/Confetti';
 import styles from './App.module.css';
 
 function App() {
@@ -20,11 +23,13 @@ function App() {
     challenges,
     getCurrentChallenge,
     resetSession,
+    allMessages,
+    showConfetti,
+    clearConfetti,
   } = useSessionStore();
 
   const {
     voiceState,
-    lastResponse,
     displayedText,
     runGreetingInteraction,
     runPreChallengeInteraction,
@@ -114,6 +119,12 @@ function App() {
 
   return (
     <div className={styles.container}>
+      {/* Landscape orientation prompt for mobile */}
+      <LandscapePrompt />
+
+      {/* Celebration confetti */}
+      <Confetti isActive={showConfetti} onComplete={clearConfetti} />
+
       {/* Header with progress */}
       <header className={styles.header}>
         <ProgressBar
@@ -123,41 +134,66 @@ function App() {
         />
       </header>
 
-      {/* Main content area */}
+      {/* Main content area - Two-pane layout */}
       <main className={styles.main}>
-        {/* Voice interaction screens */}
-        {(phase === 'GREETING' || phase === 'PRE_CHALLENGE' || phase === 'POST_CHALLENGE') && (
-          <VoiceInteraction
-            voiceState={voiceState}
-            message={displayedText || lastResponse}
-            onPTTStart={handlePTTStart}
-            onPTTEnd={handlePTTEnd}
-          />
-        )}
+        <div className={styles.twoPaneContainer}>
+          {/* Chat Pane - Desktop/Tablet: sidebar, Mobile: overlay */}
+          <div className={styles.chatPaneDesktop}>
+            <ChatPane
+              messages={allMessages}
+              currentMessage={displayedText}
+              voiceState={voiceState}
+              onPTTStart={handlePTTStart}
+              onPTTEnd={handlePTTEnd}
+            />
+          </div>
 
-        {/* Challenge content */}
-        {phase === 'IN_CHALLENGE' && challenge && (
-          <>
-            {challenge.type === 'video' ? (
-              challenge.youtubeId ? (
-                <YouTubePlayer
-                  videoId={challenge.youtubeId}
-                  onComplete={handleChallengeComplete}
-                />
-              ) : (
-                <VideoPlayer
-                  src={challenge.path}
-                  onComplete={handleChallengeComplete}
-                />
-              )
-            ) : (
-              <AppletContainer
-                src={challenge.path}
-                onComplete={handleChallengeComplete}
-              />
+          {/* Content Pane */}
+          <div className={styles.contentPane}>
+            {/* Avatar display during voice interactions (greeting/pre/post) */}
+            {(phase === 'GREETING' || phase === 'PRE_CHALLENGE' || phase === 'POST_CHALLENGE') && (
+              <div className={styles.avatarContainer}>
+                <MathMateAvatar state={voiceState} size="large" />
+              </div>
             )}
-          </>
-        )}
+
+            {/* Challenge content */}
+            {phase === 'IN_CHALLENGE' && challenge && (
+              <>
+                {challenge.type === 'video' ? (
+                  challenge.youtubeId ? (
+                    <YouTubePlayer
+                      videoId={challenge.youtubeId}
+                      onComplete={handleChallengeComplete}
+                    />
+                  ) : (
+                    <VideoPlayer
+                      src={challenge.path}
+                      onComplete={handleChallengeComplete}
+                    />
+                  )
+                ) : (
+                  <AppletContainer
+                    src={challenge.path}
+                    onComplete={handleChallengeComplete}
+                  />
+                )}
+              </>
+            )}
+          </div>
+
+          {/* Chat Pane - Mobile overlay */}
+          <div className={styles.chatPaneMobile}>
+            <ChatPane
+              messages={allMessages}
+              currentMessage={displayedText}
+              voiceState={voiceState}
+              onPTTStart={handlePTTStart}
+              onPTTEnd={handlePTTEnd}
+              isOverlay={true}
+            />
+          </div>
+        </div>
       </main>
 
     </div>

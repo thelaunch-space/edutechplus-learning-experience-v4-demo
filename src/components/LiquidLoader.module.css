@@ -1,0 +1,185 @@
+.container {
+  display: flex;
+  align-items: flex-end;
+  gap: 6px;
+  padding: 8px;
+}
+
+.barContainer {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Droplet above bar */
+.droplet {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-bottom: 4px;
+  transition: all 0.5s ease-out;
+  filter: blur(0.3px);
+}
+
+/* Main liquid bar */
+.bar {
+  width: 14px;
+  border-radius: 999px;
+  transition: all 0.2s ease-out;
+  position: relative;
+  overflow: hidden;
+  filter: blur(0.2px);
+}
+
+/* Liquid surface tension effect at top */
+.barSurface {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 6px;
+  background: linear-gradient(to bottom, rgba(255,255,255,0.4), transparent);
+  border-radius: 999px;
+}
+
+/* Shimmer effect */
+.barShimmer {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to right, transparent 0%, rgba(255,255,255,0.4) 50%, transparent 100%);
+  border-radius: 999px;
+  width: 140%;
+  left: -20%;
+}
+
+/* Bubble inside bar */
+.barBubble {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: rgba(255,255,255,0.3);
+  border-radius: 50%;
+}
+
+/* Base droplet */
+.baseDrop {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  margin-top: 3px;
+  transition: all 0.3s;
+  filter: blur(0.2px);
+}
+
+/* Color gradients */
+.purple { background: linear-gradient(to top, #a855f7, #ec4899); }
+.blue { background: linear-gradient(to top, #3b82f6, #a855f7); }
+.cyan { background: linear-gradient(to top, #22d3ee, #3b82f6); }
+.green { background: linear-gradient(to top, #4ade80, #22d3ee); }
+.yellow { background: linear-gradient(to top, #facc15, #4ade80); }
+.orange { background: linear-gradient(to top, #fb923c, #facc15); }
+.red { background: linear-gradient(to top, #ef4444, #fb923c); }
+
+/* Size variant - small for avatar */
+.small {
+  gap: 3px;
+  padding: 4px;
+}
+
+.small .droplet {
+  width: 4px;
+  height: 4px;
+  margin-bottom: 2px;
+}
+
+.small .bar {
+  width: 6px;
+}
+
+.small .barSurface {
+  height: 3px;
+}
+
+.small .barBubble {
+  width: 2px;
+  height: 2px;
+}
+
+.small .baseDrop {
+  width: 3px;
+  height: 3px;
+  margin-top: 2px;
+}
+
+/* Size variant - large for full-pane display */
+.large {
+  gap: 10px;
+  padding: 16px;
+}
+
+.large .droplet {
+  width: 14px;
+  height: 14px;
+  margin-bottom: 6px;
+}
+
+.large .bar {
+  width: 28px;
+}
+
+.large .barSurface {
+  height: 10px;
+}
+
+.large .barBubble {
+  width: 8px;
+  height: 8px;
+}
+
+.large .baseDrop {
+  width: 10px;
+  height: 10px;
+  margin-top: 5px;
+}
+
+/* Responsive adjustments for large */
+@media (max-width: 600px) {
+  .large {
+    gap: 6px;
+  }
+
+  .large .bar {
+    width: 18px;
+  }
+
+  .large .droplet {
+    width: 10px;
+    height: 10px;
+  }
+
+  .large .baseDrop {
+    width: 7px;
+    height: 7px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .large {
+    gap: 14px;
+  }
+
+  .large .bar {
+    width: 35px;
+  }
+
+  .large .droplet {
+    width: 18px;
+    height: 18px;
+  }
+
+  .large .baseDrop {
+    width: 14px;
+    height: 14px;
+  }
+}
