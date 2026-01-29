@@ -54,4 +54,16 @@ Source: `meeting-transcripts-with-client/feedback-iteration-3.md`
 | 3 | **Content team authoring control** | Not every content piece needs pre AND post voice. Content team decides where AI intervenes. Approach: `skipPreVoice` / `skipPostVoice` flags. |
 | 4 | **Cost-conscious architecture** | Scripted (TTS-only) vs AI-powered (LLM) nodes. Not every interaction needs an LLM call. Selling point: teachers can minimize cost by scripting more and using LLM only for interactive checkpoints. |
 
-**Status:** Pending approval for implementation.
+**Status:** PARTIALLY IMPLEMENTED — Slides implemented with narration/question variants. Remaining items deferred to Iteration 4.
+
+---
+
+## What's Been Addressed (as of Jan 29, 2026)
+
+✅ **Slides content type** — Implemented with `SlideViewer.tsx`, supports both narration and question slides
+✅ **Enhanced acknowledgements** — Strengthened LLM prompts with explicit examples, removed word limits
+✅ **Better greeting message** — Changed from "7 fun challenges" to kid-friendly "pizzas and cake"
+✅ **Correctness debugging** — Added comprehensive logging for LLM + client-side decisions
+✅ **Better pacing** — Added pause after acknowledgement before confetti
+
+**Last updated:** 2026-01-29

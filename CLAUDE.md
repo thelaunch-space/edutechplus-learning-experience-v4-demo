@@ -18,13 +18,14 @@ Math Mate is a voice-guided learning experience for Grade 4 fractions. An AI com
 |------|---------|
 | `src/config/challenges.ts` | Challenge definitions, questions, correctness filters, scaffolding |
 | `src/config/prompts.ts` | LLM system prompts (Socratic evaluation) |
-| `src/hooks/useVoiceInteraction.ts` | Voice interaction + PTT + multi-turn loop |
+| `src/hooks/useVoiceInteraction.ts` | Voice interaction + PTT + multi-turn loop + slide interaction |
 | `src/services/openrouter.ts` | OpenRouter LLM service |
 | `src/services/deepgram.ts` | Speech-to-text service |
 | `src/services/tts.ts` | Text-to-speech service |
 | `src/store/sessionStore.ts` | Session state + conversation history |
 | `src/types/index.ts` | TypeScript type definitions |
-| `src/components/` | React components with CSS Modules |
+| `src/components/SlideViewer.tsx` | Full-screen slide renderer for narration/question slides |
+| `src/components/` | Other React components with CSS Modules |
 
 ## Context Files
 
@@ -36,6 +37,7 @@ Math Mate is a voice-guided learning experience for Grade 4 fractions. An AI com
 | `.context/feedback.md` | You need client feedback context or decision rationale |
 | `.context/bugs-and-recurring-issues.md` | You're debugging or investigating unexpected behavior |
 | `.context/feature-wishlist.md` | You need to know what's planned or deferred |
+| `.context/learning-journey.md` | You need the complete content roadmap (14 nodes) and implementation status |
 
 ## Dev Commands
 

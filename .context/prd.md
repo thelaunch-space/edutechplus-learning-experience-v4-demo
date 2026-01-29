@@ -49,11 +49,22 @@ Student speaks → Deepgram STT → OpenRouter LLM → Deepgram TTS → Student 
 ```
 
 Content is defined in `src/config/challenges.ts`. Each challenge bundles:
-- Content asset (video/applet) with path/URL
+- Content asset (video/applet/slide) with path/URL
 - Pre-script (intro narration)
-- Post-question + correctness filter + scaffolding hints
+- Post-question + correctness filter + scaffolding hints (for question slides/content)
+- OR slide narration (for narration-only slides)
 - Max turns (currently 5 for all)
+
+## Challenge Types
+
+**Video:** YouTube embed, skip button available
+**Applet:** Interactive Codepen embed, skip button available
+**Slide:** Static image content rendered full-screen
+  - Narration slides: AI speaks scripted narration, auto-advances
+  - Question slides: Multi-turn Socratic dialogue with confetti
 
 ## License
 
 Proprietary — EdutechPlus
+
+**Last updated:** 2026-01-29
