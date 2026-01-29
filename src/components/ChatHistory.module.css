@@ -52,6 +52,45 @@
   text-align: center;
 }
 
+/* Subtle typing indicator at bottom of chat */
+.typingIndicator {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  margin: 4px 0;
+  opacity: 0.6;
+}
+
+.typingDots {
+  display: flex;
+  gap: 3px;
+}
+
+.typingDots span {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--purple, #A855F7);
+  animation: typingBounce 1.4s infinite ease-in-out;
+}
+
+.typingDots span:nth-child(1) { animation-delay: 0s; }
+.typingDots span:nth-child(2) { animation-delay: 0.2s; }
+.typingDots span:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes typingBounce {
+  0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+  30% { transform: translateY(-8px); opacity: 1; }
+}
+
+.typingText {
+  font-family: var(--font-body, 'Nunito', sans-serif);
+  font-size: 12px;
+  font-style: italic;
+  color: rgba(0, 0, 0, 0.75);
+}
+
 /* Mobile adjustments */
 @media (max-width: 767px) {
   .container {

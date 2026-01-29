@@ -3,13 +3,13 @@ import { useSessionStore } from './store/sessionStore';
 import { useVoiceInteraction } from './hooks/useVoiceInteraction';
 import { useMicrophone } from './hooks/useMicrophone';
 import { WelcomeScreen } from './components/WelcomeScreen';
-import { MathMateAvatar } from './components/MathMateAvatar';
 import { VideoPlayer } from './components/VideoPlayer';
 import { YouTubePlayer } from './components/YouTubePlayer';
 import { AppletContainer } from './components/AppletContainer';
 import { ProgressBar } from './components/ProgressBar';
 import { CompletionScreen } from './components/CompletionScreen';
 import { ChatPane } from './components/ChatPane';
+import { MathMateAvatar } from './components/MathMateAvatar';
 import { LandscapePrompt } from './components/LandscapePrompt';
 import { Confetti } from './components/Confetti';
 import styles from './App.module.css';
@@ -34,6 +34,7 @@ function App() {
     runGreetingInteraction,
     runPreChallengeInteraction,
     runPostChallengeInteraction,
+    runSlideInteraction,
     handlePTTStart,
     handlePTTEnd,
   } = useVoiceInteraction();
@@ -46,8 +47,17 @@ function App() {
   const hasRunGreeting = useRef(false);
   const hasRunPreChallenge = useRef<number | null>(null);
   const hasRunPostChallenge = useRef<number | null>(null);
+  const hasRunSlide = useRef<number | null>(null);
 
   const challenge = getCurrentChallenge();
+
+  // Chat pane visibility logic:
+  // HIDE during IN_CHALLENGE phase for videos/applets (full-screen content)
+  // SHOW for slides and conversation phases (companion mode)
+  const shouldShowChatPane = !(
+    phase === 'IN_CHALLENGE' &&
+    (challenge?.type === 'video' || challenge?.type === 'applet')
+  );
 
   // Handle welcome screen start
   const handleStart = async () => {
@@ -68,14 +78,23 @@ function App() {
     }
   }, [phase, isWelcome]);
 
-  // Auto-run pre-challenge interaction
+  // Auto-run pre-challenge interaction OR slide interaction
   useEffect(() => {
-    if (phase === 'PRE_CHALLENGE' && hasRunPreChallenge.current !== currentChallengeIndex) {
-      console.log(`🚀 App: Starting pre-challenge for challenge ${currentChallengeIndex + 1}`);
-      hasRunPreChallenge.current = currentChallengeIndex;
-      runPreChallengeInteraction();
+    if (phase === 'PRE_CHALLENGE') {
+      const currentChallenge = getCurrentChallenge();
+
+      // Check if current challenge is a slide
+      if (currentChallenge?.type === 'slide' && hasRunSlide.current !== currentChallengeIndex) {
+        console.log(`🚀 App: Starting slide interaction for challenge ${currentChallengeIndex + 1}`);
+        hasRunSlide.current = currentChallengeIndex;
+        runSlideInteraction();
+      } else if (currentChallenge?.type !== 'slide' && hasRunPreChallenge.current !== currentChallengeIndex) {
+        console.log(`🚀 App: Starting pre-challenge for challenge ${currentChallengeIndex + 1}`);
+        hasRunPreChallenge.current = currentChallengeIndex;
+        runPreChallengeInteraction();
+      }
     }
-  }, [phase, currentChallengeIndex]);
+  }, [phase, currentChallengeIndex, getCurrentChallenge, runPreChallengeInteraction, runSlideInteraction]);
 
   // Auto-run post-challenge interaction
   useEffect(() => {
@@ -98,6 +117,7 @@ function App() {
     hasRunGreeting.current = false;
     hasRunPreChallenge.current = null;
     hasRunPostChallenge.current = null;
+    hasRunSlide.current = null;
     resetSession();
     setIsWelcome(true);
   };
@@ -118,38 +138,42 @@ function App() {
   }
 
   return (
-    <div className={styles.container}>
-      {/* Landscape orientation prompt for mobile */}
-      <LandscapePrompt />
+    <div className={styles.appStage}>
+      <div className={styles.tvFrame}>
+        <div className={styles.container}>
+          {/* Landscape orientation prompt for mobile */}
+          <LandscapePrompt />
 
-      {/* Celebration confetti */}
-      <Confetti isActive={showConfetti} onComplete={clearConfetti} />
+          {/* Celebration confetti */}
+          <Confetti isActive={showConfetti} onComplete={clearConfetti} />
 
-      {/* Header with progress */}
-      <header className={styles.header}>
-        <ProgressBar
-          current={currentChallengeIndex}
-          total={challenges.length}
-          title={challenge?.title || 'Math Adventure'}
-        />
-      </header>
-
-      {/* Main content area - Two-pane layout */}
-      <main className={styles.main}>
-        <div className={styles.twoPaneContainer}>
-          {/* Chat Pane - Desktop/Tablet: sidebar, Mobile: overlay */}
-          <div className={styles.chatPaneDesktop}>
-            <ChatPane
-              messages={allMessages}
-              currentMessage={displayedText}
-              voiceState={voiceState}
-              onPTTStart={handlePTTStart}
-              onPTTEnd={handlePTTEnd}
+          {/* Header with progress */}
+          <header className={styles.header}>
+            <ProgressBar
+              current={currentChallengeIndex}
+              total={challenges.length}
+              title={challenge?.title || 'Math Adventure'}
             />
-          </div>
+          </header>
 
-          {/* Content Pane */}
-          <div className={styles.contentPane}>
+          {/* Main content area - Two-pane layout */}
+          <main className={styles.main}>
+            <div className={styles.twoPaneContainer}>
+              {/* Chat Pane - Desktop/Tablet: sidebar */}
+              {shouldShowChatPane && (
+                <div className={styles.chatPaneDesktop}>
+                  <ChatPane
+                    messages={allMessages}
+                    currentMessage={displayedText}
+                    voiceState={voiceState}
+                    onPTTStart={handlePTTStart}
+                    onPTTEnd={handlePTTEnd}
+                  />
+                </div>
+              )}
+
+              {/* Content Pane - Full-screen when chat hidden */}
+              <div className={`${styles.contentPane} ${!shouldShowChatPane ? styles.fullScreen : ''}`}>
             {/* Avatar display during voice interactions (greeting/pre/post) */}
             {(phase === 'GREETING' || phase === 'PRE_CHALLENGE' || phase === 'POST_CHALLENGE') && (
               <div className={styles.avatarContainer}>
@@ -172,6 +196,14 @@ function App() {
                       onComplete={handleChallengeComplete}
                     />
                   )
+                ) : challenge.type === 'slide' ? (
+                  <div className={styles.slideContainer}>
+                    <img
+                      src={challenge.slideUrl}
+                      alt={challenge.title}
+                      className={styles.slideImage}
+                    />
+                  </div>
                 ) : (
                   <AppletContainer
                     src={challenge.path}
@@ -182,20 +214,24 @@ function App() {
             )}
           </div>
 
-          {/* Chat Pane - Mobile overlay */}
-          <div className={styles.chatPaneMobile}>
-            <ChatPane
-              messages={allMessages}
-              currentMessage={displayedText}
-              voiceState={voiceState}
-              onPTTStart={handlePTTStart}
-              onPTTEnd={handlePTTEnd}
-              isOverlay={true}
-            />
-          </div>
+          {/* Chat Pane - Mobile: overlay */}
+          {shouldShowChatPane && (
+            <div className={styles.chatPaneMobile}>
+              <ChatPane
+                messages={allMessages}
+                currentMessage={displayedText}
+                voiceState={voiceState}
+                onPTTStart={handlePTTStart}
+                onPTTEnd={handlePTTEnd}
+                isOverlay={true}
+              />
+            </div>
+          )}
         </div>
       </main>
 
+        </div>
+      </div>
     </div>
   );
 }

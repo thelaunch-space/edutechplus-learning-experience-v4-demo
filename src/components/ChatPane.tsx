@@ -25,34 +25,13 @@ export function ChatPane({
 
   return (
     <div className={`${styles.container} ${isOverlay ? styles.overlay : ''}`}>
-      {/* Chat history */}
+      {/* Chat history with typing indicator integrated */}
       <div className={styles.historyWrapper}>
-        <ChatHistory messages={messages} currentMessage={currentMessage} />
-      </div>
-
-      {/* Status indicator */}
-      <div className={styles.statusBar}>
-        {voiceState === 'MATH_MATE_SPEAKING' && (
-          <span className={styles.statusText}>
-            <span className={styles.statusDot} />
-            Math Mate is talking...
-          </span>
-        )}
-        {voiceState === 'PROCESSING' && (
-          <span className={styles.statusText}>
-            <span className={styles.statusDot} />
-            Thinking...
-          </span>
-        )}
-        {voiceState === 'WAITING_FOR_STUDENT' && (
-          <span className={styles.statusText}>Your turn!</span>
-        )}
-        {voiceState === 'STUDENT_RECORDING' && (
-          <span className={`${styles.statusText} ${styles.recording}`}>
-            <span className={styles.recordingDot} />
-            Listening...
-          </span>
-        )}
+        <ChatHistory
+          messages={messages}
+          currentMessage={currentMessage}
+          voiceState={voiceState}
+        />
       </div>
 
       {/* PTT Button */}

@@ -3,9 +3,14 @@
   display: flex;
   flex-direction: column;
   height: 100%;
-  background: rgba(0, 0, 0, 0.3);
+  /* Soft colorful glass effect, not dark */
+  background: linear-gradient(
+    180deg,
+    rgba(167, 139, 250, 0.15) 0%,
+    rgba(139, 92, 246, 0.1) 100%
+  );
   backdrop-filter: blur(16px);
-  border-right: 2px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 4px 0 16px rgba(167, 139, 250, 0.1);
 }
 
 /* Overlay mode for mobile */
@@ -28,61 +33,16 @@
   pointer-events: auto;
 }
 
-/* History wrapper */
+/* History wrapper (scrollable middle section) */
 .historyWrapper {
   flex: 1;
   min-height: 0;
   overflow: hidden;
+  padding-bottom: 120px; /* Safe padding to prevent overlap with PTT button */
 }
 
 .overlay .historyWrapper {
   max-height: 25vh;
-}
-
-/* Status bar */
-.statusBar {
-  padding: 8px 16px;
-  background: rgba(0, 0, 0, 0.2);
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-  min-height: 36px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.statusText {
-  font-family: var(--font-display, 'Fredoka', sans-serif);
-  font-size: 13px;
-  font-weight: 500;
-  color: rgba(255, 255, 255, 0.8);
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.statusDot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--mint, #10b981);
-  animation: pulse 1s ease-in-out infinite;
-}
-
-.recording {
-  color: var(--coral, #ff6b6b);
-}
-
-.recordingDot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--coral, #ff6b6b);
-  animation: pulse 0.5s ease-in-out infinite;
-}
-
-@keyframes pulse {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.6; transform: scale(0.9); }
 }
 
 /* PTT Container */

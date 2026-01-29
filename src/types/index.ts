@@ -25,9 +25,12 @@ export interface Scaffolding {
 export interface Challenge {
   id: string;
   number: number;
-  type: 'video' | 'applet';
+  type: 'video' | 'applet' | 'slide';
   path: string;
   youtubeId?: string;  // For video type challenges (YouTube embed)
+  slideUrl?: string;   // For slide type challenges (image path)
+  slideNarration?: string;  // TTS narration content for narration slides
+  isQuestionSlide?: boolean;  // True for question slides, false for narration slides
   title: string;
   duration: string;
   preScript: string;

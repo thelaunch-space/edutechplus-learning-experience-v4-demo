@@ -13,9 +13,6 @@ export function ProgressBar({ current, total, title }: ProgressBarProps) {
     <div className={styles.container}>
       <div className={styles.header}>
         <span className={styles.title}>{title || 'Progress'}</span>
-        <span className={styles.count}>
-          {current} of {total}
-        </span>
       </div>
 
       <div className={styles.track}>
@@ -23,7 +20,7 @@ export function ProgressBar({ current, total, title }: ProgressBarProps) {
           className={styles.fill}
           style={{ width: `${percentage}%` }}
         />
-        {/* Stars for each challenge */}
+        {/* Stars for each node - visual progress only */}
         <div className={styles.stars}>
           {Array.from({ length: total }).map((_, i) => (
             <div

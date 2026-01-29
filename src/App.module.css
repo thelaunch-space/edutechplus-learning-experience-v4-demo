@@ -1,5 +1,41 @@
 /* ===== APP LAYOUT - CANDY LAND CONTAINER ===== */
 
+/* Outer stage - the "room" with ambient background */
+.appStage {
+  width: 100%;
+  height: 100vh;
+  padding: 24px;
+  /* Vibrant playful gradient for kids */
+  background: linear-gradient(135deg,
+    #667eea 0%,
+    #764ba2 25%,
+    #f093fb 50%,
+    #4facfe 75%,
+    #00f2fe 100%
+  );
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* TV frame container - the elevated "screen" */
+.tvFrame {
+  width: 100%;
+  max-width: 1600px;
+  height: 100%;
+  max-height: calc(100vh - 48px);
+  border-radius: 24px;
+  overflow: hidden;
+  /* Transparent to show colorful gradient, just provides frame/border */
+  background: transparent;
+  box-shadow:
+    0 20px 60px rgba(0, 0, 0, 0.15),
+    0 8px 24px rgba(0, 0, 0, 0.1),
+    inset 0 0 0 2px rgba(255, 255, 255, 0.5);
+  display: flex;
+  flex-direction: column;
+}
+
 .container {
   width: 100%;
   height: 100%;
@@ -13,13 +49,13 @@
 /* Header with playful glass effect */
 .header {
   padding: 10px 16px;
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(167, 139, 250, 0.1);
   backdrop-filter: blur(12px);
-  border-bottom: 2px solid rgba(255, 255, 255, 0.15);
+  border-bottom: 2px solid rgba(167, 139, 250, 0.2);
   flex-shrink: 0;
   position: relative;
   z-index: 10;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 20px rgba(167, 139, 250, 0.15);
 }
 
 /* Subtle shimmer on header */
@@ -33,7 +69,7 @@
   background: linear-gradient(
     90deg,
     transparent,
-    rgba(255, 255, 255, 0.4),
+    rgba(167, 139, 250, 0.5),
     transparent
   );
   animation: headerShimmer 3s ease-in-out infinite;
@@ -89,6 +125,12 @@
   position: relative;
 }
 
+/* Full-screen mode for videos/applets (when chat is hidden) */
+.contentPane.fullScreen {
+  width: 100%;
+  border-left: none;
+}
+
 /* Avatar container for voice interaction phases */
 .avatarContainer {
   flex: 1;
@@ -96,6 +138,27 @@
   align-items: center;
   justify-content: center;
   padding: 20px;
+}
+
+/* Slide container */
+.slideContainer {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  overflow: hidden;
+}
+
+/* Slide image - responsive and centered */
+.slideImage {
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
 }
 
 /* Desktop/Tablet: Show sidebar, hide overlay */
@@ -106,10 +169,6 @@
 
   .chatPaneMobile {
     display: none;
-  }
-
-  .contentPane {
-    border-left: 2px solid rgba(255, 255, 255, 0.1);
   }
 }
 
@@ -162,6 +221,19 @@
 }
 
 /* Responsive adjustments */
+@media (max-width: 767px) {
+  /* Mobile: Remove TV frame padding for full screen */
+  .appStage {
+    padding: 0;
+  }
+
+  .tvFrame {
+    border-radius: 0;
+    max-height: 100vh;
+    box-shadow: none;
+  }
+}
+
 @media (max-width: 380px) {
   .header {
     padding: 8px 12px;

@@ -5,6 +5,7 @@ import type { SessionPhase, VoiceState, Challenge, Message } from '../types';
 // Module-level promise resolver for confetti completion
 let confettiResolver: (() => void) | null = null;
 let confettiPromise: Promise<void> | null = null;
+let lastConfettiTime = 0;
 
 // Extended message type for unified chat history
 export interface ChatMessage {
@@ -130,6 +131,14 @@ export const useSessionStore = create<SessionState>((set, get) => ({
   // Celebration state
   showConfetti: false,
   triggerConfetti: () => {
+    // Debounce confetti to prevent double-firing (6 second cooldown)
+    const now = Date.now();
+    if (now - lastConfettiTime < 6000) {
+      console.log('⏸️ Confetti debounced (triggered too soon, cooldown active)');
+      return;
+    }
+    lastConfettiTime = now;
+
     // Create a new promise that will resolve when confetti completes
     confettiPromise = new Promise<void>((resolve) => {
       confettiResolver = resolve;
