@@ -27,7 +27,24 @@
 - Structured JSON output from LLM for conversation control
 - Client-side backup correctness check (regex against `correctnessFilter`)
 
-## Iteration 3 (Next — Pending Approval)
+## Iteration 3 (Complete)
+
+**Goal:** Fix correctness filter failures, improve acknowledgement quality, and enhance introduction message.
+
+**Delivered:**
+- Enhanced introduction fallback message from "7 fun challenges" to "pizzas and cake"
+- Strengthened LLM evaluation prompt with explicit acknowledgement examples
+- Removed 30-word limit for better acknowledgement quality
+- Added 1-second pause after correct answer acknowledgement before confetti
+- Comprehensive correctness debugging logs (LLM decision + client-side regex + final verdict)
+
+**Key improvements:**
+- More engaging, kid-friendly language in greeting
+- Clearer, more enthusiastic acknowledgements when students answer correctly
+- Better timing/pacing for acknowledgements (pause before celebration)
+- Enhanced debugging capability for future correctness filter issues
+
+## Iteration 4 (Next — Pending)
 
 **Client asks from Jan 23, 2026 feedback session:**
 

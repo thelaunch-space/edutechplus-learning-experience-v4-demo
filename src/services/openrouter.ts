@@ -81,7 +81,7 @@ export async function generateGreeting(studentName: string): Promise<string> {
   const apiKey = import.meta.env.VITE_OPENROUTER_KEY;
 
   if (!apiKey || !studentName.trim()) {
-    return `Hi ${studentName || 'Friend'}! We have 7 fun challenges. Let's go!`;
+    return `Hi ${studentName || 'friend'}! Ready to learn fractions? We'll use yummy pizzas and cake!`;
   }
 
   try {
@@ -117,13 +117,13 @@ export async function generateGreeting(studentName: string): Promise<string> {
     clearTimeout(timeoutId);
 
     if (!response.ok) {
-      return `Hi ${studentName}! We have 7 fun challenges. Let's go!`;
+      return `Hi ${studentName}! Ready to learn fractions? We'll use yummy pizzas and cake!`;
     }
 
     const data = await response.json();
-    return data.choices?.[0]?.message?.content?.trim() || `Hi ${studentName}! We have 7 fun challenges. Let's go!`;
+    return data.choices?.[0]?.message?.content?.trim() || `Hi ${studentName}! Ready to learn fractions? We'll use yummy pizzas and cake!`;
   } catch {
-    return `Hi ${studentName}! We have 7 fun challenges. Let's go!`;
+    return `Hi ${studentName}! Ready to learn fractions? We'll use yummy pizzas and cake!`;
   }
 }
 
@@ -248,7 +248,21 @@ export async function generateEvaluatedResponse(
 
       return !hasNegation;
     });
-    console.log('🔍 Client-side correctness check:', { studentResponse, filterPatterns, clientSideCorrect });
+
+    // Find which pattern matched (if any)
+    const matchedPattern = filterPatterns.find(pattern => {
+      const escapedPattern = pattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const regex = new RegExp(`\\b${escapedPattern}\\b`, 'i');
+      return regex.test(studentLower);
+    });
+
+    console.log('🔍 CORRECTNESS ANALYSIS:', {
+      studentResponse,
+      correctnessFilter,
+      filterPatterns,
+      matchedPattern: matchedPattern || 'none',
+      clientSideCorrect
+    });
 
     // Parse JSON from response
     try {
@@ -261,7 +275,13 @@ export async function generateEvaluatedResponse(
         const isCorrect = Boolean(parsed.isCorrect) || clientSideCorrect;
         const shouldEnd = Boolean(parsed.shouldEnd) || isCorrect;
 
-        console.log('✅ Final evaluation:', { llmIsCorrect: parsed.isCorrect, clientSideCorrect, finalIsCorrect: isCorrect });
+        console.log('✅ FINAL EVALUATION:', {
+          llmIsCorrect: parsed.isCorrect,
+          clientSideCorrect,
+          finalIsCorrect: isCorrect,
+          shouldEnd,
+          llmResponse: parsed.response
+        });
 
         return {
           response: parsed.response || turnScaffolding,

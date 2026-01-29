@@ -22,6 +22,15 @@
 | Correct answers not recognized | LLM evaluation inconsistent | Added client-side backup check using regex against `correctnessFilter` |
 | Awkward 5-second recording wait | Auto-recording with fixed duration | Replaced with PTT (hold-to-talk) |
 
+## Bugs Fixed — Iteration 3
+
+| Bug | Cause | Fix |
+|-----|-------|-----|
+| Generic "7 fun challenges" intro | Hardcoded fallback message | Updated all fallback greetings to reference "pizzas and cake" |
+| Weak acknowledgements | 30-word limit too restrictive, LLM not following instructions | Enhanced prompt with explicit examples, removed word limit, added emphasis on enthusiasm |
+| Rushed correct answer flow | No pause between acknowledgement and confetti | Added 1-second pause after acknowledgement before confetti triggers |
+| Correctness filter hard to debug | Insufficient logging | Added detailed console logging showing LLM decision, client-side regex match, and final verdict |
+
 ## Known Issues
 
 None currently tracked.

@@ -41,6 +41,7 @@ interface UseVoiceInteractionReturn {
   runGreetingInteraction: () => Promise<void>;
   runPreChallengeInteraction: () => Promise<void>;
   runPostChallengeInteraction: () => Promise<void>;
+  runSlideInteraction: () => Promise<void>;
 
   // Low-level controls
   speak: (text: string) => Promise<void>;
@@ -306,6 +307,168 @@ export function useVoiceInteraction(): UseVoiceInteractionReturn {
     }
   }, [speak, getCurrentChallenge, setPhase]);
 
+  // Slide interaction with conditional multi-turn for question slides
+  const runSlideInteraction = useCallback(async (): Promise<void> => {
+    try {
+      console.log('🖼️ === SLIDE INTERACTION START ===');
+      setError(null);
+      const challenge = getCurrentChallenge();
+
+      if (!challenge) {
+        console.log('❌ Slide: No challenge found, moving to COMPLETE');
+        setPhase('COMPLETE');
+        return;
+      }
+
+      if (challenge.type !== 'slide') {
+        console.log('❌ Slide: Challenge is not a slide type, skipping');
+        setPhase('IN_CHALLENGE');
+        return;
+      }
+
+      console.log(`🎯 Slide: Challenge ${challenge.number} - ${challenge.title}`);
+      console.log(`📊 Question slide: ${challenge.isQuestionSlide || false}`);
+
+      // Speak the pre-script
+      console.log('🎤 Slide: Speaking pre-script...');
+      await speak(challenge.preScript);
+
+      // Wait before showing slide
+      console.log('⏱️ Slide: Waiting 1000ms before showing slide...');
+      await new Promise(resolve => setTimeout(resolve, 1000));
+
+      // Set phase to show the slide
+      console.log('✅ Slide: Setting phase to IN_CHALLENGE to display slide');
+      setPhase('IN_CHALLENGE');
+
+      // Wait a moment for slide to render
+      await new Promise(resolve => setTimeout(resolve, 1000));
+
+      // Check if this is a narration slide or question slide
+      if (challenge.isQuestionSlide === false) {
+        // Narration slide - speak narration and auto-advance
+        console.log('📢 Slide: Narration slide - speaking slideNarration...');
+        if (challenge.slideNarration) {
+          await speak(challenge.slideNarration);
+        }
+
+        // Wait before auto-advancing
+        console.log('⏱️ Slide: Waiting 1500ms before auto-advancing...');
+        await new Promise(resolve => setTimeout(resolve, 1500));
+
+        // Auto-advance to next challenge (NO CONFETTI for narration slides)
+        console.log('✅ === NARRATION SLIDE COMPLETE === Moving to next challenge');
+        const isComplete = goToNextChallenge();
+        if (isComplete) {
+          console.log('🏁 All challenges complete!');
+          setPhase('COMPLETE');
+        } else {
+          console.log('➡️ Moving to PRE_CHALLENGE for next challenge');
+          setPhase('PRE_CHALLENGE');
+        }
+      } else {
+        // Question slide - run multi-turn Socratic dialogue
+        console.log('❓ Slide: Question slide - starting multi-turn dialogue...');
+
+        // Reset turn counter for this challenge
+        resetTurn();
+
+        // Ask the post question
+        console.log('🎤 Slide: Asking question...');
+        await speak(challenge.postQuestion);
+
+        // Multi-turn conversation loop (same as runPostChallengeInteraction)
+        let shouldContinue = true;
+        let turnCount = 0;
+        const maxSafetyTurns = challenge.maxTurns + 1; // Safety cap
+
+        while (shouldContinue && turnCount < maxSafetyTurns) {
+          console.log(`\n🔄 Turn ${turnCount + 1} of ${challenge.maxTurns}`);
+
+          // Wait before listening
+          await new Promise(resolve => setTimeout(resolve, 500));
+
+          // Listen for student's response
+          console.log('👂 Listening for student response...');
+          const transcript = await listenAndTranscribe();
+          console.log('📝 Got transcript:', transcript);
+
+          // Add student's response to unified chat history
+          if (transcript.trim()) {
+            addChatMessage('user', transcript);
+          }
+
+          // Get conversation history for context
+          const conversationHistory = getConversationHistory(challenge.id);
+
+          // Generate evaluated response
+          console.log('🤖 Evaluating response with LLM...');
+          setVoiceState('PROCESSING');
+          const result = await generateEvaluatedResponse(
+            transcript,
+            studentName,
+            challenge.correctnessFilter,
+            challenge.scaffolding,
+            turnCount,
+            challenge.maxTurns,
+            conversationHistory
+          );
+          console.log('✅ Evaluation result:', result);
+
+          // Add messages to conversation history
+          addMessage(challenge.id, { role: 'user', content: transcript });
+          addMessage(challenge.id, { role: 'assistant', content: result.response });
+
+          // Speak the response
+          console.log('🎤 Speaking response:', result.response);
+          await speak(result.response);
+
+          // Check exit conditions
+          if (result.isCorrect) {
+            console.log('✅ Student answered correctly!');
+            shouldContinue = false;
+          } else if (result.shouldEnd) {
+            console.log('⏹️ LLM signaled to end conversation');
+            shouldContinue = false;
+          } else if (turnCount >= challenge.maxTurns - 1) {
+            console.log('⏹️ Max turns reached');
+            shouldContinue = false;
+          } else {
+            // Continue to next turn
+            incrementTurn();
+            turnCount++;
+          }
+        }
+
+        // Trigger celebration confetti
+        console.log('🎉 Triggering celebration confetti!');
+        triggerConfetti();
+
+        // Wait for confetti animation to complete (5 seconds)
+        console.log('⏱️ Waiting for confetti to complete...');
+        await waitForConfetti();
+        console.log('✅ Confetti complete!');
+
+        // Move to next challenge
+        console.log('✅ === QUESTION SLIDE COMPLETE === Moving to next challenge');
+        const isComplete = goToNextChallenge();
+        if (isComplete) {
+          console.log('🏁 All challenges complete!');
+          setPhase('COMPLETE');
+        } else {
+          console.log('➡️ Moving to PRE_CHALLENGE for next challenge');
+          setPhase('PRE_CHALLENGE');
+        }
+      }
+    } catch (err) {
+      console.error('❌ Slide interaction error:', err);
+      // On error, still move forward
+      await speak("Good job! Let's continue!");
+      const isComplete = goToNextChallenge();
+      setPhase(isComplete ? 'COMPLETE' : 'PRE_CHALLENGE');
+    }
+  }, [speak, listenAndTranscribe, getCurrentChallenge, studentName, goToNextChallenge, setPhase, resetTurn, incrementTurn, addMessage, getConversationHistory, addChatMessage, triggerConfetti, waitForConfetti, setVoiceState, setError]);
+
   // Post-challenge interaction with multi-turn loop
   const runPostChallengeInteraction = useCallback(async (): Promise<void> => {
     try {
@@ -378,6 +541,9 @@ export function useVoiceInteraction(): UseVoiceInteractionReturn {
         // Check exit conditions
         if (result.isCorrect) {
           console.log('✅ Student answered correctly!');
+          // Pause after acknowledgement for student to process
+          console.log('⏸️ Pausing 1 second to let student process acknowledgement...');
+          await new Promise(resolve => setTimeout(resolve, 1000));
           shouldContinue = false;
         } else if (result.shouldEnd) {
           console.log('⏹️ LLM signaled to end conversation');
@@ -451,6 +617,7 @@ export function useVoiceInteraction(): UseVoiceInteractionReturn {
     runGreetingInteraction,
     runPreChallengeInteraction,
     runPostChallengeInteraction,
+    runSlideInteraction,
     speak,
     listenAndRespond,
     // PTT controls
