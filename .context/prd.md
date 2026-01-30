@@ -6,13 +6,14 @@ EdutechPlus has B2G math content (videos + applets) that needs an engagement lay
 
 ## Solution
 
-**Math Mate** — an AI voice companion that guides students through 7 learning challenges covering fractions. Inspired by Synthesis AI's scripted lessons, but with LLM-powered teaching intelligence.
+**Math Mate** — an AI voice companion that guides students through 14 learning nodes (videos, applets, slides) covering fractions. Inspired by Synthesis AI's scripted lessons, but with LLM-powered teaching intelligence.
 
 Core capabilities:
 - Two-way voice interaction at content transitions
-- Multi-turn Socratic teaching conversations
+- Multi-turn Socratic teaching conversations (up to 5 turns)
 - Correctness evaluation with scaffolded follow-up
 - Hold-to-talk (PTT) for natural conversation
+- Slide content with narration and interactive questions
 - Playful, kid-friendly UI (Candy-Land theme)
 
 ## User Persona
@@ -24,9 +25,10 @@ Core capabilities:
 
 ## Success Criteria
 
-- Student stays engaged for full 20-minute session (7 challenges)
-- Demonstrates understanding through Socratic Q&A after each content piece
+- Student stays engaged for full 20-minute session (14 nodes)
+- Demonstrates understanding through Socratic Q&A after interactive content
 - Feels like talking to a tutor, not a traffic controller
+- Content-first display with AI as companion (not centerpiece)
 
 ## Tech Stack
 

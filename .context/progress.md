@@ -27,30 +27,94 @@
 - Structured JSON output from LLM for conversation control
 - Client-side backup correctness check (regex against `correctnessFilter`)
 
-## Iteration 3 (Complete)
+## Iteration 3 (Complete — 2026-01-29)
 
-**Goal:** Fix correctness filter failures, improve acknowledgement quality, and enhance introduction message.
+**Goal:** Implement slide content type with narration/question variants + WhatsApp-style chat UI.
 
 **Delivered:**
+
+**Slide Content Type:**
+- New `'slide'` content type with `slideUrl`, `slideNarration`, `isQuestionSlide` fields
+- SlideViewer component for full-screen slide rendering with skip button
+- 7 slide images added to `/public/fractions-module-content/slides/`
+- Narration slides: Auto-advance after TTS speaks scripted narration (no confetti)
+- Question slides: Multi-turn Socratic dialogue with confetti on completion
+- Complete 14-node learning journey (7 existing + 7 new slides)
+
+**WhatsApp-Style Chat UI (Complete):**
+- **ChatMessage** component with WhatsApp-style bubbles (green for user, white for assistant)
+- **ChatHistory** component with message list, auto-scroll, and typing indicators (bouncing dots)
+- **ChatPane** component integrating chat history with hold-to-talk PTT button
+- **Two-pane layout** in App.tsx:
+  - Desktop/Tablet: Sidebar chat on left, content on right
+  - Mobile: Overlay chat pane at bottom
+- **Content-first display:** Chat hides during video/applet playback for full-screen immersion
+- **Conditional visibility:** Chat shows during greeting/pre/post phases and slide interactions
+- Message bubbles with slide-in animations, recent message pulse effect
+- Typing indicators: "Math Mate is thinking..." / "Math Mate is talking..."
+
+**Components created:**
+- `src/components/ChatMessage.tsx` + `.module.css`
+- `src/components/ChatHistory.tsx` + `.module.css`
+- `src/components/ChatPane.tsx` + `.module.css`
+
+**Key technical changes:**
+- Updated `Challenge` type to include slide-specific fields
+- Updated `App.tsx` to implement two-pane responsive layout with conditional chat visibility
+- Slide behavior controlled by `isQuestionSlide` flag (narrate vs question)
+- Total challenges increased from 7 → 14 nodes
+- Session store tracks `allMessages` array for chat history
+- Voice interaction displays real-time text in chat thread
+
+**Prior Iteration 3 work (2026-01-28):**
 - Enhanced introduction fallback message from "7 fun challenges" to "pizzas and cake"
 - Strengthened LLM evaluation prompt with explicit acknowledgement examples
 - Removed 30-word limit for better acknowledgement quality
 - Added 1-second pause after correct answer acknowledgement before confetti
-- Comprehensive correctness debugging logs (LLM decision + client-side regex + final verdict)
+- Comprehensive correctness debugging logs
 
-**Key improvements:**
-- More engaging, kid-friendly language in greeting
-- Clearer, more enthusiastic acknowledgements when students answer correctly
-- Better timing/pacing for acknowledgements (pause before celebration)
-- Enhanced debugging capability for future correctness filter issues
+## Iteration 4 (In Progress — Jan 30, 2026)
 
-## Iteration 4 (Next — Pending)
+**New client feedback received:** Shifted priorities based on UX issues and pedagogical improvements.
 
-**Client asks from Jan 23, 2026 feedback session:**
+### ✅ Completed (Jan 30, 2026)
 
-1. **Slides as new content type** — static visual content with AI narration
-2. **Full-screen content mode** — content is the star; AI character enters/exits as needed
-3. **Content team authoring control** — define WHERE voice nodes appear and WHAT AI says first (via `skipPreVoice`, `skipPostVoice` flags)
-4. **Cost-conscious architecture** — scripted (TTS-only) vs AI-powered (LLM) nodes, so not every interaction needs an LLM call
+**Priority 1: Button Positioning (UI Fix) — DONE**
+- ✅ Moved Skip/Done buttons from bottom-right to top-right across all content types
+- ✅ Unified button styling (translucent pill with arrow)
+- ✅ Standardized button text to "Skip →"
+- ✅ Updated responsive positioning for mobile and landscape modes
+- ✅ Prevents interference with applet interactive elements
+- **Files modified:**
+  - `src/components/YouTubePlayer.module.css`
+  - `src/components/AppletContainer.module.css` + `AppletContainer.tsx`
+  - `src/components/SlideViewer.module.css`
+
+**Priority 2: Applet Loading Investigation (Bug) — DONE**
+- ✅ Verified all 4 applet index.html files exist at correct paths
+- ✅ Confirmed file structure matches challenges.ts configuration:
+  - A1: `A1. M2-Fraction Cut and Glue Practice/index.html` ✓
+  - A2: `A2.M2-Fraction Paper Cut Snapshot/index.html` ✓
+  - A3: `A3. M2-Fraction Statement Cake Snapshot/index.html` ✓
+  - A4: `A4.M2-Fraction Cut and Glue Practice 2/index.html` ✓
+- **Conclusion:** Issue likely client-side browser caching, not codebase bug
+
+### 📋 Deferred to Future Iterations
+
+**Priority 3: Dynamic Slide Behavior (Major Feature)**
+- Transform slides from static images to interactive "blackboards"
+- Slides update based on conversation state (question → hint → answer)
+- Multi-state slide data model + SlideViewer state machine
+- Requires architectural changes to Challenge type and voice interaction
+- Content team creates multi-frame slide assets
+- **Scope:** 3-5 days (large architectural change)
+- **Status:** Needs design phase planning before implementation
+
+**Previously Planned (Medium Priority):**
+- Chat-style conversation UI (WhatsApp-like thread)
+- Flexible voice nodes (`skipPreVoice`/`skipPostVoice` flags)
+- Additional correctness filter improvements
 
 See `.context/feedback.md` for full rationale and `.context/feature-wishlist.md` for detailed feature list.
+
+**Last updated:** 2026-01-30

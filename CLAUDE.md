@@ -2,7 +2,7 @@
 
 ## Quick Context
 
-Math Mate is a voice-guided learning experience for Grade 4 fractions. An AI companion guides students through 7 challenges (videos + applets) with multi-turn Socratic conversations, evaluating understanding and scaffolding when students struggle. Built for EdutechPlus B2C mobile app — no teacher present.
+Math Mate is a voice-guided learning experience for Grade 4 fractions. An AI companion guides students through 14 nodes (videos + applets + slides) with multi-turn Socratic conversations, evaluating understanding and scaffolding when students struggle. Built for EdutechPlus B2C mobile app — no teacher present.
 
 ## Tech Stack
 
@@ -16,15 +16,21 @@ Math Mate is a voice-guided learning experience for Grade 4 fractions. An AI com
 
 | File | Purpose |
 |------|---------|
-| `src/config/challenges.ts` | Challenge definitions, questions, correctness filters, scaffolding |
+| `src/config/challenges.ts` | 14 challenge definitions (videos, applets, slides) with questions, correctness filters, scaffolding |
 | `src/config/prompts.ts` | LLM system prompts (Socratic evaluation) |
 | `src/hooks/useVoiceInteraction.ts` | Voice interaction + PTT + multi-turn loop + slide interaction |
 | `src/services/openrouter.ts` | OpenRouter LLM service |
 | `src/services/deepgram.ts` | Speech-to-text service |
 | `src/services/tts.ts` | Text-to-speech service |
-| `src/store/sessionStore.ts` | Session state + conversation history |
-| `src/types/index.ts` | TypeScript type definitions |
+| `src/store/sessionStore.ts` | Session state + conversation history (allMessages array) |
+| `src/types/index.ts` | TypeScript type definitions (includes `'slide'` content type) |
+| `src/App.tsx` | Main app with two-pane responsive layout, conditional chat visibility |
+| `src/components/ChatMessage.tsx` | WhatsApp-style chat bubbles (green for user, white for assistant) |
+| `src/components/ChatHistory.tsx` | Message list with auto-scroll, typing indicators |
+| `src/components/ChatPane.tsx` | Chat UI integrating history + PTT button |
 | `src/components/SlideViewer.tsx` | Full-screen slide renderer for narration/question slides |
+| `src/components/YouTubePlayer.tsx` | YouTube embed with Skip button |
+| `src/components/AppletContainer.tsx` | iframe wrapper for interactive applets |
 | `src/components/` | Other React components with CSS Modules |
 
 ## Context Files

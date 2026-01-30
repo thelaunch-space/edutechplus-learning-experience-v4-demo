@@ -4,20 +4,20 @@
 
 | # | Type | Title | Description | Status |
 |---|------|-------|-------------|--------|
-| 1 | Slide | Why Fractions? | Motivation hook - sharing cake with friends | ⏳ Yet to be added |
+| 1 | Slide | Why Fractions? | Motivation hook - sharing cake with friends | ✅ Implemented |
 | 2 | Video | What are Fractions? | Intro to fractions using pizza/cake examples | ✅ Implemented |
 | 3 | Applet | Cut and Glue Practice | Hands-on: cutting paper into equal parts (halves, quarters) | ✅ Implemented |
 | 4 | Applet | Fraction Patterns | Visual comparison: 1/2, 1/4, 1/6 - which has more pieces? | ✅ Implemented |
 | 5 | Applet | Cake Fractions | Vocabulary lesson: numerator (top), denominator (bottom) | ✅ Implemented |
-| 6 | Slide | What are Fractions? | Preview for Video 2 - cutting objects into equal parts | ⏳ Yet to be added |
+| 6 | Slide | What are Fractions? | Preview for Video 2 - cutting objects into equal parts | ✅ Implemented |
 | 7 | Video | Bigger Fractions | Numerators > 1: examples like 2/4, 3/6 | ✅ Implemented |
 | 8 | Applet | Advanced Practice | Create fractions with bigger numerators: 2/5, 3/5 | ✅ Implemented |
-| 9 | Slide | Math Vault: Fraction Definition | Formal definition - fraction = part of whole, has 2 parts | ⏳ Yet to be added |
-| 10 | Slide | Numerator and Denominator | Visual breakdown of 1/4 with labeled parts | ⏳ Yet to be added |
-| 11 | Slide | Discover More Fractions | Quick check: "What fraction is 2 slices out of 6?" | ⏳ Yet to be added |
+| 9 | Slide | Math Vault: Fraction Definition | Formal definition - fraction = part of whole, has 2 parts | ✅ Implemented |
+| 10 | Slide | Numerator and Denominator | Visual breakdown of 1/4 with labeled parts | ✅ Implemented |
+| 11 | Slide | Discover More Fractions | Quick check: "What fraction is 2 slices out of 6?" | ✅ Implemented |
 | 12 | Video | You Did It! | Celebration + final review: "What's the bottom number called?" | ✅ Implemented |
-| 13 | Slide | Math Trap: Find the Error | Diagnostic - spot mistake in 2/4 vs 2/6 bar diagrams | ⏳ Yet to be added |
-| 14 | Slide | Snapshot: More Parts | Final summary - fractions can show multiple parts (2/5, 3/5, 4/6) | ⏳ Yet to be added |
+| 13 | Slide | Math Trap: Find the Error | Diagnostic - spot mistake in 2/4 vs 2/6 bar diagrams | ✅ Implemented |
+| 14 | Slide | Snapshot: More Parts | Final summary - fractions can show multiple parts (2/5, 3/5, 4/6) | ✅ Implemented |
 
 ## Node Type Definitions
 
@@ -44,7 +44,11 @@ Each node (video/applet/slide) follows this pattern:
 
 ## Implementation Notes
 
-- Total journey: 14 nodes (7 existing + 7 new slides)
-- Slides 1,2,6,9,10,11,13,14 need to be added to `challenges.ts`
-- New Challenge type: `'slide'` with `imageUrl` field
-- Slide images located in: `/public/fractions-module-content/slides/`
+- Total journey: 14 nodes (all implemented as of 2026-01-29)
+- Slide content type added with `slideUrl`, `slideNarration`, `isQuestionSlide` fields
+- 7 slide images located in: `/public/fractions-module-content/slides/`
+- SlideViewer component handles full-screen slide rendering
+- Narration slides (nodes 1,6,9,10,14): Auto-advance after TTS narration
+- Question slides (nodes 11,13): Multi-turn Socratic dialogue with confetti
+
+**Last updated:** 2026-01-30

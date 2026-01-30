@@ -53,76 +53,56 @@
   z-index: 1;
 }
 
-/* Complete button - celebration style */
+/* Skip button - unified simple style */
 .completeButton {
   position: absolute;
-  bottom: 24px;
+  top: 24px;
   right: 24px;
-  padding: 16px 32px;
+  padding: 14px 28px;
   font-family: var(--font-display);
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 700;
   color: #fff;
-  background: linear-gradient(135deg, var(--mint) 0%, #10b981 100%);
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(12px);
+  border: 3px solid rgba(255, 255, 255, 0.3);
   border-radius: 100px;
-  box-shadow:
-    0 6px 0 #059669,
-    0 10px 25px rgba(16, 185, 129, 0.4);
   cursor: pointer;
   transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
   z-index: 20;
   display: flex;
   align-items: center;
-  gap: 10px;
-  animation: buttonBreathe 2s ease-in-out infinite;
+  gap: 8px;
 }
 
-@keyframes buttonBreathe {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.03); }
-}
-
-/* Checkmark icon */
-.completeButton::before {
-  content: '✓';
-  font-size: 20px;
-  font-weight: 800;
-}
-
-/* Sparkle hint */
 .completeButton::after {
-  content: '✨';
-  font-size: 16px;
-  animation: sparkleHint 1.5s ease-in-out infinite;
-}
-
-@keyframes sparkleHint {
-  0%, 100% { opacity: 0.5; transform: scale(0.8) rotate(0deg); }
-  50% { opacity: 1; transform: scale(1.2) rotate(15deg); }
+  content: '→';
+  font-size: 18px;
+  transition: transform 0.2s ease;
 }
 
 .completeButton:hover {
-  transform: translateY(-4px);
-  box-shadow:
-    0 10px 0 #059669,
-    0 16px 35px rgba(16, 185, 129, 0.5);
-  animation: none;
+  background: rgba(255, 255, 255, 0.25);
+  border-color: rgba(255, 255, 255, 0.5);
+  transform: translateX(4px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.completeButton:hover::after {
+  transform: translateX(4px);
 }
 
 .completeButton:active {
-  transform: translateY(2px);
-  box-shadow:
-    0 2px 0 #059669,
-    0 4px 12px rgba(16, 185, 129, 0.4);
+  transform: translateX(2px) scale(0.98);
 }
 
 /* Responsive */
 @media (max-width: 380px) {
   .completeButton {
-    bottom: 16px;
+    top: 16px;
     right: 16px;
-    padding: 14px 24px;
-    font-size: 16px;
+    padding: 12px 20px;
+    font-size: 14px;
   }
 
   .iframe {
@@ -143,10 +123,10 @@
 /* Landscape mode */
 @media (max-height: 500px) {
   .completeButton {
-    bottom: 12px;
+    top: 12px;
     right: 12px;
-    padding: 10px 20px;
-    font-size: 14px;
+    padding: 10px 18px;
+    font-size: 13px;
   }
 
   .iframe {

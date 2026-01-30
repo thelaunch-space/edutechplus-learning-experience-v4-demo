@@ -58,7 +58,7 @@ export function AppletContainer({ src, onComplete }: AppletContainerProps) {
           }
         }}
       >
-        Done! Next Challenge →
+        Skip
       </button>
     </div>
   );
