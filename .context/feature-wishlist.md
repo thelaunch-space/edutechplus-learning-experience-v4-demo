@@ -36,6 +36,20 @@
 - **Corrective slides / routing logic** — branch to remedial content if student struggles *(feedback-iter-3, transcript-2)*
 - **On-demand doubts** — tap-to-speak outside structured conversation for ad-hoc questions *(impl-plan-iter-2)*
 - **Pre-asset multi-turn** — currently just scripted intro; could become interactive *(impl-plan-iter-2)*
-- **Content authoring portal** — GUI for content team to drag/drop nodes, replace config file editing *(feedback-iter-3)*
+- **Content authoring portal** — GUI for content team to drag/drop nodes, replace config file editing *(feedback-iter-3)* **[FRAMEWORK DESIGNED — see `.context/framework-wip.md` and `content-inputs/`]**
+
+## Platform Scaling (Framework Designed, Build Deferred)
+
+Framework documentation and reference implementation complete:
+- `.context/framework-wip.md` — Client-friendly guide
+- `.context/framework-technical.md` — Technical spec
+- `content-inputs/` — Reference content structure
+
+**Build phases when ready:**
+1. Backend setup (Convex + Clerk)
+2. Progress persistence
+3. Content authoring GUI
+4. Analytics dashboard
+5. Buddy system (configurable AI personas)
 
 **Last updated:** 2026-02-02

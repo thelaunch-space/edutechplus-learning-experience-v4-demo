@@ -1,14 +1,22 @@
-# Math Mate Platform — Content Team Guide
+# Math Mate Platform — Content Authoring Framework
 
-**Document Purpose:** This explains how your content team can create learning journeys using the Math Mate platform.
-
+**Document Type:** Proposal
+**Status:** Framework designed, pending implementation
 **Last updated:** 2026-02-02
+
+---
+
+## Overview
+
+This document proposes how your content team will create learning journeys using the Math Mate platform. The framework has been designed based on the working demo — the next phase is building the authoring tools.
 
 ---
 
 ## What is Math Mate?
 
-Math Mate is an AI-powered learning companion that guides students through educational content. Your content team creates the **learning journeys** — Math Mate brings them to life with voice, conversation, and interactivity.
+Math Mate is an AI-powered learning companion that guides students through educational content. Your content team creates the **learning journeys** — the platform brings them to life with voice, conversation, and interactivity.
+
+*Note: "Math Mate" is a working name for the product. You can rename the product and the AI companion (called "Buddies") to match your brand.*
 
 ---
 
@@ -27,6 +35,8 @@ Your content team doesn't start from scratch. Here's how it works:
 - Faster content creation (AI does the heavy lifting)
 - Your experts focus on quality, not blank pages
 - Consistent structure across all content
+
+*This workflow will be enabled through a content authoring interface — currently in the design phase.*
 
 ---
 
@@ -139,10 +149,12 @@ For nodes that need student interaction (tapping, comparing, etc.), you'll choos
 
 Students will be able to choose their AI companion ("Buddy"):
 
-- **Math Mate** — The friendly math tutor (current)
-- **More buddies coming** — Different personalities, voices, characters
+- **Default Buddy** — The friendly tutor (currently called "Math Mate" in the demo)
+- **Additional Buddies** — Different personalities, voices, characters
 
-Each Buddy has a defined persona that shapes how they speak and encourage students. Your content works with any Buddy — they just deliver it with their own style.
+Each Buddy has a defined persona that shapes how they speak and encourage students. Your content works with any Buddy — they deliver it with their own style.
+
+*You control Buddy names, personalities, and voices to match your brand.*
 
 ---
 
@@ -201,8 +213,12 @@ For each node with questions:
 
 ---
 
-## Questions?
+## Next Steps
 
-This document will evolve as we build. Your feedback shapes what controls you need.
+This framework has been validated through the working demo. To move forward:
 
-*— The Math Mate Platform Team*
+1. **Review this proposal** — Does this match how your content team wants to work?
+2. **Provide feedback** — What controls are missing? What's unclear?
+3. **Build phase** — Once approved, we build the authoring interface
+
+Your feedback shapes the final product.

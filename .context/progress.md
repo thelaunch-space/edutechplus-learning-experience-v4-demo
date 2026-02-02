@@ -132,12 +132,41 @@
 - Celebration answer banner with sparkle animations
 - Responsive design for mobile, tablet, and desktop
 
+### ✅ Completed (Feb 2, 2026) — Framework & Content Structure
+
+**Priority 4: Content Authoring Framework Design — DONE**
+- ✅ Created `framework-wip.md` — Client-friendly guide explaining what content teams control
+- ✅ Created `framework-technical.md` — Technical spec for building the scalable platform
+- ✅ Created `content-inputs/` folder — Reference implementation of content team inputs:
+  - `journey-metadata.json` — Journey-level config (title, objectives, vocabulary)
+  - `node-sequence.json` — 14-node sequence definition
+  - `asset-contexts/*.md` — 14 files describing what each video/applet/slide teaches
+  - `conversations/*.json` — 14 files with pre/post conversation configs
+
+**Key framework decisions:**
+- Scaffolding uses flexible `probes[]` array (2-5 per question, not fixed 5)
+- Asset context descriptions required — AI can't watch videos
+- AI drafts conversation config from asset descriptions; content team reviews/edits
+- Linear node sequence for v1 (no branching)
+- Buddy system (configurable AI personas) planned for future
+
+**Files created:**
+- `.context/framework-wip.md`
+- `.context/framework-technical.md`
+- `content-inputs/` folder (34 files)
+
 ### 📋 Deferred to Future Iterations
 
 **Previously Planned (Medium Priority):**
 - Flexible voice nodes (`skipPreVoice`/`skipPostVoice` flags)
 - Additional correctness filter improvements
 - Generalized dynamic slide system (if experiment proves successful)
+
+**Platform Build (Future Phase):**
+- Backend setup (Convex + Clerk)
+- Content authoring GUI
+- Progress persistence
+- Analytics dashboard
 
 See `.context/feedback.md` for full rationale and `.context/feature-wishlist.md` for detailed feature list.
 
