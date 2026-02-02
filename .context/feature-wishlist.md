@@ -16,15 +16,11 @@
 1. ✅ **Unified button positioning** — Moved Skip/Done buttons to top-right across video/applet/slide. Unified styling (translucent pill with arrow). Standardized text to "Skip →" *(feedback-jan-30)*
 2. ✅ **Debug Applet A2 loading** — Verified all 4 applet files exist at correct paths. Issue likely client-side caching *(feedback-jan-30)*
 
-## Iteration 4 (Current — Jan 30, 2026)
+## Completed (Iteration 4 — Feb 2, 2026)
 
-### High Priority (Immediate)
-1. 🚀 **Dynamic slide behavior** — Slides as interactive "blackboards" that update based on conversation state *(feedback-jan-30)*
-   - Voice asks question → slide appears
-   - Student struggles → slide shows visual hint
-   - Student correct → slide shows answer reveal
-   - Requires: Multi-state slide data model, SlideViewer state machine, voice-slide coordination
-   - **Status:** Needs design phase planning (3-5 day effort)
+3. ✅ **Dynamic interactive slide (Node 4)** — FractionCompareSlide with 5-frame state machine (question → cut → highlight → compare → celebration). Two interaction paths: Path A (correct first try) with quick animated summary, Path B (wrong answer) with interactive tap-to-split scaffolding. 15-second auto-timeout fallback. *(feedback-jan-30)*
+
+## Future Iterations
 
 ### Medium Priority
 4. **Acknowledge student responses** — AI must reference what the student said before moving on, not just traverse a fixed scaffolding tree *(transcript-2)* [PARTIALLY ADDRESSED via prompt improvements]
@@ -42,4 +38,4 @@
 - **Pre-asset multi-turn** — currently just scripted intro; could become interactive *(impl-plan-iter-2)*
 - **Content authoring portal** — GUI for content team to drag/drop nodes, replace config file editing *(feedback-iter-3)*
 
-**Last updated:** 2026-01-30
+**Last updated:** 2026-02-02

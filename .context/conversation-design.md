@@ -119,39 +119,51 @@ Slides should function like a teacher's blackboard — revealing content dynamic
 - Student: "Two sixths!" OR Voice reveals answer
 - Slide: Shows final answer 2/6 with checkmark/celebration visual
 
-### Technical Requirements
+### Implementation (Completed Feb 2, 2026)
 
-**Multi-State Slide Data Model:**
-- Slides need multiple "frames" or "states" (initial, hint1, hint2, answer)
-- Challenge type extension: `slideFrames?: string[]` or `slideStates?: { initial, hint, answer }`
-- Backward compatible: Single `slideUrl` = single-state slide (narration slides)
+**Focused Experiment: FractionCompareSlide (Node 4)**
 
-**SlideViewer State Machine:**
-- Track current frame index
-- Transition between frames based on external trigger
-- Support both static (single frame) and dynamic (multi-frame) modes
+Built a React component `FractionCompareSlide` that demonstrates the vision. Uses programmatic rendering (not image assets) for flexibility.
 
-**Voice-Slide Coordination:**
-- `useVoiceInteraction` triggers slide frame transitions
-- Scaffolding level maps to frame (probe → initial, hint → hint frame, reveal → answer frame)
-- OR turn number determines frame progression
+**Architecture:**
+- 5-frame state machine: `question` → `cut` → `highlight` → `compare` → `celebration`
+- Types added to `src/types/index.ts`: `SlideFrame`, `SlideInteractionState`
+- State managed in `sessionStore.ts`: `dynamicSlideFrame`, `slideInteraction`, `setDynamicSlideFrame()`, etc.
+- Voice coordination in `useVoiceInteraction.ts`: `runFractionCompareInteraction(isCorrect: boolean)`
 
-**Content Creation:**
-- Content team creates layered slide assets:
-  - `slide-11-initial.png` - question only
-  - `slide-11-hint.png` - question with visual scaffold
-  - `slide-11-answer.png` - question with answer revealed
-- OR: Single layered image with CSS show/hide logic
-- OR: SVG with programmable element visibility
+**Two Interaction Paths:**
+- **Path A (Correct first try):** Student says "1/6" → Quick 5-second animation showing all frames
+- **Path B (Wrong answer):** Student gives wrong answer → Interactive scaffolding:
+  1. Tap indicators appear on rectangles
+  2. Student taps to split (or 15-second auto-advance)
+  3. Tap indicators appear on pieces
+  4. Student taps to highlight (or 15-second auto-advance)
+  5. Piece counts appear
+  6. Voice asks "Which number is bigger - 4 or 6?"
+  7. Student answers verbally
+  8. Celebration frame
 
-### Migration Path
-- Narration slides (nodes 1, 6, 9, 10, 14): Keep as single-state, no changes needed
-- Question slides (nodes 11, 13): Upgrade to multi-state behavior
-- Backward compatibility: Existing single `slideUrl` slides continue working
+**Touch Interactions:**
+- Tap-to-split: Triggers rectangle cut animation
+- Tap-to-highlight: Fills pieces with coral color
+- 15-second timeout auto-advances if student doesn't tap
+
+**Visual Design:**
+- Split animations with staggered vertical lines
+- Pulsing glow on tap indicators
+- Piece count badges with pop-in animation
+- Celebration banner with sparkle effects
+
+### Future Expansion
+
+The `hasDynamicSlide: true` flag on Challenge type enables identifying nodes that use this pattern. If experiment proves successful:
+- Generalize to nodes 11, 13 (question slides)
+- Create reusable dynamic slide framework
+- Consider SVG-based slides for easier content authoring
 
 ## Source Material
 
 Full conversation scripts with opening questions, teaching points, follow-ups, and exit phrases are in:
 `fractions-module-content/content-context-docs/mathmate-conversation-design.md`
 
-**Last updated:** 2026-01-30
+**Last updated:** 2026-02-02

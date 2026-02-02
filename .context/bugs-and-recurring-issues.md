@@ -38,28 +38,22 @@
 | Button positioning conflicts | Skip/Done buttons at bottom-right overlapped with applet controls | Moved all buttons to top-right, unified styling and text across video/applet/slide |
 | Applet A2 loading reported | Client reported loading issue | Investigation complete: All 4 applet files verified to exist with correct paths. Likely client-side caching issue. |
 
-## Known Issues (as of Jan 30, 2026)
+## Known Issues (as of Feb 2, 2026)
 
-| Issue | Type | Severity | Investigation Status |
-|-------|------|----------|---------------------|
-| **Dynamic slide behavior** | Feature Request | High | 📋 Design phase - requires architectural planning |
+No critical bugs. All Iteration 4 priorities completed.
 
-### Dynamic Slide Behavior (Feature Request)
+## Resolved Issues — Iteration 4
+
+### Dynamic Slide Behavior (Implemented Feb 2, 2026)
 - **Reported:** Jan 30, 2026
-- **Current behavior:** Slides are static images with linear narration
-- **Desired behavior:** Slides should act as "blackboards" that update based on conversation state
-- **Example flow:**
-  1. Voice asks question
-  2. Slide appears showing visual
-  3. Student struggles
-  4. Slide transitions to hint state (highlights relevant parts)
-  5. Student answers correctly
-  6. Slide transitions to answer state (shows confirmation)
-- **Impact:** Much stronger pedagogically - visual aids appear when needed to support scaffolding
-- **Scope:** Large architectural change (3-5 days)
-- **Requirements:**
-  - Multi-state slide data model (initial, hint, answer frames)
-  - SlideViewer state machine
-  - Voice interaction coordination with slide transitions
-  - Content team creates multi-frame slide assets
-  - Backward compatibility with single-state narration slides
+- **Previous behavior:** Slides were static images with linear narration
+- **Implemented solution:** `FractionCompareSlide` component for Node 4 with 5-frame state machine
+- **Implementation details:**
+  - Frames: question → cut → highlight → compare → celebration
+  - Path A (correct first try): Quick animated summary
+  - Path B (wrong answer): Interactive tap-to-split scaffolding
+  - 15-second auto-timeout fallback for tap interactions
+  - Voice-visual synchronization via `runFractionCompareInteraction()`
+  - `hasDynamicSlide: true` flag on Challenge type for future expansion
+- **Files created:** `src/components/FractionCompareSlide/`
+- **Status:** ✅ Focused experiment complete; can be generalized to other nodes if successful

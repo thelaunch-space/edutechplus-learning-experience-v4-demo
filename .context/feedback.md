@@ -90,7 +90,7 @@ Source: `meeting-transcripts-with-client/feedback-iteration-3.md`
 **Priority order:**
 1. ✅ Fix button positioning (high priority, low risk) — **COMPLETED Jan 30**
 2. ✅ Debug applet loading (critical path, medium risk) — **COMPLETED Jan 30** (files verified, likely caching issue)
-3. 📋 Design + implement dynamic slides (high impact, high complexity) — **DEFERRED** to separate design phase
+3. ✅ Design + implement dynamic slides (high impact, high complexity) — **COMPLETED Feb 2** (focused experiment for Node 4)
 
 **Implementation summary (Jan 30):**
 - All Skip/Done buttons moved to top-right across video, applet, and slide components
@@ -99,4 +99,13 @@ Source: `meeting-transcripts-with-client/feedback-iteration-3.md`
 - Responsive positioning updated for mobile and landscape modes
 - Applet investigation: All 4 applet index.html files verified to exist at correct paths. File structure matches challenges.ts configuration. Issue likely client-side browser caching.
 
-**Last updated:** 2026-01-30
+**Implementation summary (Feb 2) — Dynamic Interactive Slide:**
+- Focused experiment on Node 4 (Applet A2 - Fraction Patterns) with `FractionCompareSlide` component
+- 5-frame state machine: question → cut → highlight → compare → celebration
+- Two interaction paths: Path A (correct first try) quick summary animation, Path B (wrong answer) interactive scaffolding
+- Touch interactions: tap-to-split rectangles, tap-to-highlight pieces
+- Voice-visual synchronization with 15-second auto-timeout fallback
+- Upgraded TTS voice from `aura-asteria-en` to `aura-2-asteria-en` (more natural with breaths/pacing)
+- Added `hasDynamicSlide: true` flag to Challenge type for future expansion
+
+**Last updated:** 2026-02-02

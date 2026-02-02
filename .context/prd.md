@@ -14,6 +14,7 @@ Core capabilities:
 - Correctness evaluation with scaffolded follow-up
 - Hold-to-talk (PTT) for natural conversation
 - Slide content with narration and interactive questions
+- Dynamic interactive slides with voice-visual synchronization (Node 4)
 - Playful, kid-friendly UI (Candy-Land theme)
 
 ## User Persona
@@ -38,7 +39,7 @@ Core capabilities:
 | State | Zustand |
 | STT | Deepgram Nova-2 (WebSocket streaming) |
 | LLM | OpenRouter GPT-4.1-nano (JSON response format) |
-| TTS | Deepgram Aura (`aura-asteria-en`) |
+| TTS | Deepgram Aura-2 (`aura-2-asteria-en`) |
 | Styling | CSS Modules, Fredoka + Nunito fonts |
 
 ## Architecture
@@ -69,4 +70,4 @@ Content is defined in `src/config/challenges.ts`. Each challenge bundles:
 
 Proprietary — EdutechPlus
 
-**Last updated:** 2026-01-29
+**Last updated:** 2026-02-02

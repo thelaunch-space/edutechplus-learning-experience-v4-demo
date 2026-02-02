@@ -10,7 +10,7 @@ Math Mate is a voice-guided learning experience for Grade 4 fractions. An AI com
 - **State:** Zustand
 - **STT:** Deepgram Nova-2 (WebSocket)
 - **LLM:** OpenRouter GPT-4.1-nano (JSON response format)
-- **TTS:** Deepgram Aura (`aura-asteria-en`)
+- **TTS:** Deepgram Aura-2 (`aura-2-asteria-en`)
 
 ## Key Files
 
@@ -31,6 +31,7 @@ Math Mate is a voice-guided learning experience for Grade 4 fractions. An AI com
 | `src/components/SlideViewer.tsx` | Full-screen slide renderer for narration/question slides |
 | `src/components/YouTubePlayer.tsx` | YouTube embed with Skip button |
 | `src/components/AppletContainer.tsx` | iframe wrapper for interactive applets |
+| `src/components/FractionCompareSlide/` | Dynamic interactive slide for Node 4 (5-frame state machine with tap interactions) |
 | `src/components/` | Other React components with CSS Modules |
 
 ## Context Files
