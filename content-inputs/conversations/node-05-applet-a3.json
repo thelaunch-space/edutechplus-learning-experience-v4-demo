@@ -1,0 +1,22 @@
+{
+  "nodeId": "node-05",
+  "nodeTitle": "Cake Fractions",
+  "preConversation": {
+    "script": "Time to learn fraction words with a cake story. Watch closely!",
+    "isNarrationOnly": true
+  },
+  "postConversation": {
+    "question": "What do we call the top number in a fraction?",
+    "correctnessFilter": "numerator",
+    "scaffolding": {
+      "probes": [
+        "In 3/4, the 3 is on top. It counts how many pieces you have. What's its special name?",
+        "The top number has a fancy math name. It starts with 'N'...",
+        "It rhymes with 'later' and starts with 'numer'...",
+        "Say it with me: numer-AY-tor. What's the word?",
+        "It's the numerator! The top number that counts your pieces. Great job!"
+      ]
+    },
+    "isNarrationOnly": false
+  }
+}

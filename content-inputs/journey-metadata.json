@@ -1,0 +1,33 @@
+{
+  "id": "fractions-intro-grade4",
+  "title": "Introduction to Fractions",
+  "description": "Learn what fractions are using pizza, cake, and fun interactive activities. Perfect for students just starting their fractions journey.",
+  "grade": "Grade 4",
+  "subject": "Math",
+  "estimatedDuration": "20 min",
+  "learningObjectives": [
+    "Understand that fractions represent parts of a whole",
+    "Recognize that fraction parts must be equal in size",
+    "Identify the numerator (top number) and denominator (bottom number)",
+    "Read and write simple fractions like 1/4, 2/6, 3/5",
+    "Compare fractions by counting pieces (e.g., 1/6 has more pieces than 1/4)"
+  ],
+  "prerequisites": [
+    "Basic counting (1-10)",
+    "Understanding of 'equal' and 'same size'"
+  ],
+  "targetVocabulary": [
+    "fraction",
+    "numerator",
+    "denominator",
+    "equal parts",
+    "one-fourth",
+    "one-sixth",
+    "whole"
+  ],
+  "targetAudience": {
+    "ageRange": "9-10 years",
+    "languageLevel": "ESL-friendly (simple English)",
+    "priorKnowledge": "None required for fractions"
+  }
+}

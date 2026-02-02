@@ -1,0 +1,22 @@
+{
+  "nodeId": "node-08",
+  "nodeTitle": "Advanced Practice",
+  "preConversation": {
+    "script": "Now make fractions with bigger top numbers. Try 2/5 or 3/5!",
+    "isNarrationOnly": true
+  },
+  "postConversation": {
+    "question": "If you colored 3 pieces out of 5, what fraction is that?",
+    "correctnessFilter": "3/5|three fifths|three-fifths|3 over 5|three over five",
+    "scaffolding": {
+      "probes": [
+        "You colored 3 pieces. Total is 5 pieces. How do we write that?",
+        "Remember: colored pieces go on TOP, total pieces go on BOTTOM. What do you get?",
+        "It's 3 over 5. How do we write that as a fraction?",
+        "Three on top, five on bottom. Say the fraction!",
+        "It's 3/5! Three pieces out of five. Excellent effort!"
+      ]
+    },
+    "isNarrationOnly": false
+  }
+}

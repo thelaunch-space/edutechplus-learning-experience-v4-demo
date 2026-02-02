@@ -1,0 +1,40 @@
+{
+  "nodeId": "node-04",
+  "nodeTitle": "Fraction Patterns",
+  "preConversation": {
+    "script": "Watch how fractions change from 1/2 to 1/4 to 1/6. Pay attention!",
+    "isNarrationOnly": true
+  },
+  "postConversation": {
+    "question": "Which has MORE pieces - 1/4 or 1/6?",
+    "correctnessFilter": "1/6|one sixth|six|1 6",
+    "scaffolding": {
+      "probes": [
+        "If you cut a cake into 4 slices vs 6 slices, which way makes more pieces?",
+        "Look at the bottom numbers - 4 and 6. Which number is bigger?",
+        "More cuts = more pieces. Does 1/4 or 1/6 have more cuts?",
+        "6 is bigger than 4. So which fraction has more pieces?",
+        "1/6 has more pieces! 6 is more than 4. Good thinking!"
+      ]
+    },
+    "isNarrationOnly": false
+  },
+  "hasInteractiveSlide": true,
+  "interactiveSlideConfig": {
+    "templateId": "comparison",
+    "question": "Which has MORE pieces - 1/4 or 1/6?",
+    "leftLabel": "1/4",
+    "rightLabel": "1/6",
+    "leftPieces": 4,
+    "rightPieces": 6,
+    "correctSide": "right",
+    "scaffolding": {
+      "probes": [
+        "If you cut a cake into 4 vs 6 slices, which has more pieces?",
+        "Look at the numbers - 4 and 6. Which is bigger?",
+        "6 is bigger than 4. So which has more pieces?",
+        "1/6 has more pieces! 6 pieces is more than 4 pieces."
+      ]
+    }
+  }
+}

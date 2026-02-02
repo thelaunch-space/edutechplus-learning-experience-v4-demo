@@ -1,0 +1,129 @@
+[
+  {
+    "id": "node-01",
+    "sequenceNumber": 1,
+    "type": "slide",
+    "assetRef": "slide-1-why-fractions",
+    "title": "Why Fractions?",
+    "duration": "1 min",
+    "hasPostQuestion": false
+  },
+  {
+    "id": "node-02",
+    "sequenceNumber": 2,
+    "type": "video",
+    "assetRef": "video-1-what-are-fractions",
+    "title": "What are Fractions?",
+    "duration": "2.5 min",
+    "hasPostQuestion": true
+  },
+  {
+    "id": "node-03",
+    "sequenceNumber": 3,
+    "type": "applet",
+    "assetRef": "applet-a1-cut-and-glue",
+    "title": "Cut and Glue Practice",
+    "duration": "4 min",
+    "hasPostQuestion": true
+  },
+  {
+    "id": "node-04",
+    "sequenceNumber": 4,
+    "type": "applet",
+    "assetRef": "applet-a2-fraction-patterns",
+    "title": "Fraction Patterns",
+    "duration": "2 min",
+    "hasPostQuestion": true,
+    "hasInteractiveSlide": true
+  },
+  {
+    "id": "node-05",
+    "sequenceNumber": 5,
+    "type": "applet",
+    "assetRef": "applet-a3-cake-fractions",
+    "title": "Cake Fractions",
+    "duration": "3 min",
+    "hasPostQuestion": true
+  },
+  {
+    "id": "node-06",
+    "sequenceNumber": 6,
+    "type": "slide",
+    "assetRef": "slide-2-what-are-fractions",
+    "title": "What are Fractions?",
+    "duration": "1 min",
+    "hasPostQuestion": false
+  },
+  {
+    "id": "node-07",
+    "sequenceNumber": 7,
+    "type": "video",
+    "assetRef": "video-2-bigger-fractions",
+    "title": "Bigger Fractions",
+    "duration": "1.9 min",
+    "hasPostQuestion": true
+  },
+  {
+    "id": "node-08",
+    "sequenceNumber": 8,
+    "type": "applet",
+    "assetRef": "applet-a4-advanced-practice",
+    "title": "Advanced Practice",
+    "duration": "3 min",
+    "hasPostQuestion": true
+  },
+  {
+    "id": "node-09",
+    "sequenceNumber": 9,
+    "type": "slide",
+    "assetRef": "slide-3-math-vault",
+    "title": "Math Vault: Fraction Definition",
+    "duration": "1 min",
+    "hasPostQuestion": false
+  },
+  {
+    "id": "node-10",
+    "sequenceNumber": 10,
+    "type": "slide",
+    "assetRef": "slide-4-numerator-denominator",
+    "title": "Numerator and Denominator",
+    "duration": "1 min",
+    "hasPostQuestion": false
+  },
+  {
+    "id": "node-11",
+    "sequenceNumber": 11,
+    "type": "slide",
+    "assetRef": "slide-5-discover-more",
+    "title": "Discover More Fractions",
+    "duration": "2 min",
+    "hasPostQuestion": true
+  },
+  {
+    "id": "node-12",
+    "sequenceNumber": 12,
+    "type": "video",
+    "assetRef": "video-3-celebration",
+    "title": "You Did It!",
+    "duration": "30 sec",
+    "hasPostQuestion": true
+  },
+  {
+    "id": "node-13",
+    "sequenceNumber": 13,
+    "type": "slide",
+    "assetRef": "slide-6-math-trap",
+    "title": "Math Trap: Find the Error",
+    "duration": "2 min",
+    "hasPostQuestion": true
+  },
+  {
+    "id": "node-14",
+    "sequenceNumber": 14,
+    "type": "slide",
+    "assetRef": "slide-7-snapshot",
+    "title": "Snapshot: More Parts",
+    "duration": "1 min",
+    "hasPostQuestion": false
+  }
+]

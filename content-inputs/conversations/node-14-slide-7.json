@@ -1,0 +1,10 @@
+{
+  "nodeId": "node-14",
+  "nodeTitle": "Snapshot: More Parts",
+  "preConversation": {
+    "script": "Let's wrap up what we learned!",
+    "isNarrationOnly": true
+  },
+  "slideNarration": "Remember, fractions can show multiple parts! Like 2/5, 3/5, or 4/6. You're a fraction expert now!",
+  "postConversation": null
+}

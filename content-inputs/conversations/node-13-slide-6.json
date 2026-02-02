@@ -1,0 +1,22 @@
+{
+  "nodeId": "node-13",
+  "nodeTitle": "Math Trap: Find the Error",
+  "preConversation": {
+    "script": "Can you spot the mistake?",
+    "isNarrationOnly": true
+  },
+  "postConversation": {
+    "question": "Look at the two bar diagrams. One shows 2/4 and one shows 2/6. Which diagram is wrong?",
+    "correctnessFilter": "2/6|two sixths|second|bottom|six",
+    "scaffolding": {
+      "probes": [
+        "Count the shaded parts in each diagram. Do they match the fractions written?",
+        "Look carefully - does 2/6 really have 2 out of 6 parts shaded?",
+        "Check the bottom diagram. How many total parts does it show?",
+        "The 2/6 diagram should have 6 total parts. Does it?",
+        "The 2/6 diagram is wrong! It doesn't show 6 equal parts. Good thinking!"
+      ]
+    },
+    "isNarrationOnly": false
+  }
+}

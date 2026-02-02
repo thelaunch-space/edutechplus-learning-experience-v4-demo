@@ -1,0 +1,22 @@
+{
+  "nodeId": "node-12",
+  "nodeTitle": "You Did It!",
+  "preConversation": {
+    "script": "You've learned so much! Watch this final message!",
+    "isNarrationOnly": true
+  },
+  "postConversation": {
+    "question": "Quick review! What's the bottom number called?",
+    "correctnessFilter": "denominator",
+    "scaffolding": {
+      "probes": [
+        "In 3/4, the 4 is on the bottom. It shows total pieces. What's its name?",
+        "The bottom number has a name that starts with 'D'...",
+        "It sounds like 'de-NOM-in-ator'...",
+        "Say it with me: de-NOM-in-ator. What's the word?",
+        "It's the denominator! The bottom number showing total pieces. Amazing work today!"
+      ]
+    },
+    "isNarrationOnly": false
+  }
+}

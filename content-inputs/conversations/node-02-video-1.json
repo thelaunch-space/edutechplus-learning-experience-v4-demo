@@ -1,0 +1,22 @@
+{
+  "nodeId": "node-02",
+  "nodeTitle": "What are Fractions?",
+  "preConversation": {
+    "script": "Let's start our first challenge! Watch this video about fractions.",
+    "isNarrationOnly": true
+  },
+  "postConversation": {
+    "question": "If a pizza has 4 equal slices, what do we call ONE slice?",
+    "correctnessFilter": "one fourth|quarter|1/4|one-fourth|a fourth",
+    "scaffolding": {
+      "probes": [
+        "Fractions have special names! When there are 4 equal pieces, what's the special name for just ONE piece?",
+        "Think about the number FOUR. Each piece is called a 'fourth'. So what do we call ONE of them?",
+        "One piece out of four. The fraction name starts with 'one-f...'",
+        "The word is one-FOURTH. Can you say that?",
+        "It's one-fourth! Or you can say 'one quarter'. Great job!"
+      ]
+    },
+    "isNarrationOnly": false
+  }
+}

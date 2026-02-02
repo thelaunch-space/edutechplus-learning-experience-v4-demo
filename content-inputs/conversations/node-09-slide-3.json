@@ -1,0 +1,10 @@
+{
+  "nodeId": "node-09",
+  "nodeTitle": "Math Vault: Fraction Definition",
+  "preConversation": {
+    "script": "Time to learn the official math definition!",
+    "isNarrationOnly": true
+  },
+  "slideNarration": "A fraction is a number that represents a part of a whole. It has two parts: the numerator on top and the denominator on bottom!",
+  "postConversation": null
+}

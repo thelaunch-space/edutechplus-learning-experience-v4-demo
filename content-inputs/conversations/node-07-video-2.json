@@ -1,0 +1,22 @@
+{
+  "nodeId": "node-07",
+  "nodeTitle": "Bigger Fractions",
+  "preConversation": {
+    "script": "Now we'll make fractions like 2/4 and 3/6. The top number can be more than 1!",
+    "isNarrationOnly": true
+  },
+  "postConversation": {
+    "question": "Look at the fraction 2/4. What does the top number tell us?",
+    "correctnessFilter": "two|2|two pieces|2 pieces|2 parts|two parts",
+    "scaffolding": {
+      "probes": [
+        "Look at 2/4. The top number is 2. What does that 2 tell us?",
+        "If the top number is 2, how many pieces do you have?",
+        "The answer is the same as the top number...",
+        "The top number is 2. How many pieces is that?",
+        "Two pieces! The 2 on top means you have 2 pieces. Well done!"
+      ]
+    },
+    "isNarrationOnly": false
+  }
+}

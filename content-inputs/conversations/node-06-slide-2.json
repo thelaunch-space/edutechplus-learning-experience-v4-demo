@@ -1,0 +1,10 @@
+{
+  "nodeId": "node-06",
+  "nodeTitle": "What are Fractions?",
+  "preConversation": {
+    "script": "Let me show you what's coming next!",
+    "isNarrationOnly": true
+  },
+  "slideNarration": "Watch how cutting an object into equal parts shows a fraction and how to write it in math!",
+  "postConversation": null
+}

@@ -1,0 +1,22 @@
+{
+  "nodeId": "node-03",
+  "nodeTitle": "Cut and Glue Practice",
+  "preConversation": {
+    "script": "Now you'll cut paper into fractions! Use the scissors to make equal parts. Try it!",
+    "isNarrationOnly": true
+  },
+  "postConversation": {
+    "question": "When we make fractions, what do we need to remember about the size of the pieces?",
+    "correctnessFilter": "same|equal|same size",
+    "scaffolding": {
+      "probes": [
+        "If you share a chocolate bar with your friend, would it be fair if one piece is big and one tiny?",
+        "When we share equally, what must be true about each piece?",
+        "For fair sharing, pieces must be what kind of size?",
+        "Think about the word 'same' — same size means equal!",
+        "Same size! For fractions, all pieces must be equal. Nice effort!"
+      ]
+    },
+    "isNarrationOnly": false
+  }
+}

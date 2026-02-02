@@ -1,0 +1,22 @@
+{
+  "nodeId": "node-11",
+  "nodeTitle": "Discover More Fractions",
+  "preConversation": {
+    "script": "Let's test what you've learned!",
+    "isNarrationOnly": true
+  },
+  "postConversation": {
+    "question": "If you have 2 slices out of 6 total slices, what fraction is that?",
+    "correctnessFilter": "2/6|two sixths|two-sixths|2 over 6|two over six",
+    "scaffolding": {
+      "probes": [
+        "You have 2 slices. There are 6 total. Which number goes on top?",
+        "The pieces you have go on top. The total goes on bottom. What do you get?",
+        "It's 2 over 6. How do we write that as a fraction?",
+        "Two on top, six on bottom. Say the fraction!",
+        "It's 2/6! Two slices out of six. Great job!"
+      ]
+    },
+    "isNarrationOnly": false
+  }
+}

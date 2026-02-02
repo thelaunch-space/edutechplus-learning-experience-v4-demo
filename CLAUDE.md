@@ -45,6 +45,8 @@ Math Mate is a voice-guided learning experience for Grade 4 fractions. An AI com
 | `.context/bugs-and-recurring-issues.md` | You're debugging or investigating unexpected behavior |
 | `.context/feature-wishlist.md` | You need to know what's planned or deferred |
 | `.context/learning-journey.md` | You need the complete content roadmap (14 nodes) and implementation status |
+| `.context/framework-wip.md` | You need to understand what content teams control (client-friendly doc) |
+| `.context/framework-technical.md` | You're building the scalable platform (schemas, architecture, migration) |
 
 ## Dev Commands
 

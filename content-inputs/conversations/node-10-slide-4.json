@@ -1,0 +1,10 @@
+{
+  "nodeId": "node-10",
+  "nodeTitle": "Numerator and Denominator",
+  "preConversation": {
+    "script": "Let's break down the parts of a fraction!",
+    "isNarrationOnly": true
+  },
+  "slideNarration": "In one-fourth, the numerator is 1 - it shows how many parts we have. The denominator is 4 - it shows total equal parts!",
+  "postConversation": null
+}

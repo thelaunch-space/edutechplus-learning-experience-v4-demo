@@ -1,0 +1,10 @@
+{
+  "nodeId": "node-01",
+  "nodeTitle": "Why Fractions?",
+  "preConversation": {
+    "script": "Let me show you something fun!",
+    "isNarrationOnly": true
+  },
+  "slideNarration": "Ever tried sharing a cake with friends? Let's see how sharing cake helps us understand halves, quarters, and more!",
+  "postConversation": null
+}
