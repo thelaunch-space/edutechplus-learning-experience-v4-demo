@@ -99,22 +99,46 @@
   - A4: `A4.M2-Fraction Cut and Glue Practice 2/index.html` ✓
 - **Conclusion:** Issue likely client-side browser caching, not codebase bug
 
+### ✅ Completed (Feb 2, 2026)
+
+**Priority 3: Dynamic Interactive Slide (Focused Experiment) — DONE**
+- ✅ Implemented `FractionCompareSlide` for Node 4 (Applet A2 - Fraction Patterns)
+- ✅ 5-frame state machine: question → cut → highlight → compare → celebration
+- ✅ Two interaction paths:
+  - **Path A (Correct first try):** Quick animated summary showing rectangles splitting, highlighting, and counts
+  - **Path B (Wrong answer):** Interactive scaffolding with tap-to-split and tap-to-highlight interactions
+- ✅ Voice-visual synchronization: Math Mate narrates while slide animates
+- ✅ Touch interaction: Students tap rectangles to split them, tap pieces to highlight
+- ✅ Automatic timeout fallback: If student doesn't tap within 15 seconds, auto-advances
+- ✅ Added `hasDynamicSlide: true` flag to Challenge type for Node 4
+- ✅ Full two-pane layout with chat visible during dynamic slide interaction
+
+**Files created:**
+- `src/components/FractionCompareSlide/FractionCompareSlide.tsx` - Interactive slide component with 5 frames
+- `src/components/FractionCompareSlide/FractionCompareSlide.module.css` - Playful Candy-Land styling with animations
+
+**Files modified:**
+- `src/types/index.ts` - Added `SlideFrame`, `SlideInteractionState`, and `hasDynamicSlide` to Challenge type
+- `src/store/sessionStore.ts` - Added dynamic slide state management (frame, interaction tracking, reset)
+- `src/hooks/useVoiceInteraction.ts` - Added `runFractionCompareInteraction()` for voice-slide coordination
+- `src/config/challenges.ts` - Added `hasDynamicSlide: true` to Node 4 (applet-a2)
+- `src/App.tsx` - Integrated FractionCompareSlide rendering and tap handlers
+
+**Design details:**
+- Rectangles with split animations (vertical divider lines appearing with stagger)
+- Tap indicators with pulsing glow animation
+- Piece highlight with coral color fill
+- Piece count badges with pop-in animation
+- Celebration answer banner with sparkle animations
+- Responsive design for mobile, tablet, and desktop
+
 ### 📋 Deferred to Future Iterations
 
-**Priority 3: Dynamic Slide Behavior (Major Feature)**
-- Transform slides from static images to interactive "blackboards"
-- Slides update based on conversation state (question → hint → answer)
-- Multi-state slide data model + SlideViewer state machine
-- Requires architectural changes to Challenge type and voice interaction
-- Content team creates multi-frame slide assets
-- **Scope:** 3-5 days (large architectural change)
-- **Status:** Needs design phase planning before implementation
-
 **Previously Planned (Medium Priority):**
-- Chat-style conversation UI (WhatsApp-like thread)
 - Flexible voice nodes (`skipPreVoice`/`skipPostVoice` flags)
 - Additional correctness filter improvements
+- Generalized dynamic slide system (if experiment proves successful)
 
 See `.context/feedback.md` for full rationale and `.context/feature-wishlist.md` for detailed feature list.
 
-**Last updated:** 2026-01-30
+**Last updated:** 2026-02-02

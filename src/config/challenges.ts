@@ -87,7 +87,8 @@ export const challenges: Challenge[] = [
       scaffold: "6 is bigger than 4. So which fraction has more pieces - 1/4 or 1/6?",
       reveal: "1/6 has more pieces! 6 is more than 4. Good thinking!"
     },
-    maxTurns: 5
+    maxTurns: 5,
+    hasDynamicSlide: true  // Uses interactive FractionCompareSlide for post-challenge
   },
   // Applet A3: Cake Fractions
   {

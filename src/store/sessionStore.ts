@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { challenges } from '../config/challenges';
-import type { SessionPhase, VoiceState, Challenge, Message } from '../types';
+import type { SessionPhase, VoiceState, Challenge, Message, SlideFrame, SlideInteractionState } from '../types';
 
 // Module-level promise resolver for confetti completion
 let confettiResolver: (() => void) | null = null;
@@ -62,6 +62,13 @@ interface SessionState {
   // Session controls
   resetSession: () => void;
   skipToChallenge: (index: number) => void;
+
+  // Dynamic slide state (for FractionCompareSlide)
+  dynamicSlideFrame: SlideFrame;
+  setDynamicSlideFrame: (frame: SlideFrame) => void;
+  slideInteractionState: SlideInteractionState;
+  updateSlideInteraction: (update: Partial<SlideInteractionState>) => void;
+  resetSlideState: () => void;
 }
 
 export const useSessionStore = create<SessionState>((set, get) => ({
@@ -169,10 +176,42 @@ export const useSessionStore = create<SessionState>((set, get) => ({
     allMessages: [],
     currentTurn: 0,
     lastError: null,
-    showConfetti: false
+    showConfetti: false,
+    dynamicSlideFrame: 'question',
+    slideInteractionState: {
+      leftTapped: false,
+      rightTapped: false,
+      leftHighlighted: false,
+      rightHighlighted: false
+    }
   }),
   skipToChallenge: (index) => set({
     currentChallengeIndex: Math.min(index, challenges.length - 1),
     phase: 'PRE_CHALLENGE'
+  }),
+
+  // Dynamic slide state
+  dynamicSlideFrame: 'question',
+  setDynamicSlideFrame: (frame) => set({ dynamicSlideFrame: frame }),
+  slideInteractionState: {
+    leftTapped: false,
+    rightTapped: false,
+    leftHighlighted: false,
+    rightHighlighted: false
+  },
+  updateSlideInteraction: (update) => set((state) => ({
+    slideInteractionState: {
+      ...state.slideInteractionState,
+      ...update
+    }
+  })),
+  resetSlideState: () => set({
+    dynamicSlideFrame: 'question',
+    slideInteractionState: {
+      leftTapped: false,
+      rightTapped: false,
+      leftHighlighted: false,
+      rightHighlighted: false
+    }
   })
 }));

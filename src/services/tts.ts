@@ -7,21 +7,12 @@ export interface TTSResult {
   playbackDone: Promise<void>;  // Resolves when audio finishes
 }
 
-// Available Aura voices:
-// aura-asteria-en - Female, warm, friendly (recommended for kids)
-// aura-luna-en - Female, soft
-// aura-stella-en - Female, upbeat
-// aura-athena-en - Female, professional
-// aura-hera-en - Female, authoritative
-// aura-orion-en - Male, warm
-// aura-arcas-en - Male, authoritative
-// aura-perseus-en - Male, youthful
-// aura-angus-en - Male, conversational
-// aura-orpheus-en - Male, rich
-// aura-helios-en - Male, enthusiastic
-// aura-zeus-en - Male, authoritative
+// Aura-2 voices (more natural with breaths, pacing, expressiveness)
+// Format: aura-2-[voicename]-en
+// Popular English voices: thalia, andromeda, helena, apollo, asteria, luna, stella
+// See: https://developers.deepgram.com/docs/tts-models
 
-const VOICE = 'aura-asteria-en'; // Warm female voice, great for kids
+const VOICE = 'aura-2-asteria-en'; // Warm female voice with natural Aura-2 quality
 
 let isAudioUnlocked = false;
 

@@ -12,6 +12,7 @@ import { ChatPane } from './components/ChatPane';
 import { MathMateAvatar } from './components/MathMateAvatar';
 import { LandscapePrompt } from './components/LandscapePrompt';
 import { Confetti } from './components/Confetti';
+import { FractionCompareSlide } from './components/FractionCompareSlide/FractionCompareSlide';
 import styles from './App.module.css';
 
 function App() {
@@ -26,6 +27,9 @@ function App() {
     allMessages,
     showConfetti,
     clearConfetti,
+    dynamicSlideFrame,
+    slideInteractionState,
+    updateSlideInteraction,
   } = useSessionStore();
 
   const {
@@ -35,6 +39,7 @@ function App() {
     runPreChallengeInteraction,
     runPostChallengeInteraction,
     runSlideInteraction,
+    runFractionCompareInteraction,
     handlePTTStart,
     handlePTTEnd,
   } = useVoiceInteraction();
@@ -48,16 +53,20 @@ function App() {
   const hasRunPreChallenge = useRef<number | null>(null);
   const hasRunPostChallenge = useRef<number | null>(null);
   const hasRunSlide = useRef<number | null>(null);
+  const hasRunDynamicSlide = useRef<number | null>(null);
 
   const challenge = getCurrentChallenge();
 
+  // Check if we should show dynamic slide (Node 4 in POST_CHALLENGE)
+  const showDynamicSlide = phase === 'POST_CHALLENGE' && challenge?.hasDynamicSlide;
+
   // Chat pane visibility logic:
   // HIDE during IN_CHALLENGE phase for videos/applets (full-screen content)
-  // SHOW for slides and conversation phases (companion mode)
+  // SHOW for slides, conversation phases, and dynamic slide phases (companion mode)
   const shouldShowChatPane = !(
     phase === 'IN_CHALLENGE' &&
     (challenge?.type === 'video' || challenge?.type === 'applet')
-  );
+  ) || showDynamicSlide;
 
   // Handle welcome screen start
   const handleStart = async () => {
@@ -96,14 +105,24 @@ function App() {
     }
   }, [phase, currentChallengeIndex, getCurrentChallenge, runPreChallengeInteraction, runSlideInteraction]);
 
-  // Auto-run post-challenge interaction
+  // Auto-run post-challenge interaction (or dynamic slide interaction for Node 4)
   useEffect(() => {
     if (phase === 'POST_CHALLENGE' && hasRunPostChallenge.current !== currentChallengeIndex) {
-      console.log(`🚀 App: Starting post-challenge for challenge ${currentChallengeIndex + 1}`);
-      hasRunPostChallenge.current = currentChallengeIndex;
-      runPostChallengeInteraction();
+      const currentChallenge = getCurrentChallenge();
+
+      // Check if this challenge uses dynamic slide
+      if (currentChallenge?.hasDynamicSlide && hasRunDynamicSlide.current !== currentChallengeIndex) {
+        console.log(`🚀 App: Starting dynamic slide interaction for challenge ${currentChallengeIndex + 1}`);
+        hasRunPostChallenge.current = currentChallengeIndex;
+        hasRunDynamicSlide.current = currentChallengeIndex;
+        runFractionCompareInteraction();
+      } else if (!currentChallenge?.hasDynamicSlide) {
+        console.log(`🚀 App: Starting post-challenge for challenge ${currentChallengeIndex + 1}`);
+        hasRunPostChallenge.current = currentChallengeIndex;
+        runPostChallengeInteraction();
+      }
     }
-  }, [phase, currentChallengeIndex]);
+  }, [phase, currentChallengeIndex, getCurrentChallenge, runPostChallengeInteraction, runFractionCompareInteraction]);
 
   // Handle challenge completion
   const handleChallengeComplete = () => {
@@ -118,9 +137,16 @@ function App() {
     hasRunPreChallenge.current = null;
     hasRunPostChallenge.current = null;
     hasRunSlide.current = null;
+    hasRunDynamicSlide.current = null;
     resetSession();
     setIsWelcome(true);
   };
+
+  // Dynamic slide tap handlers
+  const handleLeftTap = () => updateSlideInteraction({ leftTapped: true });
+  const handleRightTap = () => updateSlideInteraction({ rightTapped: true });
+  const handleLeftHighlight = () => updateSlideInteraction({ leftHighlighted: true });
+  const handleRightHighlight = () => updateSlideInteraction({ rightHighlighted: true });
 
   // Render welcome screen
   if (isWelcome) {
@@ -174,11 +200,23 @@ function App() {
 
               {/* Content Pane - Full-screen when chat hidden */}
               <div className={`${styles.contentPane} ${!shouldShowChatPane ? styles.fullScreen : ''}`}>
-            {/* Avatar display during voice interactions (greeting/pre/post) */}
-            {(phase === 'GREETING' || phase === 'PRE_CHALLENGE' || phase === 'POST_CHALLENGE') && (
+            {/* Avatar display during voice interactions (greeting/pre/post without dynamic slide) */}
+            {(phase === 'GREETING' || phase === 'PRE_CHALLENGE' || (phase === 'POST_CHALLENGE' && !showDynamicSlide)) && (
               <div className={styles.avatarContainer}>
                 <MathMateAvatar state={voiceState} size="large" />
               </div>
+            )}
+
+            {/* Dynamic slide for Node 4 (FractionCompareSlide) */}
+            {showDynamicSlide && (
+              <FractionCompareSlide
+                frame={dynamicSlideFrame}
+                interactionState={slideInteractionState}
+                onLeftTap={handleLeftTap}
+                onRightTap={handleRightTap}
+                onLeftHighlight={handleLeftHighlight}
+                onRightHighlight={handleRightHighlight}
+              />
             )}
 
             {/* Challenge content */}

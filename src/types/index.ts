@@ -5,6 +5,22 @@ export type SessionPhase =
   | 'POST_CHALLENGE'
   | 'COMPLETE';
 
+// Dynamic slide frame states for FractionCompareSlide
+export type SlideFrame =
+  | 'question'      // Initial: just question + labels
+  | 'cut'           // Show rectangles, wait for taps to split
+  | 'highlight'     // Rectangles split, tap to highlight pieces
+  | 'compare'       // Piece counts visible, ask question again
+  | 'celebration';  // Answer revealed, confetti
+
+// Interaction state for dynamic slide tap tracking
+export interface SlideInteractionState {
+  leftTapped: boolean;
+  rightTapped: boolean;
+  leftHighlighted: boolean;
+  rightHighlighted: boolean;
+}
+
 export type VoiceState =
   | 'IDLE'
   | 'MATH_MATE_SPEAKING'
@@ -31,6 +47,7 @@ export interface Challenge {
   slideUrl?: string;   // For slide type challenges (image path)
   slideNarration?: string;  // TTS narration content for narration slides
   isQuestionSlide?: boolean;  // True for question slides, false for narration slides
+  hasDynamicSlide?: boolean;  // True if this challenge uses interactive dynamic slide for post-challenge
   title: string;
   duration: string;
   preScript: string;

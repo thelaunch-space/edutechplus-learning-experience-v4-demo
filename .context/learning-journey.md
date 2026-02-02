@@ -7,7 +7,7 @@
 | 1 | Slide | Why Fractions? | Motivation hook - sharing cake with friends | ✅ Implemented |
 | 2 | Video | What are Fractions? | Intro to fractions using pizza/cake examples | ✅ Implemented |
 | 3 | Applet | Cut and Glue Practice | Hands-on: cutting paper into equal parts (halves, quarters) | ✅ Implemented |
-| 4 | Applet | Fraction Patterns | Visual comparison: 1/2, 1/4, 1/6 - which has more pieces? | ✅ Implemented |
+| 4 | Applet | Fraction Patterns | Visual comparison: 1/2, 1/4, 1/6 - which has more pieces? | ✅ Implemented + **Dynamic Slide** |
 | 5 | Applet | Cake Fractions | Vocabulary lesson: numerator (top), denominator (bottom) | ✅ Implemented |
 | 6 | Slide | What are Fractions? | Preview for Video 2 - cutting objects into equal parts | ✅ Implemented |
 | 7 | Video | Bigger Fractions | Numerators > 1: examples like 2/4, 3/6 | ✅ Implemented |
@@ -51,4 +51,28 @@ Each node (video/applet/slide) follows this pattern:
 - Narration slides (nodes 1,6,9,10,14): Auto-advance after TTS narration
 - Question slides (nodes 11,13): Multi-turn Socratic dialogue with confetti
 
-**Last updated:** 2026-01-30
+## Dynamic Interactive Slide (Node 4)
+
+Node 4 (Applet A2 - Fraction Patterns) has a special post-challenge interaction that uses an interactive dynamic slide instead of the standard voice-only post-challenge flow.
+
+**Component:** `FractionCompareSlide`
+
+**Question:** "Which has MORE pieces - 1/4 or 1/6?"
+
+**5-Frame State Machine:**
+1. `question` - Shows question text and fraction labels (1/4, 1/6)
+2. `cut` - Shows empty rectangles with tap indicators; student taps to split
+3. `highlight` - Shows split rectangles; student taps pieces to highlight them
+4. `compare` - Shows piece counts (4 pieces, 6 pieces)
+5. `celebration` - Shows answer banner with confetti
+
+**Two Interaction Paths:**
+- **Path A (Correct first try):** Student says "1/6" → Quick animated summary showing all frames automatically
+- **Path B (Wrong answer):** Student gives wrong answer → Interactive scaffolding with tap-to-split, tap-to-highlight, then verbal "6 is bigger" question
+
+**Key Features:**
+- Voice-visual synchronization: Math Mate speaks while slide animates
+- Tap interactions with 15-second auto-timeout fallback
+- Uses `hasDynamicSlide: true` flag on Challenge type
+
+**Last updated:** 2026-02-02

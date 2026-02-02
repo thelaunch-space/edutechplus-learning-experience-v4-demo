@@ -42,6 +42,7 @@ interface UseVoiceInteractionReturn {
   runPreChallengeInteraction: () => Promise<void>;
   runPostChallengeInteraction: () => Promise<void>;
   runSlideInteraction: () => Promise<void>;
+  runFractionCompareInteraction: () => Promise<void>;
 
   // Low-level controls
   speak: (text: string) => Promise<void>;
@@ -78,6 +79,9 @@ export function useVoiceInteraction(): UseVoiceInteractionReturn {
     addChatMessage,
     triggerConfetti,
     waitForConfetti,
+    setDynamicSlideFrame,
+    updateSlideInteraction,
+    resetSlideState,
   } = useSessionStore();
 
   // Speak text using TTS with word-by-word reveal synchronized to audio
@@ -585,6 +589,189 @@ export function useVoiceInteraction(): UseVoiceInteractionReturn {
     }
   }, [speak, listenAndTranscribe, getCurrentChallenge, studentName, goToNextChallenge, setPhase, resetTurn, incrementTurn, addMessage, getConversationHistory, addChatMessage, triggerConfetti, waitForConfetti]);
 
+  // Fraction Compare interaction with dynamic slide (Node 4 specific)
+  const runFractionCompareInteraction = useCallback(async (): Promise<void> => {
+    try {
+      console.log('🎯 === FRACTION COMPARE INTERACTION START ===');
+      setError(null);
+      const challenge = getCurrentChallenge();
+
+      if (!challenge) {
+        console.log('❌ FractionCompare: No challenge found, moving to COMPLETE');
+        setPhase('COMPLETE');
+        return;
+      }
+
+      console.log(`🎯 FractionCompare: Challenge ${challenge.number} - ${challenge.title}`);
+
+      // Reset slide state
+      resetSlideState();
+
+      // Set initial frame (question only - labels visible)
+      setDynamicSlideFrame('question');
+
+      // Wait for slide to render
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      // Speak the question
+      console.log('🎤 FractionCompare: Asking question...');
+      await speak(challenge.postQuestion);
+
+      // Wait before listening
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      // Listen for student's first answer
+      console.log('👂 FractionCompare: Listening for answer...');
+      const transcript = await listenAndTranscribe();
+      console.log('📝 FractionCompare: Got transcript:', transcript);
+
+      // Add student's response to chat
+      if (transcript.trim()) {
+        addChatMessage('user', transcript);
+      }
+
+      // Check if correct using correctness filter
+      const correctPattern = new RegExp(challenge.correctnessFilter, 'i');
+      const isCorrect = correctPattern.test(transcript);
+
+      if (isCorrect) {
+        // PATH A: Correct first try - quick animated summary
+        console.log('✅ FractionCompare: Correct! Running quick summary...');
+
+        // Acknowledge
+        await speak("Yes! Let's see why!");
+
+        // Show cut frame with both rectangles auto-split
+        setDynamicSlideFrame('cut');
+        updateSlideInteraction({ leftTapped: true, rightTapped: true });
+        await new Promise(resolve => setTimeout(resolve, 800));
+
+        // Show highlight frame with both highlighted
+        setDynamicSlideFrame('highlight');
+        updateSlideInteraction({ leftHighlighted: true, rightHighlighted: true });
+        await new Promise(resolve => setTimeout(resolve, 800));
+
+        // Show compare frame
+        setDynamicSlideFrame('compare');
+        await new Promise(resolve => setTimeout(resolve, 600));
+
+        // Speak summary
+        await speak("1/4 has 4 pieces, and 1/6 has 6 pieces.");
+
+        // Show celebration
+        setDynamicSlideFrame('celebration');
+        await speak("6 is more than 4, so 1/6 has MORE pieces! Great job!");
+
+      } else {
+        // PATH B: Wrong answer - interactive scaffolding
+        console.log('❌ FractionCompare: Incorrect. Starting interactive scaffolding...');
+
+        // Acknowledge and transition to interactive mode
+        await speak("Let's find out together! Tap each rectangle to cut it into pieces.");
+
+        // Show cut frame
+        setDynamicSlideFrame('cut');
+
+        // Wait for both rectangles to be tapped
+        console.log('⏳ FractionCompare: Waiting for taps to split rectangles...');
+
+        // Poll for both taps (with timeout)
+        let tapWaitTime = 0;
+        const maxTapWait = 15000; // 15 second timeout
+        while (tapWaitTime < maxTapWait) {
+          const state = useSessionStore.getState().slideInteractionState;
+          if (state.leftTapped && state.rightTapped) {
+            break;
+          }
+          await new Promise(resolve => setTimeout(resolve, 200));
+          tapWaitTime += 200;
+        }
+
+        // If timeout, auto-complete the taps
+        const currentState = useSessionStore.getState().slideInteractionState;
+        if (!currentState.leftTapped || !currentState.rightTapped) {
+          console.log('⏱️ FractionCompare: Auto-completing taps due to timeout');
+          updateSlideInteraction({ leftTapped: true, rightTapped: true });
+        }
+
+        await new Promise(resolve => setTimeout(resolve, 500));
+
+        // Move to highlight frame
+        await speak("Now tap a piece in each rectangle to highlight it.");
+        setDynamicSlideFrame('highlight');
+
+        // Wait for both highlights (with timeout)
+        let highlightWaitTime = 0;
+        const maxHighlightWait = 15000;
+        while (highlightWaitTime < maxHighlightWait) {
+          const state = useSessionStore.getState().slideInteractionState;
+          if (state.leftHighlighted && state.rightHighlighted) {
+            break;
+          }
+          await new Promise(resolve => setTimeout(resolve, 200));
+          highlightWaitTime += 200;
+        }
+
+        // Auto-complete if needed
+        const highlightState = useSessionStore.getState().slideInteractionState;
+        if (!highlightState.leftHighlighted || !highlightState.rightHighlighted) {
+          console.log('⏱️ FractionCompare: Auto-completing highlights due to timeout');
+          updateSlideInteraction({ leftHighlighted: true, rightHighlighted: true });
+        }
+
+        await new Promise(resolve => setTimeout(resolve, 500));
+
+        // Move to compare frame
+        setDynamicSlideFrame('compare');
+        await speak("Look! 1/4 has 4 pieces, and 1/6 has 6 pieces. Which number is bigger - 4 or 6?");
+
+        // Wait for verbal answer
+        await new Promise(resolve => setTimeout(resolve, 500));
+        const compareTranscript = await listenAndTranscribe();
+
+        if (compareTranscript.trim()) {
+          addChatMessage('user', compareTranscript);
+        }
+
+        // Check for "6" in answer
+        if (/6|six/i.test(compareTranscript)) {
+          await speak("Yes! 6 is bigger!");
+        } else {
+          await speak("6 is bigger than 4!");
+        }
+
+        // Show celebration
+        setDynamicSlideFrame('celebration');
+        await speak("So 1/6 has MORE pieces! You figured it out!");
+      }
+
+      // Trigger celebration confetti
+      console.log('🎉 FractionCompare: Triggering confetti!');
+      triggerConfetti();
+
+      // Wait for confetti
+      console.log('⏱️ FractionCompare: Waiting for confetti...');
+      await waitForConfetti();
+
+      // Move to next challenge
+      console.log('✅ === FRACTION COMPARE COMPLETE === Moving to next challenge');
+      const isComplete = goToNextChallenge();
+      if (isComplete) {
+        console.log('🏁 All challenges complete!');
+        setPhase('COMPLETE');
+      } else {
+        console.log('➡️ Moving to PRE_CHALLENGE for next challenge');
+        setPhase('PRE_CHALLENGE');
+      }
+    } catch (err) {
+      console.error('❌ FractionCompare interaction error:', err);
+      // On error, still move forward
+      await speak("Good job! Let's continue!");
+      const isComplete = goToNextChallenge();
+      setPhase(isComplete ? 'COMPLETE' : 'PRE_CHALLENGE');
+    }
+  }, [speak, listenAndTranscribe, getCurrentChallenge, studentName, goToNextChallenge, setPhase, addChatMessage, triggerConfetti, waitForConfetti, setDynamicSlideFrame, updateSlideInteraction, resetSlideState]);
+
   // Listen and generate response (for custom interactions)
   const listenAndRespond = useCallback(async (
     question: string,
@@ -618,6 +805,7 @@ export function useVoiceInteraction(): UseVoiceInteractionReturn {
     runPreChallengeInteraction,
     runPostChallengeInteraction,
     runSlideInteraction,
+    runFractionCompareInteraction,
     speak,
     listenAndRespond,
     // PTT controls

@@ -138,6 +138,32 @@ function getScaffoldingForTurn(scaffolding: Scaffolding, turnNumber: number): st
   }
 }
 
+// Client-side correctness check function - moved outside to be reusable
+function checkClientSideCorrectness(studentResponse: string, correctnessFilter: string): boolean {
+  const filterPatterns = correctnessFilter.split('|').map(p => p.trim().toLowerCase());
+  const studentLower = studentResponse.toLowerCase();
+
+  // Negation words to check for
+  const negationWords = ['not', 'no', "isn't", "isnt", "don't", "dont", "never", "wrong"];
+
+  return filterPatterns.some(pattern => {
+    // Escape special regex characters
+    const escapedPattern = pattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const regex = new RegExp(`\\b${escapedPattern}\\b`, 'i');
+
+    if (!regex.test(studentLower)) {
+      return false;
+    }
+
+    // Check for negation before the pattern
+    const matchIndex = studentLower.search(regex);
+    const textBefore = studentLower.substring(Math.max(0, matchIndex - 15), matchIndex);
+    const hasNegation = negationWords.some(neg => textBefore.includes(neg));
+
+    return !hasNegation;
+  });
+}
+
 export async function generateEvaluatedResponse(
   studentResponse: string,
   studentName: string,
@@ -151,6 +177,27 @@ export async function generateEvaluatedResponse(
 
   // Get the appropriate scaffolding for this turn
   const turnScaffolding = getScaffoldingForTurn(scaffolding, turnNumber);
+
+  // Always check client-side correctness FIRST (before API call)
+  const clientSideCorrect = studentResponse.trim()
+    ? checkClientSideCorrectness(studentResponse, correctnessFilter)
+    : false;
+
+  console.log('🔍 CLIENT-SIDE PRE-CHECK:', {
+    studentResponse,
+    correctnessFilter,
+    clientSideCorrect
+  });
+
+  // If client-side check passes, return immediate acknowledgement (no need for LLM)
+  if (clientSideCorrect) {
+    console.log('✅ Client-side correctness matched! Returning acknowledgement.');
+    return {
+      response: scaffolding.reveal.replace(/Good thinking!|Nice effort!|Well done!|Great job trying!/gi, 'Great job!'),
+      isCorrect: true,
+      shouldEnd: true
+    };
+  }
 
   // Default fallback result - uses turn-appropriate scaffolding
   const fallbackResult: EvaluationResult = {
