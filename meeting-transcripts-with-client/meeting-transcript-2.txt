@@ -1,0 +1,314 @@
+Edutechplus voice agent demo - iteration 2
+Wed, Jan 21, 2026
+
+0:00 - Krishna Goutham N
+I slipped through the stairs while going down. Slipped through the stairs, meaning what?
+
+0:05 - Vinay Ravindra
+There were holes in the stairs? I slipped on the stairs, I mean.
+
+0:11 - Krishna Goutham N
+So the left side hip, I got, it's more like a spring. So moving is a little, it feels like a pull right through the leg.
+
+0:26 - Krishna Goutham N
+I'm getting old, buddy.
+
+0:32 - Vinay Ravindra
+Start planning retirement.
+
+0:34 - Krishna Goutham N
+OK, I'm sending one link to you on WhatsApp. So I deployed it. It's not the URL. Yeah, this one, the second one. Can you open it on a mobile phone and mobile or desktop. Yeah, you can play it on desktop also mobile so that I can also listen to the conversation.
+
+1:09 - Krishna Goutham N
+Desktop also works.
+
+1:13 - Krishna Goutham N
+So the changes that I have not done in this are the fetching of slides that will be iteration three.
+
+1:26 - Krishna Goutham N
+One second. Whatever I showed you.
+
+1:32 - Krishna Goutham N
+It's in a blank screen.
+
+1:57 - Krishna Goutham N
+Okay yeah so before you go quick things to keep in mind what I'm trying to optimize for right now is depth of conversation right for example if the answer is wrong instead of throwing away the answer and like no soul in conversation how do you make those probing style questions to nudge the student to get to the right answer and then go forward. So, each node gets a correctness filter. I'll explain the architecture later. So, things that I have to add further are intro conversations are more like, okay, how are you doing, what are you doing, and all of that. So, those things I'm still exploring on how to make it a little bit more natural. I've solved, to some extent, solved for the academic The rest of it you tell me the feedback that you're thinking of and I'll keep taking note of it.
+
+3:01 - Vinay Ravindra
+I'll have to treat this as a teacher trying to teach me.
+
+3:06 - Krishna Goutham N
+You are a student you are playing with this product.
+
+3:10 - Vinay Ravindra
+Playing effectively means I am interacting with a teacher and the teacher is trying to teach me as a student.
+
+3:20 - Vinay Ravindra
+assuming as a larger context, the student has said I want to learn fractions and now you have landed on this particular node in your journey. So, there is a whole bunch of things that can be done before this, but now you have landed on fractions because it is identified that I want to learn fractions. Okay, I am starting.
+
+3:48 - Vinay Ravindra
+Hi, I'm Mathmate, your friend.
+
+3:50 - Unidentified Speaker
+What's your name? My name is Vinay.
+
+4:00 - Vinay Ravindra
+This latency, I'll fix it.
+
+4:03 - Krishna Goutham N
+Hi Vinay, we have seven fun challenges today.
+
+4:06 - Unidentified Speaker
+Let's have fun together.
+
+4:10 - Unidentified Speaker
+Let's start our first challenge. This video about fractions.
+
+4:20 - Unidentified Speaker
+If a pizza has four equal slices, what do we call one slice?
+
+4:27 - Unidentified Speaker
+I still call it a pizza.
+
+4:38 - Unidentified Speaker
+Fractions have special names when there are four equal equal pieces, what's the special name for just one piece?
+
+4:47 - Vinay Ravindra
+Pizza for pizza.
+
+4:54 - Krishna Goutham N
+Think about the number four.
+
+4:56 - Unidentified Speaker
+Each piece is called a fourth, so what do we call one of them?
+
+5:02 - Unidentified Speaker
+one of the fourth.
+
+5:09 - Vinay Ravindra
+One piece out of four, the fraction name starts with own F.
+
+5:16 - Vinay Ravindra
+It's not acknowledging what I'm seeing.
+
+5:21 - Unidentified Speaker
+Knowledge and then correct.
+
+5:23 - Vinay Ravindra
+It is directly assuming whatever I say I could have said, blah, blah, blah. Which is what I do right now, it will still go on with the same thing, right? Blah, blah, blah, blue, blah, blue.
+
+5:43 - Krishna Goutham N
+A word is 1 4th.
+
+5:45 - Unidentified Speaker
+Can you say that?
+
+5:48 - Vinay Ravindra
+You're not acknowledging. You've already made a tree, is what I would assume, or whatever you're doing behind the scenes. And just traversing that tree without acknowledging what I'm saying and then modifying the conversation according to that. I understand that you have to end up here. I'm not getting that, but the conversation needs to be acknowledgement of what I say, say, hey, you're almost there. Oh, that's almost correct. No, your way of track, can we now look at it this way? Something that guides you, right?
+
+6:26 - Krishna Goutham N
+Because you now have the link, I'll keep deploying these smaller updates to the same link. This is a small patch. I'll add that. I'll add that and I'll ping you again for you can take the acknowledgement part in the next maybe a day or two. Got it.
+
+6:42 - Vinay Ravindra
+I can say that.
+
+6:51 - Unidentified Speaker
+Great job, Vinay. You learned the fraction name well.
+
+6:56 - Unidentified Speaker
+Now you'll cut paper into fractions. Use the scissors to make equal parts. Try it.
+
+7:08 - Unidentified Speaker
+When we make fractions, what do we need to remember about the size of the pieces?
+
+7:17 - Vinay Ravindra
+Make sure that We've cut them all.
+
+7:25 - Vinay Ravindra
+I'm sorry, but I cannot assist with that request.
+
+7:29 - Krishna Goutham N
+Okay, this is coming because...
+
+7:33 - Vinay Ravindra
+Why can't you assist me with that request? I have to cut a hole into parts and that's what a fraction is, correct? Or have I gone wrong? If I've gone wrong, tell me where have I gone wrong? If okay I just wanted to see how long will you keep the conversation going when we share equally what must be true about each piece yeah the acknowledgement part I learned uh okay For fair sharing, pieces must be the size.
+
+8:16 - Vinay Ravindra
+Okay, so this is good. Ideally, you should pull up the slide.
+
+8:23 - Krishna Goutham N
+Yeah, this is where the slide has to show up.
+
+8:28 - Krishna Goutham N
+One more thing that I'm seeing here is the explanation part can still be more meaningful, but that will be fixed when the acknowledgment happens. So this is going to be like a queue now.
+
+8:43 - Unidentified Speaker
+OK, right.
+
+8:45 - Vinay Ravindra
+And can you also look at the UI of what you're basically doing at this point in time, where you're putting all the conversations on the left panel, like what basically happens on WhatsApp or anything, where you are talking, I am talking, you're acknowledging and going forward. And maybe you will even fade it off and only have the most important ones in the forefront. And then you have a whole to talk at the bottom where you are you are doing the same exact activity and on the right you are doing all the showcasing of the slides and highlighting stuff that you want to. Got it.
+
+9:18 - Krishna Goutham N
+So this is like a same thing. Got it.
+
+9:26 - Vinay Ravindra
+When I say something you are anyway hearing just put that in the conversation as in put it as a part of the conversation.
+
+9:34 - Krishna Goutham N
+Got it. So whatever the says that also should be written out there yeah yeah it will be better if you write that out there got it so this is so which this is on primarily mobile devices or desktop primarily it will be on mobile devices as we move forward but let us build it for both oh yeah the reason I asked is So two-pane layouts usually are for desktop UIs. For mobile, so this one, for example, if you right-click anywhere, click on inspect.
+
+10:24 - Krishna Goutham N
+So right-click, inspect, and I mean, you should see, I mean, the moment you're clicking inspect, it should resize itself. Maybe you can resize this window also.
+
+10:43 - Krishna Goutham N
+So on mobile screens, how would it look is what it shows up. So because of the smaller real estate, the push to talk format also helps because it's just one large button for I'll figure out another UI for it, but I get what you're saying. So basically whatever I'm saying should also show up so student can also see or follow that conversation through.
+
+11:11 - Krishna Goutham N
+Got it. That I'll figure a UI for that. So one more thing is that so once the acknowledgement part is sorted out, the next answer that the AI should give becomes reasonably easier. Is forcing itself to have context. So right now, in this architecture so far, context is preserved only within this one conversation. So for example, if you move to the next asset, which is video, this context and conversation will go away. We can add that context also. That's not a major problem. So that's fun. I mean, right now, I've not added it. But it's something that is easy to do. I'm just deliberately leaving it out for ease of building for now. Got it.
+
+12:08 - Krishna Goutham N
+And the other things that will change is... I didn't catch that. The word rhymes with Dane. S-E, size. No, this one. So those fill in the blanks, et cetera, that I will try to either remove and mostly it's it's picking up memory and recall based responses and probing that I will change it it's a it's a simple system prompt change I'll tell it to what the questions are as long as it's able to understand and then keep progressing down right we can always tweak it and say based we can always say ask more intelligent questions and so on to that. One more thing. In fact, what I worked on primarily is this entire conversation is configurable at scale, meaning for every learning journey like this from the team, we just need, OK, these are the five modules after each module. Again, this is optional, by the way, if the team wants to customize it, you can configure the first starting question that AI should ask and then all subsequent questions should be depending on what the student is saying and we can also configure the number of back and forth we want the AI to meaningfully have. So right now recommended version back and forth is four or five turns but we can either decrease it or increase it also. If we decrease it, it rushes a little bit. If we increase it, it'll take its own But recommended for now is 5 for this age group.
+
+13:59 - Vinay Ravindra
+I understand those could be smaller iterations and we can always parameterize that as we keep moving forward based on age and based on a whole bunch of other parameters that we will set. But what I'm actually looking at is how is that interaction or how is that conversation itself, right? In terms of how many conversations and what conversation is what we have to iterate on. For me, there are two things, right? One is, it has to acknowledge what I'm saying. And the second thing is, there is going to be something else on the screen. I don't want the screen to be the AI piece, right? The screen needs to be something where you just have hold the whole talk and the conversation is basically happening. And the slides that we have and context setting that we basically bring out in the slides is what it needs to take them through, saying, hey, you know what? Now, the next that I will basically throw up is a video. And the video talks about all of these and showcase that slide which does that. And then you say, now click on it to click over there to start watching the video. And then it starts watching. I hope you enjoyed what the video was. And this is the summary of what the video basically said. And then if you can now move forward, let's do a hands-on experience with an applet. And then you basically hand it over. In this, you will also have conversations that you are doing. So if you are a teacher and you are running them through those slides, what all conversations you will have, you will basically do those. And in between, you will also ask a bunch of questions so that they are to understand whether they understood the material or not.
+
+15:45 - Krishna Goutham N
+Got it. I think there are two kinds of acknowledgement. One is acknowledgement of what the student has answered to the previous question. The second one is what's happening on the screen. For example, in the video, Jane did this or in the applet, here's a scissor and you need to cut this into different parts. So acknowledgement of what will happen in the content asset and what has happened in the content So, that acknowledgment also.
+
+16:11 - Vinay Ravindra
+So, that context has been put into the slides. It has to go through it like a teacher would. If you were teaching that slideshow, what conversations would you have? So, it is about that and then whatever teacher notes you will put, that's the conversation that this needs to have. Got it.
+
+16:37 - Krishna Goutham N
+Slightly tangential question. So there was this one developer guy who did a breakthrough of how Synthesia works. So basically, the entire thing is a lesson plan, completely hard-coded, and then text-to-speech engine running. Basically, the personalization there is what voice and what, I mean, each tutor is a voice there. So there they have used some voice modulations to give a feeling of a different tutor each time. Is that an easiest next step that you're looking at? So for example, that doesn't generate...
+
+17:21 - Vinay Ravindra
+I want you to imagine, Synthesia was just an example for you to look at how the UI, UX and things like that were happening. For me, Synthesia where it breaks is it gets too much. It just does not do, because it's a, it's a, it's a extremely hard coded set of things that I don't have ability to even have any kind of interaction at any point in time. So that's a negative on Zentesha, but the thing is, it's a, it's, it's clean and it is, it does, it does what it is supposed to basically do. That's the problem. But for me, Zentesha is just a reference. The bottom line is what we were doing with, let's say Vita Jr. We will give the teacher a cue and saying, this is what you need to speak on this particular slide. This is what you have to basically make the student do on this particular interaction. That is what the AI is expected to do. That is hard-coded. Now, at some points in time, you can say after two slides or three slides, just check for understanding of what the student has learned.
+
+18:23 - Vinay Ravindra
+It could be we will add those nodes where the AI will come and do you and this, can I ask you a question, please answer, shout out the answer loud, things like that, which will make it a little more interaction. Now, at that point, I don't understand it, then you go back and redo that, redo that piece or pull up some other content, content piece at that point in time. So for me, it does work what we had basically put into the teacher notes.
+
+18:52 - Krishna Goutham N
+Got understood. Fair enough.
+
+18:57 - Vinay Ravindra
+Where it is interacting, it is asking a bunch of questions and all of that, right?
+
+19:02 - Krishna Goutham N
+Got it.
+
+19:03 - Vinay Ravindra
+Can I say that it is equal size? Is that correct?
+
+19:14 - Unidentified Speaker
+Yes, it is equal size is correct for fair sharing.
+
+19:19 - Vinay Ravindra
+Watch how fractions change from 1, 2 to 1, 4 to 1.
+
+19:23 - Unidentified Speaker
+Pay attention.
+
+19:32 - Vinay Ravindra
+That context was not fraction represent part of a whole we are interested in.
+
+19:40 - Unidentified Speaker
+What is this?
+
+19:49 - Krishna Goutham N
+Yeah, it's moving from one half to one fourth to one sixth.
+
+19:55 - Vinay Ravindra
+Which has more pieces one four or one six.
+
+20:02 - Vinay Ravindra
+It's nice these some of these interactions are good in between when they come.
+
+20:07 - Vinay Ravindra
+One six.
+
+20:15 - Unidentified Speaker
+If you cut a cake into versus six slices, which way makes more pieces?
+
+20:20 - Vinay Ravindra
+I said the answer. It is not indicated.
+
+20:24 - Vinay Ravindra
+Six slices.
+
+20:31 - Unidentified Speaker
+Look at the bottom numbers, four and six. Which number is bigger?
+
+20:35 - Vinay Ravindra
+Even though I'm giving the right answer, it is going wrong.
+
+20:38 - Unidentified Speaker
+Time to learn fraction words with a cake story. Watch closely.
+
+20:44 - Krishna Goutham N
+I think here again an acknowledgement. So what's happening here is there is something called a correctness filter. Maybe it didn't realize it didn't hit the correctness filter properly there. I'll check that.
+
+21:12 - Vinay Ravindra
+We didn't talk about unit fractions.
+
+21:19 - Unidentified Speaker
+What do we call the top number in a fraction?
+
+21:31 - Unidentified Speaker
+Great job, Vinay. Enumerator is the top number showing how many pieces you have.
+
+21:38 - Unidentified Speaker
+Now we'll make fractions like 2, 4 and The top number can be more than 1. Look at the fraction What does the top number tell us? Look at The top number is 2. What does that 2 tell us?
+
+22:09 - Krishna Goutham N
+Now make fractions with bigger top numbers.
+
+22:12 - Unidentified Speaker
+Try 25 or 35. What am I supposed to do?
+
+22:36 - Krishna Goutham N
+split the square into 5 equal parts and click on the white paper I'll check this.
+
+23:12 - Vinay Ravindra
+No, it is not.
+
+23:15 - Krishna Goutham N
+Yeah, this applet, I think it's not fitting. This is a UI thing. I think that last update, I just pushed like two minutes before I joined the call. I think that messed this one up. I tried to make it mobile optimized.
+
+23:35 - Unidentified Speaker
+If you colored three pieces out of five, what fraction is that?
+
+23:41 - Vinay Ravindra
+Three out of five.
+
+23:48 - Unidentified Speaker
+Great job, Vinay. You're understanding fractions well. You've learned so much.
+
+23:58 - Unidentified Speaker
+They are called unit fractions. But the numerator need not always be 1. What happens if I pick up? Quick review. What's the bottom number called?
+
+24:20 - Vinay Ravindra
+Good try.
+
+24:20 - Unidentified Speaker
+In 3, 4, the 4 is on the bottom. It shows total pieces. What's its name?
+
+24:27 - Unidentified Speaker
+Parts of a whole.
+
+24:35 - Unidentified Speaker
+The bottom number is called the denominator. It shows total parts in the whole.
+
+24:44 - Vinay Ravindra
+It's much better than where it was, Goutham, but I think acknowledgment as well as pulling slides would make it one level better.
+
+24:55 - Krishna Goutham N
+Yeah, I think I'll tackle both in the next iteration.
+
+25:01 - Krishna Goutham N
+Acknowledgement should be a simple fix. Slides is something that I'll pick up now. I have some of the slides that are created for this lesson. I'll put them in initially. I'll give you one message, Once the acknowledgement is done, so you can do one quick check again and once slides are also done, I'll do the next thing. So this slide may be tomorrow. Latest is tomorrow.
+
+25:34 - Vinay Ravindra
+You just let me know that it looks much better. Then we can work a little bit on the UI also making it slightly better for the rest of the Yes, sir.
+
+25:49 - Krishna Goutham N
+I will see you again mid next week sir. With a broken hip. Yes bye.

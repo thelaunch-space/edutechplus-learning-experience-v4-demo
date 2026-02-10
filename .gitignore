@@ -26,8 +26,6 @@ npm-debug.log*
 # Internal feedback notes (LLM context only)
 feedback/
 
-# Client meeting transcripts
-meeting-transcripts-with-client/
 
 # Video files (using YouTube embeds instead)
 *.mp4
