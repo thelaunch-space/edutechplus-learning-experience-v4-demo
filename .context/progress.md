@@ -73,7 +73,7 @@
 - Added 1-second pause after correct answer acknowledgement before confetti
 - Comprehensive correctness debugging logs
 
-## Iteration 4 (In Progress — Jan 30, 2026)
+## Iteration 4 (Complete — Feb 2, 2026)
 
 **New client feedback received:** Shifted priorities based on UX issues and pedagogical improvements.
 
@@ -155,19 +155,160 @@
 - `.context/framework-technical.md`
 - `content-inputs/` folder (34 files)
 
-### 📋 Deferred to Future Iterations
+---
 
-**Previously Planned (Medium Priority):**
+## Iteration 5 (Complete — Feb 10, 2026)
+
+**Goal:** Visual overhaul (sci-fi theme), character system (Master Tutor "Max" with 7 expressions + Minion "Spark" robot), onboarding flow, checkpoint dynamic slides, and fun moments.
+
+**Status:** Implementation complete. Build passing.
+
+**Full spec:** `.context/iteration-5-requirements.md`
+
+### ✅ Completed
+
+**1. UI Overhaul — DONE**
+- ✅ BG.jpg full-screen background replacing candy-land gradient
+- ✅ MediaBox.png frame for right content pane (~70%), white interior
+- ✅ Transparent sidebar (~30%) with chat overlay on background
+- ✅ Sci-fi themed chat bubbles (cyan/teal user, white/blue assistant)
+- ✅ Content renderers (YouTube, applet, slide) restyled for light MediaBox interior
+- ✅ Progress bar removed entirely
+- ✅ NavBar with consistent Next/Skip button (center) and PTT button (right, using Button.png)
+
+**Files modified:** `App.module.css`, `ChatMessage.module.css`, `ChatPane.module.css`, `ChatHistory.module.css`, `YouTubePlayer.module.css`, `AppletContainer.module.css`, `SlideViewer.module.css`, `WelcomeScreen.tsx` + `.module.css`
+**Files deleted:** `ProgressBar.tsx`, `ProgressBar.module.css`
+**Files created:** `NavBar.tsx` + `.module.css`
+
+**2. Master Tutor "Max" — 7 Expression States — DONE**
+- ✅ TutorCharacter component with crossfade transitions between expressions
+- ✅ Phase-based expression switching throughout all voice flows:
+  - Onboarding: `greeting` → `neutral`
+  - Pre-challenge narration: `neutral`
+  - Post-challenge question: `nudging`
+  - PTT active (student speaking): `listening`
+  - Student correct: `celebration`
+  - Student incorrect/scaffolding: `encouragement`
+  - Goofy moments: `giggling`
+  - Checkpoints: `celebration`
+- ✅ Positioned bottom-left overlapping sidebar/content boundary
+
+**Files created:** `TutorCharacter.tsx` + `.module.css`
+
+**3. Minion "Spark" Robot — DONE**
+- ✅ MinionCharacter component with slide-in/fade entrance animation
+- ✅ Visible during onboarding intro and goofy moments, hidden otherwise
+- ✅ Positioned left of tutor at bottom-left
+
+**Files created:** `MinionCharacter.tsx` + `.module.css`
+
+**4. Onboarding Flow (Node 0) — DONE**
+- ✅ New `'onboarding'` challenge type at index 0
+- ✅ Replaces old GREETING phase (SessionPhase changed from GREETING → ONBOARDING)
+- ✅ `runOnboardingInteraction()` in voice hook: intro → name capture → warm-up questions (max 5 turns)
+- ✅ `ONBOARDING_SYSTEM_PROMPT` for LLM (no correctness eval, warm/anchored)
+- ✅ `generateOnboardingResponse()` in OpenRouter service (plain text, no JSON)
+- ✅ OnboardingWelcome component for MediaBox content area
+
+**Files modified:** `types/index.ts` (SessionPhase), `sessionStore.ts`, `useVoiceInteraction.ts`, `openrouter.ts`, `prompts.ts`, `challenges.ts`
+**Files created:** `OnboardingWelcome.tsx` + `.module.css`
+
+**5. Checkpoint Dynamic Slides (3x) — DONE**
+- ✅ New `'checkpoint'` challenge type at nodes 7, 14, 19
+- ✅ 3 checkpoints after each LO group:
+  - LO1 (nodes 1-6): Equal parts & basic notation
+  - LO2 (nodes 8-13): Bigger fractions & numerator/denominator
+  - LO3 (nodes 15-18): Applying fraction knowledge
+- ✅ `runCheckpointInteraction()` in voice hook: celebratory summary → review questions → confetti
+- ✅ `getCheckpointPrompt()` in prompts + `generateCheckpointResponse()` in OpenRouter
+- ✅ CheckpointSlide component (sci-fi themed, visual LO summary)
+
+**Files created:** `CheckpointSlide/CheckpointSlide.tsx` + `.module.css`
+
+**6. Fun/Goofy Moments (2x) — DONE**
+- ✅ New `'goofy'` challenge type at nodes 5 and 11
+- ✅ `runGoofyMomentInteraction()` in voice hook: auto-play, no PTT, auto-advance
+- ✅ Pre-scripted content in `goofyMoments.ts`
+- ✅ Minion appears during Spark's joke (goofy-1), hidden for Max's fun fact (goofy-2)
+
+**Files created:** `src/config/goofyMoments.ts`
+
+**7. App Integration — DONE**
+- ✅ App.tsx fully rewritten with new layout structure
+- ✅ ChatPane simplified (PTT moved to NavBar)
+- ✅ All new useEffects for onboarding, checkpoint, goofy triggers
+- ✅ Journey expanded from 14 → 20 nodes (0-19)
+- ✅ Tutor name changed from "Math Mate" to "Max" in all prompts
+
+**Files modified:** `App.tsx`, `ChatPane.tsx`
+
+### Assets
+
+**Copied to `public/tutor-assets/`:** BG.jpg, MediaBox.png, bot.png, Button.png, Character/ (7 PNGs)
+**Pending:** Final nav button assets from design team (using CSS placeholders)
+
+### ⚠️ CRITICAL — Onboarding Flow Still Broken (Feb 10, 2026)
+
+**Status:** Actively being fixed. Multiple failed attempts. Resume tomorrow.
+
+**The problem:** The onboarding flow (Node 0) is fundamentally broken in conversation design. Claude has repeatedly failed to think through the interaction properly, producing robotic, thoughtless flows that no real teacher would use. The owner is extremely frustrated.
+
+**Issues found through testing:**
+1. **Fallback fires on Turn 1** — When LLM times out after kid says their name, the fallback was a generic "That sounds fun!" instead of a name-aware greeting. **Fixed:** Fallbacks now name-aware per turn.
+2. **LLM sets shouldProceed=true on reluctant responses** — Kid says "No, I'm not interested" and the system ends the conversation and starts the lesson. **Fixed:** Code-level minimum 3 turns enforced regardless of LLM output.
+3. **Max never asks questions** — Every Max response was a statement ending with a period. Kid has no idea what to say next, literally asks "What do you want me to say now?" **Fixed:** Prompt now requires turns 1-2 to end with a simple question (e.g., "Do you like pizza?").
+4. **Name extraction fails silently** — When kid doesn't give a clear name, system calls them "Friend" and says "Your name is super fun!" **Fixed:** Re-asks once ("I didn't catch that — what should I call you?"), falls back to "Buddy" if still fails.
+
+**What changed (code):**
+- `src/config/prompts.ts` — `ONBOARDING_SYSTEM_PROMPT` → `getOnboardingSystemPrompt(turnNumber, studentName)` — turn-aware, question-enforcing
+- `src/services/openrouter.ts` — `generateOnboardingResponse()` accepts `turnNumber`, name-aware fallbacks per turn, max_tokens 80→120
+- `src/hooks/useVoiceInteraction.ts` — Multi-turn loop (max 4 LLM turns), name re-ask on failure, minimum 3 turns enforced
+- `src/config/challenges.ts` — Warmer preScript with Spark humor, maxTurns 3→5
+
+**Latest test (Feb 10 evening):** Current version is "decently okay" but still missing critical elements. See feedback below.
+
+**Owner feedback — MUST address in next session (Feb 11):**
+Claude has been repeatedly messing up the onboarding conversation design. Multiple failed iterations due to not thinking through what a real teacher would do. The current version works mechanically but is still missing the SOUL of the interaction:
+
+1. **Learning outcomes are MISSING** — Max never tells the kid what they'll actually learn. Must include a fun, kid-friendly preview of learning outcomes: "We're gonna learn how to share pizza fairly, cut cakes into equal pieces, and figure out cool fraction puzzles!" NOT academic language. Make it sound like a game/adventure.
+2. **Warm greeting should set the stage** — The whole point of onboarding is to make the kid feel excited about learning fractions. Every turn should nudge toward: "we're going to have fun while learning fractions." Don't just chat aimlessly.
+3. **Conversation turn logic** — Max 5 total turns. Min 2-3 conversation turns. Once the child shows interest/engagement, start encouraging and smoothly transition into the lesson. Don't drag it out if the kid is eager, don't rush if the kid needs warming up.
+4. **Name extraction still buggy** — Kid said "I don't know" and extractName returned "I" instead of triggering the re-ask (re-ask only fires when result is "Friend", not other garbage like "I").
+
+### ✅ Onboarding Flow — 5-Beat Rewrite (Feb 11, 2026)
+
+**Problem:** Previous onboarding was a multi-turn LLM loop that produced robotic, aimless conversations. No learning outcomes, name extraction returned garbage, LLM controlled flow.
+
+**Solution:** Replaced with "Scripted Backbone, LLM Intelligence at the Joints" — 5-beat linear structure:
+
+| Beat | What | Type |
+|------|------|------|
+| 1 | Grand Entrance (Max + Spark, no fraction reveal) | Scripted |
+| 2 | Name Capture (hardened extractName) | Scripted + PTT |
+| 3 | Adventure Hook (greet + learning outcomes + fun Q) | LLM + PTT |
+| 4 | Bridge + Transition (acknowledge + transition) | LLM |
+| 5 | Auto-advance to Node 1 | Auto |
+
+**Key changes:**
+- `extractName()` — Garbage detection: single letters, common words, numbers (40+ blocked words)
+- `getAdventureHookPrompt()` — Replaces turn-based prompt. One job: greet + pitch fraction adventure + ask fun Q
+- `getBridgeTransitionPrompt()` — Replaces turn-based prompt. One job: acknowledge + transition
+- `generateAdventureHook()` / `generateBridgeTransition()` — Replace `generateOnboardingResponse()`. Plain text output (no JSON)
+- `runOnboardingInteraction()` — Linear 5-beat flow, no while loop, exactly 2 LLM calls
+- Beat 1 saves fraction reveal for Beat 3 (adventure framing: "You, me, and Spark are going on a fraction adventure!")
+- Fallbacks pre-written per beat (not generic)
+
+**Files modified:** `useVoiceInteraction.ts`, `prompts.ts`, `openrouter.ts`, `challenges.ts`
+**Files updated:** `.context/conversation-design.md`, `.context/bugs-and-recurring-issues.md`
+
+### Deferred
+
 - Flexible voice nodes (`skipPreVoice`/`skipPostVoice` flags)
-- Additional correctness filter improvements
-- Generalized dynamic slide system (if experiment proves successful)
+- Correctness filter improvements
+- ElevenLabs TTS switch
+- Personalized quiz
+- Platform build (Convex + Clerk, authoring GUI, analytics)
 
-**Platform Build (Future Phase):**
-- Backend setup (Convex + Clerk)
-- Content authoring GUI
-- Progress persistence
-- Analytics dashboard
+See `.context/feature-wishlist.md` for detailed feature list.
 
-See `.context/feedback.md` for full rationale and `.context/feature-wishlist.md` for detailed feature list.
-
-**Last updated:** 2026-02-02
+**Last updated:** 2026-02-10

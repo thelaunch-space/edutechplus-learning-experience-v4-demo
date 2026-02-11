@@ -47,6 +47,7 @@ Math Mate is a voice-guided learning experience for Grade 4 fractions. An AI com
 | `.context/learning-journey.md` | You need the complete content roadmap (14 nodes) and implementation status |
 | `.context/framework-wip.md` | You need to understand what content teams control (client-friendly doc) |
 | `.context/framework-technical.md` | You're building the scalable platform (schemas, architecture, migration) |
+| `.context/iteration-5-requirements.md` | You're working on Iteration 5 features (UI overhaul, onboarding, expressions, checkpoints) |
 
 ## Dev Commands
 
@@ -62,8 +63,8 @@ Requires `.env` with: `VITE_DEEPGRAM_API_KEY`, `VITE_OPENROUTER_API_KEY`
 - CSS Modules (not Tailwind)
 - Zustand for state management
 - Fredoka + Nunito fonts (kid-friendly typography)
-- Playful, Candy-Land themed UI for grade 4 students
-- Mobile-first responsive design
+- **Iteration 5+:** Sci-fi/tech classroom theme (blue gradients, glowing borders, hexagonal patterns) replacing previous Candy-Land pastel theme
+- Laptop-first design (students are on laptops, not mobile)
 
 ## Critical Rules
 
@@ -72,3 +73,5 @@ Requires `.env` with: `VITE_DEEPGRAM_API_KEY`, `VITE_OPENROUTER_API_KEY`
 - **MUST** read `.context/bugs-and-recurring-issues.md` before debugging
 - **MUST** use `response_format: { type: "json_object" }` for all OpenRouter calls
 - **MUST** keep LLM responses under 2 sentences for student-facing text
+- **MUST** use AskUserQuestion tool for any product/requirements/design ambiguity — never guess or assume. For technical decisions (implementation approach, code architecture), use your own judgement. For anything the user/client cares about (UX, flow, wording, placement, feature scope), ask first.
+- **MUST** read `.context/iteration-5-requirements.md` before working on Iteration 5 features

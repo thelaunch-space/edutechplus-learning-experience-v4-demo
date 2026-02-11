@@ -31,12 +31,26 @@
 8. **Scripted vs AI-powered nodes** — `interactive: boolean` flag. If false, just TTS the script (no LLM). If true, Socratic back-and-forth *(feedback-iter-3)*
 9. **Visual context integration** — Add `visualDescription` field to slides so AI can reference on-screen content (e.g., "Look at the pizza!")
 
+## Completed (Iteration 5 — Feb 10, 2026)
+
+Full spec: `.context/iteration-5-requirements.md`
+
+1. ✅ **UI overhaul** — Sci-fi/tech theme replacing Candy-Land. BG.jpg + MediaBox.png layout, laptop-first.
+2. ✅ **Master Tutor "Max" expressions** — 7 expression states, phase-based switching, crossfade transitions
+3. ✅ **Minion "Spark" robot** — Sidekick character, appears during onboarding + goofy moments
+4. ✅ **Onboarding flow (Node 0)** — Warm-up conversation: intro, name capture, warm-up Qs. Replaces GREETING phase.
+5. ✅ **Checkpoint dynamic slides** — 3 checkpoints after LO groups (nodes 7, 14, 19). Voice + review questions, confetti.
+6. ✅ **Fun/goofy moments** — 2 pre-scripted moments (nodes 5, 11). Voice-only, auto-advance.
+7. ✅ **Remove progress bar** — Deleted ProgressBar component entirely
+8. ✅ **Unified nav buttons** — NavBar with Next/Skip (center) + PTT (right, Button.png) in fixed positions
+
 ## Deferred / Future
 
 - **Corrective slides / routing logic** — branch to remedial content if student struggles *(feedback-iter-3, transcript-2)*
 - **On-demand doubts** — tap-to-speak outside structured conversation for ad-hoc questions *(impl-plan-iter-2)*
-- **Pre-asset multi-turn** — currently just scripted intro; could become interactive *(impl-plan-iter-2)*
-- **Content authoring portal** — GUI for content team to drag/drop nodes, replace config file editing *(feedback-iter-3)* **[FRAMEWORK DESIGNED — see `.context/framework-wip.md` and `content-inputs/`]**
+- **ElevenLabs TTS switch** — More voice options, better quality. Staying on Deepgram Aura-2 for now. *(feedback-iter-4)*
+- **Personalized quiz** — AI-generated quiz based on conversation history and struggle areas *(feedback-iter-4)*
+- **Content authoring portal** — GUI for content team to drag/drop nodes *(feedback-iter-3)* **[FRAMEWORK DESIGNED — see `.context/framework-wip.md` and `content-inputs/`]**
 
 ## Platform Scaling (Framework Designed, Build Deferred)
 
@@ -50,6 +64,5 @@ Framework documentation and reference implementation complete:
 2. Progress persistence
 3. Content authoring GUI
 4. Analytics dashboard
-5. Buddy system (configurable AI personas)
 
-**Last updated:** 2026-02-02
+**Last updated:** 2026-02-10

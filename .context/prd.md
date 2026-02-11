@@ -15,13 +15,14 @@ Core capabilities:
 - Hold-to-talk (PTT) for natural conversation
 - Slide content with narration and interactive questions
 - Dynamic interactive slides with voice-visual synchronization (Node 4)
-- Playful, kid-friendly UI (Candy-Land theme)
+- Character system: Master Tutor (7 expressions) + Minion robot sidekick
+- Sci-fi/tech classroom UI theme (Iteration 5+, replacing earlier Candy-Land theme)
 
 ## User Persona
 
 - Grade 4 student, age 9-10
 - Indonesian, ESL (simple English required)
-- Using mobile device (touch-first)
+- Using laptop (laptop-first experience)
 - No teacher present — Math Mate IS the teacher
 
 ## Success Criteria
@@ -70,4 +71,4 @@ Content is defined in `src/config/challenges.ts`. Each challenge bundles:
 
 Proprietary — EdutechPlus
 
-**Last updated:** 2026-02-02
+**Last updated:** 2026-02-10

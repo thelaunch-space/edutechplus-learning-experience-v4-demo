@@ -24,22 +24,25 @@
   display: flex;
   align-items: flex-start;
   gap: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
-/* User bubble - WhatsApp-style green */
+/* User bubble — semi-transparent cyan/teal */
 .user .bubble {
-  background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
+  background: rgba(0, 200, 255, 0.15);
   color: #fff;
+  border: 1px solid rgba(0, 200, 255, 0.4);
   border-bottom-right-radius: 6px;
+  backdrop-filter: blur(8px);
 }
 
-/* Assistant bubble - white */
+/* Assistant bubble — semi-transparent white/light blue */
 .assistant .bubble {
-  background: #fff;
-  color: var(--text-dark, #1a1a2e);
+  background: rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.25);
   border-bottom-left-radius: 6px;
-  border: 2px solid rgba(168, 85, 247, 0.2);
+  backdrop-filter: blur(8px);
 }
 
 /* Current message being spoken - subtle pulse */
@@ -85,10 +88,10 @@
 
 @keyframes pulse {
   0%, 100% {
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
   }
   50% {
-    box-shadow: 0 2px 16px rgba(168, 85, 247, 0.3);
+    box-shadow: 0 2px 16px rgba(0, 180, 255, 0.3);
   }
 }
 

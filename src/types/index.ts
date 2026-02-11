@@ -1,9 +1,15 @@
 export type SessionPhase =
-  | 'GREETING'
+  | 'ONBOARDING'
   | 'PRE_CHALLENGE'
   | 'IN_CHALLENGE'
   | 'POST_CHALLENGE'
   | 'COMPLETE';
+
+// Checkpoint slide frame states
+export type CheckpointFrame = 'intro' | 'question' | 'scaffold' | 'celebration';
+
+// Checkpoint identifiers
+export type CheckpointId = 'lo1' | 'lo2' | 'lo3';
 
 // Dynamic slide frame states for FractionCompareSlide
 export type SlideFrame =
@@ -19,6 +25,16 @@ export interface SlideInteractionState {
   rightTapped: boolean;
   leftHighlighted: boolean;
   rightHighlighted: boolean;
+}
+
+// Tutor expression states (maps to character PNGs)
+export type TutorExpression = 'neutral' | 'greeting' | 'celebration' | 'encouragement' | 'giggling' | 'listening' | 'nudging';
+
+// Goofy moment script
+export interface GoofyMomentScript {
+  tutorLine: string;
+  minionLine?: string;
+  showMinion: boolean;
 }
 
 export type VoiceState =
@@ -41,7 +57,7 @@ export interface Scaffolding {
 export interface Challenge {
   id: string;
   number: number;
-  type: 'video' | 'applet' | 'slide';
+  type: 'video' | 'applet' | 'slide' | 'onboarding' | 'checkpoint' | 'goofy';
   path: string;
   youtubeId?: string;  // For video type challenges (YouTube embed)
   slideUrl?: string;   // For slide type challenges (image path)
@@ -54,9 +70,13 @@ export interface Challenge {
   postQuestion: string;
   contextInfo: string;
   // Iteration 2: Multi-turn conversation support
-  correctnessFilter: string;
-  scaffolding: Scaffolding;
+  correctnessFilter?: string;
+  scaffolding?: Scaffolding;
   maxTurns: number;
+  isCheckpoint?: boolean;
+  checkpointLO?: string;
+  checkpointId?: CheckpointId;
+  goofyScript?: GoofyMomentScript;
 }
 
 export interface EvaluationResult {

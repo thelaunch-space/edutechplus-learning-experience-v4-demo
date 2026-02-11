@@ -1,0 +1,41 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  gap: 16px;
+  padding: 32px;
+}
+
+.decorTop {
+  font-size: 28px;
+  color: rgba(0, 180, 255, 0.7);
+  letter-spacing: 8px;
+  text-shadow: 0 0 10px rgba(0, 180, 255, 0.4);
+}
+
+.heading {
+  font-family: 'Fredoka', sans-serif;
+  font-size: 40px;
+  font-weight: 600;
+  color: #0a1a3a;
+  margin: 0;
+  text-align: center;
+}
+
+.subtitle {
+  font-family: 'Nunito', sans-serif;
+  font-size: 20px;
+  color: #334;
+  margin: 0;
+  text-align: center;
+}
+
+.decorBottom {
+  font-size: 20px;
+  color: #ffd700;
+  letter-spacing: 12px;
+  text-shadow: 0 0 6px rgba(255, 215, 0, 0.5);
+}

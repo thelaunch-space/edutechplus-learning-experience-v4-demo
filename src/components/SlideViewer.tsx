@@ -6,7 +6,7 @@ interface SlideViewerProps {
   onComplete: () => void;
 }
 
-export default function SlideViewer({ slideUrl, onComplete }: SlideViewerProps) {
+export default function SlideViewer({ slideUrl }: SlideViewerProps) {
   const [isLoaded, setIsLoaded] = useState(false);
 
   const handleImageLoad = () => {
@@ -16,12 +16,7 @@ export default function SlideViewer({ slideUrl, onComplete }: SlideViewerProps) 
 
   const handleImageError = () => {
     console.error('❌ Slide: Failed to load image');
-    setIsLoaded(true); // Still show the skip button
-  };
-
-  const handleSkip = () => {
-    console.log('⏭️ Slide: Skip button clicked');
-    onComplete();
+    setIsLoaded(true);
   };
 
   return (
@@ -40,11 +35,6 @@ export default function SlideViewer({ slideUrl, onComplete }: SlideViewerProps) 
         onError={handleImageError}
         style={{ opacity: isLoaded ? 1 : 0 }}
       />
-      {isLoaded && (
-        <button className={styles.skipButton} onClick={handleSkip}>
-          Skip →
-        </button>
-      )}
     </div>
   );
 }

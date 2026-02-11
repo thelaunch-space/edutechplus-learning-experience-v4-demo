@@ -145,18 +145,6 @@ export function YouTubePlayer({ videoId, onComplete }: YouTubePlayerProps) {
     };
   }, [isApiLoaded, videoId, handleVideoEnd]);
 
-  // Handle skip button
-  const handleSkip = () => {
-    console.log('Skip button clicked');
-    if (playerRef.current) {
-      playerRef.current.pauseVideo();
-    }
-    if (!hasEndedRef.current) {
-      hasEndedRef.current = true;
-      onComplete();
-    }
-  };
-
   return (
     <div className={styles.container}>
       {!isReady && (
@@ -170,11 +158,6 @@ export function YouTubePlayer({ videoId, onComplete }: YouTubePlayerProps) {
         className={styles.playerContainer}
         style={{ opacity: isReady ? 1 : 0 }}
       />
-      {isReady && (
-        <button className={styles.skipButton} onClick={handleSkip}>
-          Skip
-        </button>
-      )}
     </div>
   );
 }

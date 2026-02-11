@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { MathMateAvatar } from './MathMateAvatar';
 import { unlockAudio } from '../services/tts';
 import styles from './WelcomeScreen.module.css';
 
@@ -21,11 +20,16 @@ export function WelcomeScreen({ onStart }: WelcomeScreenProps) {
   return (
     <div className={styles.container}>
       <div className={styles.content}>
-        <MathMateAvatar state="IDLE" size="large" showBranding={true} />
+        <img
+          src="/tutor-assets/Character/Greeting.png"
+          alt="Max greeting"
+          className={styles.characterImage}
+          draggable={false}
+        />
 
-        <h1 className={styles.title}>Learn Fractions!</h1>
+        <h1 className={styles.title}>Welcome to Fractions!</h1>
         <p className={styles.subtitle}>
-          7 fun challenges with your friend Math Mate
+          Learn fractions with Max!
         </p>
 
         <button
@@ -33,7 +37,7 @@ export function WelcomeScreen({ onStart }: WelcomeScreenProps) {
           onClick={handleStart}
           disabled={isStarting}
         >
-          {isStarting ? 'Starting...' : "Let's Go! 🚀"}
+          {isStarting ? 'Starting...' : "Let's Go!"}
         </button>
 
         <p className={styles.hint}>

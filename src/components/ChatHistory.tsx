@@ -26,8 +26,8 @@ export function ChatHistory({ messages, currentMessage, voiceState }: ChatHistor
 
   // Determine typing indicator text
   const getTypingText = () => {
-    if (voiceState === 'MATH_MATE_SPEAKING') return 'Math Mate is talking...';
-    if (voiceState === 'PROCESSING') return 'Math Mate is thinking...';
+    if (voiceState === 'MATH_MATE_SPEAKING') return 'Max is talking...';
+    if (voiceState === 'PROCESSING') return 'Max is thinking...';
     return null;
   };
 

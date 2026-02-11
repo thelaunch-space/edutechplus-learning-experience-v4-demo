@@ -1,0 +1,24 @@
+/* Minion Character — smaller bot to the left of tutor */
+.minion {
+  width: 120px;
+  height: 160px;
+  pointer-events: none;
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+.minionImage {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: bottom center;
+}
+
+.visible {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.hidden {
+  opacity: 0;
+  transform: translateX(-40px);
+}

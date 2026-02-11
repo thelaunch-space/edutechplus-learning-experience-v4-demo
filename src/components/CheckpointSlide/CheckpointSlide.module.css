@@ -1,0 +1,415 @@
+/* ===== CHECKPOINT SLIDE ===== */
+
+.container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  padding: 24px;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 32px 40px;
+  background: linear-gradient(145deg, #0a1a3a 0%, #0d2456 50%, #0a1a3a 100%);
+  border: 2px solid rgba(0, 180, 255, 0.4);
+  border-radius: 20px;
+  box-shadow:
+    0 0 20px rgba(0, 120, 255, 0.15),
+    inset 0 0 30px rgba(0, 80, 180, 0.1);
+  max-width: 520px;
+  width: 100%;
+  transition: all 0.5s ease;
+}
+
+.cardCelebration {
+  border-color: rgba(76, 217, 100, 0.6);
+  box-shadow:
+    0 0 30px rgba(76, 217, 100, 0.2),
+    0 0 60px rgba(255, 215, 0, 0.1),
+    inset 0 0 30px rgba(76, 217, 100, 0.05);
+}
+
+/* ===== HEADER ===== */
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.star {
+  font-size: 28px;
+  color: #ffd700;
+  text-shadow: 0 0 8px rgba(255, 215, 0, 0.6);
+  animation: starTwinkle 2s ease-in-out infinite;
+}
+
+@keyframes starTwinkle {
+  0%, 100% { transform: scale(1) rotate(0deg); opacity: 0.8; }
+  50% { transform: scale(1.15) rotate(10deg); opacity: 1; }
+}
+
+.title {
+  font-family: 'Fredoka', sans-serif;
+  font-size: 30px;
+  font-weight: 600;
+  color: #fff;
+  margin: 0;
+  text-shadow: 0 0 12px rgba(0, 180, 255, 0.5);
+}
+
+.divider {
+  width: 60%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(0, 180, 255, 0.6), transparent);
+}
+
+/* ===== VISUAL AREA ===== */
+
+.visualArea {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 120px;
+  opacity: 1;
+  animation: fadeSlideIn 0.5s ease forwards;
+}
+
+.visualVisible {
+  animation: popIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+@keyframes fadeSlideIn {
+  0% { opacity: 0; transform: translateY(10px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes popIn {
+  0% { opacity: 0; transform: scale(0.8); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+/* ===== PIZZA VISUAL ===== */
+
+.pizzaContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pizza {
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  position: relative;
+  background: rgba(255, 255, 255, 0.05);
+  border: 3px solid rgba(0, 180, 255, 0.4);
+  overflow: hidden;
+}
+
+.pizzaSlice {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.sliceNormal {
+  fill: rgba(0, 120, 200, 0.2);
+  transition: fill 0.4s ease;
+}
+
+.sliceHighlighted {
+  fill: #ff6b6b;
+  animation: sliceHighlight 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  filter: drop-shadow(0 0 6px rgba(255, 107, 107, 0.5));
+}
+
+@keyframes sliceHighlight {
+  0% { opacity: 0.3; transform: scale(0.95); }
+  50% { transform: scale(1.02); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+/* ===== FRACTION NOTATION VISUAL ===== */
+
+.notationContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.fractionNotation {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.numerator {
+  font-family: 'Fredoka', sans-serif;
+  font-size: 56px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.9);
+  line-height: 1;
+  transition: all 0.4s ease;
+}
+
+.numeratorHighlighted {
+  color: #ff6b6b;
+  text-shadow: 0 0 16px rgba(255, 107, 107, 0.6);
+  transform: scale(1.1);
+}
+
+.fractionLine {
+  width: 60px;
+  height: 4px;
+  background: rgba(0, 180, 255, 0.8);
+  border-radius: 2px;
+  box-shadow: 0 0 8px rgba(0, 180, 255, 0.4);
+}
+
+.denominator {
+  font-family: 'Fredoka', sans-serif;
+  font-size: 56px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.9);
+  line-height: 1;
+}
+
+.notationLabel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  animation: labelFadeIn 0.5s ease forwards;
+}
+
+.arrowUp {
+  color: #ff6b6b;
+  font-size: 20px;
+  animation: arrowBounce 1s ease-in-out infinite;
+}
+
+@keyframes arrowBounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+.labelText {
+  font-family: 'Nunito', sans-serif;
+  font-size: 14px;
+  color: #ff6b6b;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+@keyframes labelFadeIn {
+  0% { opacity: 0; transform: translateY(8px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+/* ===== CHOCOLATE BAR VISUAL ===== */
+
+.chocolateContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.chocolateBar {
+  display: flex;
+  gap: 3px;
+  padding: 8px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 10px;
+  border: 2px solid rgba(0, 180, 255, 0.3);
+}
+
+.chocolatePiece {
+  width: 44px;
+  height: 64px;
+  border-radius: 6px;
+  transition: all 0.4s ease;
+}
+
+.pieceNormal {
+  background: rgba(0, 120, 200, 0.2);
+  border: 2px solid rgba(0, 180, 255, 0.3);
+}
+
+.pieceHighlighted {
+  background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+  border: 2px solid rgba(255, 107, 107, 0.6);
+  box-shadow: 0 0 12px rgba(255, 107, 107, 0.4);
+  animation: piecePopIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+@keyframes piecePopIn {
+  0% { opacity: 0; transform: scale(0.7); }
+  60% { transform: scale(1.08); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+/* ===== QUESTION BUBBLE ===== */
+
+.questionBubble {
+  padding: 10px 24px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(0, 180, 255, 0.3);
+  border-radius: 100px;
+  animation: questionSlideIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.questionText {
+  font-family: 'Nunito', sans-serif;
+  font-size: 17px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.95);
+}
+
+@keyframes questionSlideIn {
+  0% { opacity: 0; transform: translateY(16px) scale(0.9); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* ===== SCAFFOLD HINT ===== */
+
+.scaffoldHint {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  background: rgba(255, 193, 7, 0.12);
+  border: 1px solid rgba(255, 193, 7, 0.3);
+  border-radius: 12px;
+  animation: hintFadeIn 0.6s ease forwards;
+}
+
+.hintIcon {
+  font-size: 20px;
+}
+
+.hintText {
+  font-family: 'Nunito', sans-serif;
+  font-size: 15px;
+  color: rgba(255, 220, 100, 0.95);
+  font-weight: 600;
+}
+
+@keyframes hintFadeIn {
+  0% { opacity: 0; transform: translateY(8px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+/* ===== CELEBRATION ===== */
+
+.celebrationArea {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  animation: celebrationReveal 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+@keyframes celebrationReveal {
+  0% { opacity: 0; transform: translateY(20px) scale(0.8); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.fractionResult {
+  padding: 12px 32px;
+  background: linear-gradient(135deg, #4cd964 0%, #2ecc71 100%);
+  border-radius: 100px;
+  box-shadow:
+    0 4px 0 rgba(39, 174, 96, 0.5),
+    0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+.resultText {
+  font-family: 'Fredoka', sans-serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: white;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.successBadge {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #ffd700 0%, #ffb700 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow:
+    0 0 16px rgba(255, 215, 0, 0.4),
+    0 4px 0 rgba(204, 156, 0, 0.5);
+  animation: badgePop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) 0.3s both;
+}
+
+@keyframes badgePop {
+  0% { transform: scale(0) rotate(-45deg); }
+  100% { transform: scale(1) rotate(0deg); }
+}
+
+.checkmark {
+  font-size: 22px;
+  color: white;
+  font-weight: 900;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+/* ===== PROMPT ===== */
+
+.prompt {
+  font-family: 'Fredoka', sans-serif;
+  font-size: 18px;
+  color: rgba(0, 200, 255, 0.9);
+  margin: 0;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.7; }
+  50% { opacity: 1; }
+}
+
+/* ===== RESPONSIVE ===== */
+
+@media (max-height: 500px) {
+  .card {
+    padding: 20px 32px;
+    gap: 10px;
+  }
+
+  .title {
+    font-size: 24px;
+  }
+
+  .pizza {
+    width: 100px;
+    height: 100px;
+  }
+
+  .numerator, .denominator {
+    font-size: 40px;
+  }
+
+  .chocolatePiece {
+    width: 32px;
+    height: 48px;
+  }
+
+  .visualArea {
+    min-height: 80px;
+  }
+}

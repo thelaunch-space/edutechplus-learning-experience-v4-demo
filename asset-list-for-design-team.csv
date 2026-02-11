@@ -1,0 +1,46 @@
+Category,Asset Name,Type,Description / Purpose,Format,Variants / States,Priority,Notes
+,,,,,,,"Math Mate — Asset List for Design Team. Currently the app uses emojis and CSS animations as placeholders. This list covers what's needed for the full visual reskin."
+,,,,,,,
+CHARACTERS,,,,,,,"Two characters: a Master Tutor (primary teaching voice) and a Sidekick/Minion (cute companion for nudges and light humor)"
+Characters,Tutor — Default/Idle,Illustration,"The tutor's resting state. Visible in the chat panel area and content pane when speaking. Friendly, approachable, teacher-like.",PNG with transparency,1 pose,P0,This is the primary character asset — everything else builds on this design
+Characters,Tutor — Speaking,Illustration / Animation,"Tutor is talking (mouth open/moving). Shown whenever AI voice is playing (narration, questions, scaffolding).",Lottie or sprite sheet,Looping animation,P0,Most frequently seen state — needs to feel natural and not repetitive
+Characters,Tutor — Listening,Illustration / Animation,"Tutor is paying attention to the student. Shown when student holds PTT and speaks.",Lottie or sprite sheet,Looping animation (e.g. ear cupped or leaning in),P0,Should feel attentive — kid should feel heard
+Characters,Tutor — Thinking,Illustration / Animation,"Tutor is processing what the student said. Brief state between student speaking and AI responding.",Lottie or sprite sheet,Looping animation (e.g. hand on chin or looking up),P1,"Shown for 1-3 seconds. Can be simpler than speaking/listening."
+Characters,Tutor — Celebrating,Illustration / Animation,"Tutor is happy/excited. Shown when student answers correctly, alongside confetti.",Lottie or sprite sheet,One-shot animation (e.g. arms up or clapping),P0,Triggered on correct answers — needs to feel genuinely excited
+Characters,Tutor — Encouraging,Illustration,"Tutor is warm and supportive. Shown when student answers incorrectly. Must NOT look disappointed.",PNG with transparency,1 pose (gentle smile or beckoning gesture),P1,"Critical: never sad or frustrated. Think 'good try, let's figure it out together'"
+Characters,Tutor — Waving/Greeting,Illustration / Animation,"Tutor waves hello. Shown on welcome screen and during greeting conversation.",Lottie or sprite sheet,One-shot animation,P1,First impression — sets the tone for the whole session
+Characters,Sidekick — Default/Idle,Illustration,"The sidekick's resting pose. Small, cute, sits near the chat area or corner of screen. Not attention-stealing.",PNG with transparency,1 pose,P0,Should be noticeably smaller than the tutor — a companion not a co-teacher
+Characters,Sidekick — Nudging,Illustration / Animation,"Sidekick pokes or waves to get student's attention. Used when student is supposed to talk but hasn't pressed PTT.",Lottie or sprite sheet,Looping animation (e.g. bouncing or waving),P1,"Playful 'hey, your turn!' energy. Replaces the current text-only prompt"
+Characters,Sidekick — Celebrating,Illustration / Animation,"Sidekick does a little happy dance or jump. Shown alongside tutor celebration on correct answers.",Lottie or sprite sheet,One-shot animation,P2,Secondary celebration — smaller and quicker than tutor's
+Characters,Sidekick — Giggling/Playful,Illustration / Animation,"Ambient idle animation. Sidekick does something cute occasionally (yawns, scratches head, looks around). Keeps the screen feeling alive.",Lottie or sprite sheet,"2-3 micro-animations (randomly triggered, looping)",P2,These are the personality moments — small things that make kids smile
+,,,,,,,
+UI — BACKGROUNDS,,,,,,,"Replacing the current CSS-only Candy Land background"
+UI,App Background,Background illustration,"Main app background visible behind all content. Should be warm, inviting, not distracting. Think classroom or adventure world.",PNG or SVG,"1 main version (can be tiled or stretched). Optional: subtle parallax layers",P0,Must not compete with content for attention. Soft colors.
+UI,Welcome Screen Background,Background illustration,"Landing page background when the app first loads. Can be more vibrant/exciting than the in-session background.",PNG or SVG,1 version,P1,This is the 'cover page' — can be more expressive
+UI,Completion Screen Background,Background illustration,"Celebration background shown when student finishes all 14 nodes. Festive, achievement-focused.",PNG or SVG,1 version,P1,Should feel like a culmination — balloons/stars/party vibe
+,,,,,,,
+UI — PANELS & FRAMES,,,,,,,
+UI,Chat Panel Background,Panel/Frame asset,"Background or frame for the chat sidebar where conversation bubbles appear. Currently a plain translucent panel.",PNG or SVG (9-slice or stretchable),1 version,P1,Needs to be tall and narrow — sidebar on desktop; bottom overlay on mobile
+UI,Chat Bubble — Tutor,Bubble shape/style,"Message bubble shape for tutor messages. Currently white rounded rectangle.",SVG or CSS reference,1 shape (can include small tutor avatar thumbnail),P2,WhatsApp-style. Tutor bubble should be visually distinct from student bubble
+UI,Chat Bubble — Student,Bubble shape/style,"Message bubble shape for student messages. Currently green rounded rectangle.",SVG or CSS reference,1 shape,P2,Could stay simpler than tutor bubble — student messages are short
+UI,Content Frame,Border/Frame,"Optional decorative frame around the main content area (where slides, videos, applets appear).",PNG or SVG (9-slice),1 version,P2,"Light touch — don't obscure content edges. Could be just rounded corners with a subtle border"
+,,,,,,,
+UI — BUTTONS & ICONS,,,,,,,
+UI,PTT Button — Default,Button asset,"Hold-to-talk button in the chat panel. Currently emoji mic + CSS. The primary student interaction control.",SVG or PNG,"2 states: default (ready) + active (recording)",P0,"Most tapped element in the app. Must be large, clear, and finger-friendly"
+UI,PTT Button — Recording Indicator,Animation,"Visual feedback while student is holding the button and speaking. Currently CSS waveform bars.",Lottie or CSS reference,Looping animation,P1,Should feel responsive — 'yes I can hear you'
+UI,Skip Button,Button/Icon,"Skip/Done button shown on videos, applets, and slides (top-right corner). Currently a translucent pill with arrow text.",SVG or PNG,1 state,P1,"Small, unobtrusive but findable"
+UI,Start Button,Button asset,"'Let's Go' button on the welcome screen.",SVG or PNG,1 state (+ optional pressed state),P1,Big and inviting — the call to action
+,,,,,,,
+PROGRESS & GAMIFICATION,,,,,,,"Note: the current top progress bar with 14 star milestones is being removed. Replaced with something simpler."
+Progress,Node Complete Star/Badge,Icon,"Small icon awarded per completed node. Could be a star, gem, or custom collectible.",SVG or PNG,"2 states: locked (grey/outline) + earned (colored/full)",P2,14 total across the journey. Only needed if we keep any progress visualization
+Progress,Trophy / Certificate,Illustration,"Shown on completion screen. Currently a trophy emoji.",PNG with transparency,1 version,P2,Could be a badge or certificate or medal — whatever fits the character theme
+,,,,,,,
+EFFECTS & TRANSITIONS,,,,,,,
+Effects,Confetti / Celebration Particles,Animation,"Triggered on correct answers. Currently CSS confetti pieces. Could become themed particles (stars, sparkles, fraction symbols).",Lottie or sprite sheet,One-shot animation (1-2 seconds),P1,Should match the overall visual style — not generic confetti
+Effects,Screen Transition,Animation,"Transition between nodes (e.g. from video to post-question). Currently an instant cut.",Lottie or CSS reference,"1 transition style (e.g. slide, fade, wipe)",P2,Keep it fast (300-500ms). Just enough to feel polished not sluggish
+Effects,Correct Answer Flash,Animation / Effect,"Brief visual reward overlaid on content when student answers correctly, just before confetti.",Lottie or CSS reference,One-shot (e.g. green glow or checkmark burst),P2,Optional — confetti may be sufficient on its own
+,,,,,,,
+AUDIO ASSETS,,,,,,,"Not visual but worth listing since the design team may coordinate with audio"
+Audio,Correct Answer SFX,Sound effect,"Short positive chime on correct answer.",MP3/OGG,1 clip (< 1 second),P2,Currently no SFX — purely voice-driven. Adding this would enhance the celebration moment
+Audio,Node Transition SFX,Sound effect,"Subtle 'whoosh' or 'ding' when moving to the next node.",MP3/OGG,1 clip (< 1 second),P2,Optional polish
+Audio,PTT Start/Stop SFX,Sound effect,"Brief click or beep when student starts/stops recording.",MP3/OGG,2 clips (start + stop),P2,Gives tactile feedback that the mic is active

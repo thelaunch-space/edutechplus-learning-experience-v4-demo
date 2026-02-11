@@ -1,0 +1,120 @@
+/* NavBar — positioned in the bottom decorative band of MediaBox */
+.navbar {
+  position: absolute;
+  bottom: 6%;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 24px;
+  z-index: 30;
+}
+
+/* Left and right sides for balance */
+.side {
+  flex: 1;
+  display: flex;
+  align-items: center;
+}
+
+.sideRight {
+  justify-content: flex-end;
+}
+
+/* Center — PTT button */
+.center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Skip/Next pill button */
+.skipButton {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 28px;
+  font-family: var(--font-display, 'Fredoka', sans-serif);
+  font-size: 15px;
+  font-weight: 700;
+  color: #fff;
+  background: linear-gradient(135deg, #0055cc 0%, #0088ff 100%);
+  border: none;
+  border-radius: 100px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow:
+    0 3px 0 #003d99,
+    0 4px 12px rgba(0, 88, 204, 0.3);
+}
+
+.skipButton:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    0 5px 0 #003d99,
+    0 6px 16px rgba(0, 88, 204, 0.4);
+}
+
+.skipButton:active {
+  transform: translateY(2px);
+  box-shadow:
+    0 1px 0 #003d99,
+    0 2px 8px rgba(0, 88, 204, 0.3);
+}
+
+.skipArrow {
+  font-size: 18px;
+}
+
+/* PTT circular button with Button.png — centered */
+.pttButton {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  padding: 0;
+  transition: transform 0.15s ease;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
+}
+
+.pttButton:hover {
+  transform: scale(1.08);
+}
+
+.pttButton:active,
+.pttActive {
+  transform: scale(0.95);
+}
+
+.pttActive {
+  filter: brightness(1.2);
+}
+
+.pttImage {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+}
+
+/* Responsive */
+@media (max-width: 767px) {
+  .navbar {
+    padding: 8px 16px;
+  }
+
+  .skipButton {
+    padding: 8px 20px;
+    font-size: 13px;
+  }
+
+  .pttButton {
+    width: 52px;
+    height: 52px;
+  }
+}

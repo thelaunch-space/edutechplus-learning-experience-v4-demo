@@ -7,23 +7,23 @@
   scroll-behavior: smooth;
 }
 
-/* Custom scrollbar */
+/* Custom scrollbar — cyan/blue sci-fi */
 .container::-webkit-scrollbar {
   width: 6px;
 }
 
 .container::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.05);
   border-radius: 3px;
 }
 
 .container::-webkit-scrollbar-thumb {
-  background: rgba(168, 85, 247, 0.4);
+  background: rgba(0, 180, 255, 0.4);
   border-radius: 3px;
 }
 
 .container::-webkit-scrollbar-thumb:hover {
-  background: rgba(168, 85, 247, 0.6);
+  background: rgba(0, 180, 255, 0.6);
 }
 
 /* Message list */
@@ -32,6 +32,7 @@
   flex-direction: column;
   gap: 0;
   min-height: 100%;
+  padding-bottom: 340px;
 }
 
 /* Spacer pushes messages to bottom when few, allows scroll when many */
@@ -46,7 +47,7 @@
   align-items: center;
   justify-content: center;
   height: 100%;
-  color: rgba(255, 255, 255, 0.5);
+  color: rgba(255, 255, 255, 0.4);
   font-family: var(--font-body, 'Nunito', sans-serif);
   font-size: 14px;
   text-align: center;
@@ -71,7 +72,7 @@
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: var(--purple, #A855F7);
+  background: rgba(0, 200, 255, 0.8);
   animation: typingBounce 1.4s infinite ease-in-out;
 }
 
@@ -88,7 +89,7 @@
   font-family: var(--font-body, 'Nunito', sans-serif);
   font-size: 12px;
   font-style: italic;
-  color: rgba(0, 0, 0, 0.75);
+  color: rgba(255, 255, 255, 0.6);
 }
 
 /* Mobile adjustments */

@@ -47,19 +47,6 @@ export function AppletContainer({ src, onComplete }: AppletContainerProps) {
         allow="autoplay; microphone"
         sandbox="allow-scripts allow-same-origin allow-forms"
       />
-
-      {/* Manual complete button for applets that don't send postMessage */}
-      <button
-        className={styles.completeButton}
-        onClick={() => {
-          if (!hasCompletedRef.current) {
-            hasCompletedRef.current = true;
-            onComplete();
-          }
-        }}
-      >
-        Skip
-      </button>
     </div>
   );
 }

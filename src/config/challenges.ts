@@ -1,6 +1,19 @@
-import { Challenge } from '../types';
+import type { Challenge } from '../types';
 
 export const challenges: Challenge[] = [
+  // Node 0: Onboarding - Meet Max & Spark (5-Beat structure)
+  {
+    id: 'onboarding',
+    number: 0,
+    type: 'onboarding',
+    path: '',
+    title: 'Meet Max & Spark',
+    duration: '1.5 min',
+    preScript: "Hey there! I'm Max, and I LOVE solving puzzles! Oh — and see this little guy? That's Spark! He's my robot buddy. He thinks he's super smart... but honestly, he gets confused by the silliest things. You'll see!",
+    postQuestion: "So, what's your name?",
+    contextInfo: 'Onboarding warm-up conversation. No assessment.',
+    maxTurns: 5,
+  },
   // Slide 1: Why Fractions? (motivation hook)
   {
     id: 'slide-1',
@@ -90,10 +103,28 @@ export const challenges: Challenge[] = [
     maxTurns: 5,
     hasDynamicSlide: true  // Uses interactive FractionCompareSlide for post-challenge
   },
+  // Goofy Moment 1: Spark's Fraction Joke
+  {
+    id: 'goofy-1',
+    number: 5,
+    type: 'goofy',
+    path: '',
+    title: 'Spark\'s Fraction Joke',
+    duration: '30 sec',
+    preScript: '',
+    postQuestion: '',
+    contextInfo: 'Fun break - goofy moment with Spark.',
+    maxTurns: 0,
+    goofyScript: {
+      tutorLine: "Hey Spark, do you know what a fraction is?",
+      minionLine: "I tried to eat 5/4 of a cake once... it didn't end well! My tummy hurt for DAYS!",
+      showMinion: true,
+    },
+  },
   // Applet A3: Cake Fractions
   {
     id: 'applet-a3',
-    number: 5,
+    number: 6,
     type: 'applet',
     path: '/fractions-module-content/applets/A3. M2-Fraction Statement Cake Snapshot/index.html',
     title: 'Cake Fractions',
@@ -111,10 +142,34 @@ export const challenges: Challenge[] = [
     },
     maxTurns: 5
   },
+  // Checkpoint LO1: Equal Parts & Fractions
+  {
+    id: 'checkpoint-lo1',
+    number: 7,
+    type: 'checkpoint',
+    path: '',
+    title: 'Checkpoint: Equal Parts & Fractions',
+    duration: '2 min',
+    preScript: "Wow, you've learned a lot already! Let's see what you remember!",
+    postQuestion: "If you cut a pizza into 4 equal slices and eat 1, what fraction did you eat?",
+    contextInfo: 'Checkpoint reviewing LO1: equal parts, basic fraction notation (1/2, 1/4, 1/6), numerator concept.',
+    isCheckpoint: true,
+    checkpointLO: 'LO1: Understanding equal parts and basic fraction notation',
+    checkpointId: 'lo1',
+    maxTurns: 4,
+    correctnessFilter: '1/4|one fourth|one quarter|one-fourth',
+    scaffolding: {
+      probe1: "You ate 1 slice. There are 4 total. How do we write that as a fraction?",
+      probe2: "Remember, the piece you ate goes on top, total pieces on bottom.",
+      hint: "It's 1 over 4. What fraction is that?",
+      scaffold: "One slice out of four. Say it: one-fourth!",
+      reveal: "It's 1/4 — one-fourth! You're doing amazing!"
+    },
+  },
   // Slide 2: What are Fractions? (preview for Video 2)
   {
     id: 'slide-2',
-    number: 6,
+    number: 8,
     type: 'slide',
     path: '',
     slideUrl: '/fractions-module-content/slides/slide-2-what-are-fractions.png',
@@ -138,7 +193,7 @@ export const challenges: Challenge[] = [
   // Video 2: Bigger Fractions
   {
     id: 'video-2',
-    number: 7,
+    number: 9,
     type: 'video',
     path: '/fractions-module-content/videos/video-2.mp4',
     youtubeId: 'pag3P1l3Tdk',
@@ -160,7 +215,7 @@ export const challenges: Challenge[] = [
   // Applet A4: Advanced Practice
   {
     id: 'applet-a4',
-    number: 8,
+    number: 10,
     type: 'applet',
     path: '/fractions-module-content/applets/A4.M2-Fraction Cut and Glue Practice 2/index.html',
     title: 'Advanced Practice',
@@ -178,10 +233,27 @@ export const challenges: Challenge[] = [
     },
     maxTurns: 5
   },
+  // Goofy Moment 2: Max's Fun Fact
+  {
+    id: 'goofy-2',
+    number: 11,
+    type: 'goofy',
+    path: '',
+    title: 'Max\'s Fun Fact',
+    duration: '30 sec',
+    preScript: '',
+    postQuestion: '',
+    contextInfo: 'Fun break - goofy moment.',
+    maxTurns: 0,
+    goofyScript: {
+      tutorLine: "Fun fact! Did you know that if you cut a pizza into a million pieces, each piece would be one-millionth? That's a LOT of tiny bites!",
+      showMinion: false,
+    },
+  },
   // Slide 3: Math Vault - Fraction Definition
   {
     id: 'slide-3',
-    number: 9,
+    number: 12,
     type: 'slide',
     path: '',
     slideUrl: '/fractions-module-content/slides/slide-3-math-vault-fraction-definition.png',
@@ -205,7 +277,7 @@ export const challenges: Challenge[] = [
   // Slide 4: Numerator and Denominator
   {
     id: 'slide-4',
-    number: 10,
+    number: 13,
     type: 'slide',
     path: '',
     slideUrl: '/fractions-module-content/slides/slide-4-numerator-and-denominator.png',
@@ -226,10 +298,34 @@ export const challenges: Challenge[] = [
     maxTurns: 0,
     isQuestionSlide: false
   },
+  // Checkpoint LO2: Bigger Fractions
+  {
+    id: 'checkpoint-lo2',
+    number: 14,
+    type: 'checkpoint',
+    path: '',
+    title: 'Checkpoint: Bigger Fractions',
+    duration: '2 min',
+    preScript: "You're becoming a fraction expert! Let's check what you know about bigger fractions!",
+    postQuestion: "In the fraction 3/5, what does the 3 tell us?",
+    contextInfo: 'Checkpoint reviewing LO2: numerators greater than 1, reading fractions, numerator/denominator roles.',
+    isCheckpoint: true,
+    checkpointLO: 'LO2: Understanding bigger fractions and numerator/denominator',
+    checkpointId: 'lo2',
+    maxTurns: 4,
+    correctnessFilter: 'three|3|three pieces|3 pieces|how many|parts we have',
+    scaffolding: {
+      probe1: "The top number in a fraction counts something. What does the 3 count?",
+      probe2: "Remember, the numerator tells us how many pieces we HAVE.",
+      hint: "The 3 means we have three...",
+      scaffold: "Three pieces! The numerator 3 means we have 3 pieces.",
+      reveal: "The 3 tells us we have 3 pieces out of 5! Great thinking!"
+    },
+  },
   // Slide 5: Discover More Fractions (question slide)
   {
     id: 'slide-5',
-    number: 11,
+    number: 15,
     type: 'slide',
     path: '',
     slideUrl: '/fractions-module-content/slides/slide-5-discover-more-fractions.png',
@@ -252,7 +348,7 @@ export const challenges: Challenge[] = [
   // Video 3: You Did It!
   {
     id: 'video-3',
-    number: 12,
+    number: 16,
     type: 'video',
     path: '/fractions-module-content/videos/video-3.mp4',
     youtubeId: '6M7MIfeL7ak',
@@ -274,7 +370,7 @@ export const challenges: Challenge[] = [
   // Slide 6: Math Trap - Find the Error (question slide)
   {
     id: 'slide-6',
-    number: 13,
+    number: 17,
     type: 'slide',
     path: '',
     slideUrl: '/fractions-module-content/slides/slide-6-math-trap-find-the-error.png',
@@ -297,7 +393,7 @@ export const challenges: Challenge[] = [
   // Slide 7: Snapshot - More Parts
   {
     id: 'slide-7',
-    number: 14,
+    number: 18,
     type: 'slide',
     path: '',
     slideUrl: '/fractions-module-content/slides/slide-7-snapshot-more-parts.png',
@@ -317,5 +413,29 @@ export const challenges: Challenge[] = [
     },
     maxTurns: 0,
     isQuestionSlide: false
-  }
+  },
+  // Checkpoint LO3: Fraction Master
+  {
+    id: 'checkpoint-lo3',
+    number: 19,
+    type: 'checkpoint',
+    path: '',
+    title: 'Checkpoint: Fraction Master',
+    duration: '2 min',
+    preScript: "You've completed the whole journey! Let's celebrate what you've learned!",
+    postQuestion: "If you have a chocolate bar cut into 6 pieces and you eat 2, what fraction did you eat?",
+    contextInfo: 'Final checkpoint reviewing LO3: applying fraction knowledge, identifying fractions, spotting errors.',
+    isCheckpoint: true,
+    checkpointLO: 'LO3: Applying fraction knowledge',
+    checkpointId: 'lo3',
+    maxTurns: 4,
+    correctnessFilter: '2/6|two sixths|two-sixths|2 over 6',
+    scaffolding: {
+      probe1: "You ate 2 pieces. Total is 6. What fraction is that?",
+      probe2: "Pieces you ate go on top. Total pieces on bottom.",
+      hint: "It's 2 over 6. How do we say that?",
+      scaffold: "Two-sixths! Can you say that?",
+      reveal: "It's 2/6 — two-sixths! You're a fraction master!"
+    },
+  },
 ];

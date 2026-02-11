@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { challenges } from '../config/challenges';
-import type { SessionPhase, VoiceState, Challenge, Message, SlideFrame, SlideInteractionState } from '../types';
+import type { SessionPhase, VoiceState, Challenge, Message, SlideFrame, SlideInteractionState, TutorExpression, CheckpointFrame } from '../types';
 
 // Module-level promise resolver for confetti completion
 let confettiResolver: (() => void) | null = null;
@@ -69,6 +69,18 @@ interface SessionState {
   slideInteractionState: SlideInteractionState;
   updateSlideInteraction: (update: Partial<SlideInteractionState>) => void;
   resetSlideState: () => void;
+
+  // Tutor expression (maps to character PNGs)
+  tutorExpression: TutorExpression;
+  setTutorExpression: (expression: TutorExpression) => void;
+
+  // Checkpoint slide state
+  checkpointFrame: CheckpointFrame;
+  setCheckpointFrame: (frame: CheckpointFrame) => void;
+
+  // Minion visibility
+  showMinion: boolean;
+  setShowMinion: (show: boolean) => void;
 }
 
 export const useSessionStore = create<SessionState>((set, get) => ({
@@ -94,7 +106,7 @@ export const useSessionStore = create<SessionState>((set, get) => ({
   },
 
   // Session phase
-  phase: 'GREETING',
+  phase: 'ONBOARDING',
   setPhase: (phase) => set({ phase }),
 
   // Voice state
@@ -170,7 +182,7 @@ export const useSessionStore = create<SessionState>((set, get) => ({
   resetSession: () => set({
     studentName: 'Friend',
     currentChallengeIndex: 0,
-    phase: 'GREETING',
+    phase: 'ONBOARDING',
     voiceState: 'IDLE',
     conversationHistory: {},
     allMessages: [],
@@ -183,7 +195,10 @@ export const useSessionStore = create<SessionState>((set, get) => ({
       rightTapped: false,
       leftHighlighted: false,
       rightHighlighted: false
-    }
+    },
+    tutorExpression: 'neutral',
+    checkpointFrame: 'intro',
+    showMinion: false,
   }),
   skipToChallenge: (index) => set({
     currentChallengeIndex: Math.min(index, challenges.length - 1),
@@ -213,5 +228,17 @@ export const useSessionStore = create<SessionState>((set, get) => ({
       leftHighlighted: false,
       rightHighlighted: false
     }
-  })
+  }),
+
+  // Tutor expression
+  tutorExpression: 'neutral' as TutorExpression,
+  setTutorExpression: (expression) => set({ tutorExpression: expression }),
+
+  // Checkpoint slide state
+  checkpointFrame: 'intro' as CheckpointFrame,
+  setCheckpointFrame: (frame) => set({ checkpointFrame: frame }),
+
+  // Minion visibility
+  showMinion: false,
+  setShowMinion: (show) => set({ showMinion: show }),
 }));

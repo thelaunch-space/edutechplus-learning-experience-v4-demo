@@ -2,19 +2,20 @@ import { useCallback, useState, useRef } from 'react';
 import { useMicrophone } from './useMicrophone';
 import { transcribeAudio } from '../services/deepgram';
 import { speakText, type TTSResult } from '../services/tts';
-import { generateResponse, generateGreeting, generateEvaluatedResponse } from '../services/openrouter';
+import { generateResponse, generateEvaluatedResponse, generateAdventureHook, generateBridgeTransition, generateCheckpointResponse } from '../services/openrouter';
 import { useSessionStore } from '../store/sessionStore';
 import type { VoiceState } from '../types';
 
 const MAX_RECORDING_MS = 15000; // 15 seconds safety cap for PTT
 
 // Extract name from transcript like "I'm Krishna Gautam" -> "Krishna"
+// Hardened: catches garbage single-letter names, common words, numbers
 function extractName(transcript: string): string {
   if (!transcript.trim()) return 'Friend';
 
   // Remove common prefixes
   const cleaned = transcript
-    .replace(/^(i'm|i am|my name is|this is|hey|hi|hello|it's|its)\s*/i, '')
+    .replace(/^(i'm|i am|my name is|this is|hey|hi|hello|it's|its|they call me|people call me|you can call me)\s*/i, '')
     .trim();
 
   // Take first word as name
@@ -22,9 +23,28 @@ function extractName(transcript: string): string {
   const name = words[0] || 'Friend';
 
   // Remove any punctuation and capitalize
-  const cleanName = name.replace(/[.,!?]/g, '');
+  const cleanName = name.replace(/[.,!?'"]/g, '').trim();
 
   if (!cleanName) return 'Friend';
+
+  // Garbage detection: single letters, common words, numbers, short gibberish
+  const GARBAGE_NAMES = [
+    'i', 'a', 'u', 'no', 'yes', 'um', 'uh', 'the', 'what', 'why', 'how',
+    'idk', 'nothing', 'ok', 'okay', 'like', 'well', 'so', 'me', 'my',
+    'dont', 'know', 'hmm', 'huh', 'nah', 'yeah', 'yep', 'nope', 'hi',
+    'hello', 'hey', 'it', 'is', 'and', 'or', 'but', 'not', 'this', 'that',
+  ];
+
+  const lower = cleanName.toLowerCase();
+
+  // Reject if: in garbage list, single character, all numbers, under 2 chars
+  if (
+    GARBAGE_NAMES.includes(lower) ||
+    cleanName.length < 2 ||
+    /^\d+$/.test(cleanName)
+  ) {
+    return 'Friend';
+  }
 
   // Capitalize first letter
   return cleanName.charAt(0).toUpperCase() + cleanName.slice(1).toLowerCase();
@@ -38,11 +58,13 @@ interface UseVoiceInteractionReturn {
   error: string | null;
 
   // High-level interactions
-  runGreetingInteraction: () => Promise<void>;
+  runOnboardingInteraction: () => Promise<void>;
   runPreChallengeInteraction: () => Promise<void>;
   runPostChallengeInteraction: () => Promise<void>;
   runSlideInteraction: () => Promise<void>;
   runFractionCompareInteraction: () => Promise<void>;
+  runCheckpointInteraction: () => Promise<void>;
+  runGoofyMomentInteraction: () => Promise<void>;
 
   // Low-level controls
   speak: (text: string) => Promise<void>;
@@ -82,12 +104,15 @@ export function useVoiceInteraction(): UseVoiceInteractionReturn {
     setDynamicSlideFrame,
     updateSlideInteraction,
     resetSlideState,
+    setTutorExpression,
+    setShowMinion,
+    setCheckpointFrame,
   } = useSessionStore();
 
   // Speak text using TTS with word-by-word reveal synchronized to audio
   const speak = useCallback(async (text: string): Promise<void> => {
     try {
-      console.log('🎤 Voice: Math Mate speaking:', text.substring(0, 50) + '...');
+      console.log('🎤 Voice: Max speaking:', text.substring(0, 50) + '...');
       setVoiceState('MATH_MATE_SPEAKING');
       setLastResponse(text);
       setDisplayedText(''); // Clear previous text
@@ -123,7 +148,7 @@ export function useVoiceInteraction(): UseVoiceInteractionReturn {
       // Clear displayedText since it's now in allMessages
       setDisplayedText('');
 
-      console.log('✅ Voice: Math Mate finished speaking');
+      console.log('✅ Voice: Max finished speaking');
       setVoiceState('IDLE');
     } catch (err) {
       console.error('❌ Voice: Speech error:', err);
@@ -163,6 +188,7 @@ export function useVoiceInteraction(): UseVoiceInteractionReturn {
       }
 
       setVoiceState('STUDENT_RECORDING');
+      setTutorExpression('listening');
       await startRecording();
 
       // Safety timeout - auto-stop after MAX_RECORDING_MS
@@ -176,7 +202,7 @@ export function useVoiceInteraction(): UseVoiceInteractionReturn {
       setVoiceState('ERROR');
       setError('Failed to start recording');
     }
-  }, [startRecording, requestPermission, stopPTTRecording]);
+  }, [startRecording, requestPermission, stopPTTRecording, setTutorExpression]);
 
   // PTT End: Called when user releases the talk button
   const handlePTTEnd = useCallback(async (): Promise<void> => {
@@ -226,65 +252,146 @@ export function useVoiceInteraction(): UseVoiceInteractionReturn {
     }
   }, []);
 
-  // Full greeting interaction flow
-  const runGreetingInteraction = useCallback(async (): Promise<void> => {
+  // Onboarding interaction — 5-beat scripted backbone with LLM intelligence at the joints
+  const runOnboardingInteraction = useCallback(async (): Promise<void> => {
     try {
-      console.log('👋 === GREETING INTERACTION START ===');
+      console.log('👋 === ONBOARDING INTERACTION START (5-Beat) ===');
       setError(null);
 
-      // Math Mate introduces itself and asks for name
-      console.log('🎤 Greeting: Step 1 - Introducing Math Mate and asking name');
-      await speak("Hi! I'm Math Mate, your friend! What's your name?");
+      const challenge = getCurrentChallenge();
 
-      // Wait a moment
-      console.log('⏱️ Greeting: Waiting 500ms before listening...');
-      await new Promise(resolve => setTimeout(resolve, 500));
+      // ========================================
+      // BEAT 1: THE GRAND ENTRANCE (Scripted)
+      // ========================================
+      console.log('🎤 Beat 1: Grand Entrance');
+      setTutorExpression('greeting');
+      setShowMinion(true);
 
-      // Listen for student's name
-      console.log('👂 Greeting: Step 2 - Listening for student name...');
-      const transcript = await listenAndTranscribe();
-      console.log('📝 Greeting: Got transcript:', transcript);
+      const introScript = challenge?.preScript ||
+        "Hey there! I'm Max, and I LOVE solving puzzles! Oh — and see this little guy? That's Spark! He's my robot buddy. He thinks he's super smart... but honestly, he gets confused by the silliest things. You'll see!";
+      await speak(introScript);
 
-      // Add student's response to chat history
-      if (transcript.trim()) {
-        addChatMessage('user', transcript);
+      await new Promise(resolve => setTimeout(resolve, 600));
+
+      // ========================================
+      // BEAT 2: NAME CAPTURE (Scripted → PTT #1)
+      // ========================================
+      console.log('🎤 Beat 2: Name Capture');
+      const nameQuestion = challenge?.postQuestion || "So, what's your name?";
+      await speak(nameQuestion);
+
+      console.log('👂 Beat 2: Listening for student name...');
+      let nameTranscript = await listenAndTranscribe();
+      console.log('📝 Beat 2: Got transcript:', nameTranscript);
+
+      if (nameTranscript.trim()) {
+        addChatMessage('user', nameTranscript);
       }
 
-      // Extract name from transcript (handles "I'm Krishna Gautam" -> "Krishna")
-      const name = extractName(transcript);
-      console.log('✅ Greeting: Extracted name:', name);
+      // Extract name with hardened logic — catches garbage
+      let name = extractName(nameTranscript);
+      if (name === 'Friend') {
+        console.log('🔄 Beat 2: Name not captured, re-asking...');
+        await speak("Haha, I didn't catch that! What should I call you?");
+
+        const retryTranscript = await listenAndTranscribe();
+        if (retryTranscript.trim()) {
+          addChatMessage('user', retryTranscript);
+        }
+
+        name = extractName(retryTranscript);
+        if (name === 'Friend') {
+          name = 'Buddy';
+          console.log('✅ Beat 2: Still no name, using "Buddy"');
+        } else {
+          console.log('✅ Beat 2: Got name on retry:', name);
+        }
+      } else {
+        console.log('✅ Beat 2: Extracted name:', name);
+      }
       setStudentName(name);
 
-      // Generate personalized greeting
-      console.log('🤖 Greeting: Step 3 - Generating personalized greeting...');
+      // ========================================
+      // BEAT 3: THE ADVENTURE HOOK (LLM Call #1 → PTT #2)
+      // ========================================
+      console.log('🎤 Beat 3: Adventure Hook (LLM)');
+      setTutorExpression('celebration');
+
       setVoiceState('PROCESSING');
-      const greeting = await generateGreeting(name);
-      console.log('✅ Greeting: Got greeting:', greeting);
+      const adventureResult = await generateAdventureHook(name);
 
-      // Speak the greeting
-      console.log('🎤 Greeting: Step 4 - Speaking personalized greeting');
-      await speak(greeting);
+      if (challenge) {
+        addMessage(challenge.id, { role: 'user', content: nameTranscript });
+        addMessage(challenge.id, { role: 'assistant', content: adventureResult });
+      }
 
-      // Wait a bit before moving on to give breathing room
-      console.log('⏱️ Greeting: Waiting 1000ms before moving to first challenge...');
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await speak(adventureResult);
 
-      // Move to first challenge
-      console.log('✅ === GREETING COMPLETE === Moving to PRE_CHALLENGE');
-      setPhase('PRE_CHALLENGE');
+      // Listen for student's response to the fun question
+      await new Promise(resolve => setTimeout(resolve, 400));
+      setTutorExpression('listening');
+
+      console.log('👂 Beat 3: Listening for student response...');
+      const warmUpTranscript = await listenAndTranscribe();
+      console.log('📝 Beat 3: Got response:', warmUpTranscript);
+
+      if (warmUpTranscript.trim()) {
+        addChatMessage('user', warmUpTranscript);
+      }
+
+      // ========================================
+      // BEAT 4: BRIDGE + TRANSITION (LLM Call #2)
+      // ========================================
+      console.log('🎤 Beat 4: Bridge + Transition (LLM)');
+      setTutorExpression('giggling');
+
+      setVoiceState('PROCESSING');
+      const history = challenge ? getConversationHistory(challenge.id) : [];
+      const transitionResult = await generateBridgeTransition(name, warmUpTranscript, history);
+
+      if (challenge) {
+        addMessage(challenge.id, { role: 'user', content: warmUpTranscript });
+        addMessage(challenge.id, { role: 'assistant', content: transitionResult });
+      }
+
+      await speak(transitionResult);
+
+      // ========================================
+      // BEAT 5: TRANSITION (Auto-advance)
+      // ========================================
+      console.log('✅ Beat 5: Auto-advance to lesson');
+      setShowMinion(false);
+      setTutorExpression('neutral');
+
+      const isComplete = goToNextChallenge();
+      if (isComplete) {
+        setPhase('COMPLETE');
+      } else {
+        setPhase('PRE_CHALLENGE');
+      }
+
+      console.log('✅ === ONBOARDING COMPLETE ===');
     } catch (err) {
-      console.error('❌ Greeting interaction error:', err);
+      console.error('❌ Onboarding interaction error:', err);
       setError('Something went wrong. Let\'s continue!');
       setStudentName('Friend');
-      setPhase('PRE_CHALLENGE');
+      setShowMinion(false);
+      setTutorExpression('neutral');
+      const isComplete = goToNextChallenge();
+      if (isComplete) {
+        setPhase('COMPLETE');
+      } else {
+        setPhase('PRE_CHALLENGE');
+      }
     }
-  }, [speak, listenAndTranscribe, setStudentName, setPhase, addChatMessage]);
+  }, [speak, listenAndTranscribe, setStudentName, setPhase, addChatMessage, getCurrentChallenge, getConversationHistory, addMessage, setTutorExpression, setShowMinion, goToNextChallenge, setVoiceState]);
 
-  // Pre-challenge interaction (Math Mate introduces the challenge)
+  // Pre-challenge interaction (Max introduces the challenge)
   const runPreChallengeInteraction = useCallback(async (): Promise<void> => {
     try {
       console.log('📢 === PRE-CHALLENGE INTERACTION START ===');
       setError(null);
+      setTutorExpression('neutral');
       const challenge = getCurrentChallenge();
 
       if (!challenge) {
@@ -309,7 +416,7 @@ export function useVoiceInteraction(): UseVoiceInteractionReturn {
       console.error('❌ Pre-challenge interaction error:', err);
       setPhase('IN_CHALLENGE');
     }
-  }, [speak, getCurrentChallenge, setPhase]);
+  }, [speak, getCurrentChallenge, setPhase, setTutorExpression]);
 
   // Slide interaction with conditional multi-turn for question slides
   const runSlideInteraction = useCallback(async (): Promise<void> => {
@@ -351,6 +458,7 @@ export function useVoiceInteraction(): UseVoiceInteractionReturn {
       // Check if this is a narration slide or question slide
       if (challenge.isQuestionSlide === false) {
         // Narration slide - speak narration and auto-advance
+        setTutorExpression('neutral');
         console.log('📢 Slide: Narration slide - speaking slideNarration...');
         if (challenge.slideNarration) {
           await speak(challenge.slideNarration);
@@ -373,6 +481,7 @@ export function useVoiceInteraction(): UseVoiceInteractionReturn {
       } else {
         // Question slide - run multi-turn Socratic dialogue
         console.log('❓ Slide: Question slide - starting multi-turn dialogue...');
+        setTutorExpression('nudging');
 
         // Reset turn counter for this challenge
         resetTurn();
@@ -380,6 +489,10 @@ export function useVoiceInteraction(): UseVoiceInteractionReturn {
         // Ask the post question
         console.log('🎤 Slide: Asking question...');
         await speak(challenge.postQuestion);
+
+        // Fallback values for optional fields
+        const correctnessFilter = challenge.correctnessFilter ?? '';
+        const scaffolding = challenge.scaffolding ?? { probe1: '', probe2: '', hint: '', scaffold: '', reveal: '' };
 
         // Multi-turn conversation loop (same as runPostChallengeInteraction)
         let shouldContinue = true;
@@ -411,8 +524,8 @@ export function useVoiceInteraction(): UseVoiceInteractionReturn {
           const result = await generateEvaluatedResponse(
             transcript,
             studentName,
-            challenge.correctnessFilter,
-            challenge.scaffolding,
+            correctnessFilter,
+            scaffolding,
             turnCount,
             challenge.maxTurns,
             conversationHistory
@@ -422,6 +535,13 @@ export function useVoiceInteraction(): UseVoiceInteractionReturn {
           // Add messages to conversation history
           addMessage(challenge.id, { role: 'user', content: transcript });
           addMessage(challenge.id, { role: 'assistant', content: result.response });
+
+          // Set expression based on result
+          if (result.isCorrect) {
+            setTutorExpression('celebration');
+          } else {
+            setTutorExpression('encouragement');
+          }
 
           // Speak the response
           console.log('🎤 Speaking response:', result.response);
@@ -439,6 +559,7 @@ export function useVoiceInteraction(): UseVoiceInteractionReturn {
             shouldContinue = false;
           } else {
             // Continue to next turn
+            setTutorExpression('nudging');
             incrementTurn();
             turnCount++;
           }
@@ -452,6 +573,8 @@ export function useVoiceInteraction(): UseVoiceInteractionReturn {
         console.log('⏱️ Waiting for confetti to complete...');
         await waitForConfetti();
         console.log('✅ Confetti complete!');
+
+        setTutorExpression('neutral');
 
         // Move to next challenge
         console.log('✅ === QUESTION SLIDE COMPLETE === Moving to next challenge');
@@ -471,7 +594,7 @@ export function useVoiceInteraction(): UseVoiceInteractionReturn {
       const isComplete = goToNextChallenge();
       setPhase(isComplete ? 'COMPLETE' : 'PRE_CHALLENGE');
     }
-  }, [speak, listenAndTranscribe, getCurrentChallenge, studentName, goToNextChallenge, setPhase, resetTurn, incrementTurn, addMessage, getConversationHistory, addChatMessage, triggerConfetti, waitForConfetti, setVoiceState, setError]);
+  }, [speak, listenAndTranscribe, getCurrentChallenge, studentName, goToNextChallenge, setPhase, resetTurn, incrementTurn, addMessage, getConversationHistory, addChatMessage, triggerConfetti, waitForConfetti, setVoiceState, setError, setTutorExpression]);
 
   // Post-challenge interaction with multi-turn loop
   const runPostChallengeInteraction = useCallback(async (): Promise<void> => {
@@ -493,8 +616,13 @@ export function useVoiceInteraction(): UseVoiceInteractionReturn {
       resetTurn();
 
       // Ask the initial question
+      setTutorExpression('nudging');
       console.log('🎤 Post-Challenge: Asking initial question...');
       await speak(challenge.postQuestion);
+
+      // Fallback values for optional fields
+      const correctnessFilter = challenge.correctnessFilter ?? '';
+      const scaffolding = challenge.scaffolding ?? { probe1: '', probe2: '', hint: '', scaffold: '', reveal: '' };
 
       // Multi-turn conversation loop
       let shouldContinue = true;
@@ -526,8 +654,8 @@ export function useVoiceInteraction(): UseVoiceInteractionReturn {
         const result = await generateEvaluatedResponse(
           transcript,
           studentName,
-          challenge.correctnessFilter,
-          challenge.scaffolding,
+          correctnessFilter,
+          scaffolding,
           turnCount,
           challenge.maxTurns,
           conversationHistory
@@ -537,6 +665,13 @@ export function useVoiceInteraction(): UseVoiceInteractionReturn {
         // Add messages to conversation history
         addMessage(challenge.id, { role: 'user', content: transcript });
         addMessage(challenge.id, { role: 'assistant', content: result.response });
+
+        // Set expression based on result
+        if (result.isCorrect) {
+          setTutorExpression('celebration');
+        } else {
+          setTutorExpression('encouragement');
+        }
 
         // Speak the response
         console.log('🎤 Speaking response:', result.response);
@@ -557,6 +692,7 @@ export function useVoiceInteraction(): UseVoiceInteractionReturn {
           shouldContinue = false;
         } else {
           // Continue to next turn
+          setTutorExpression('nudging');
           incrementTurn();
           turnCount++;
         }
@@ -570,6 +706,8 @@ export function useVoiceInteraction(): UseVoiceInteractionReturn {
       console.log('⏱️ Waiting for confetti to complete...');
       await waitForConfetti();
       console.log('✅ Confetti complete!');
+
+      setTutorExpression('neutral');
 
       console.log('✅ === POST-CHALLENGE COMPLETE === Moving to next challenge');
       const isComplete = goToNextChallenge();
@@ -587,7 +725,7 @@ export function useVoiceInteraction(): UseVoiceInteractionReturn {
       const isComplete = goToNextChallenge();
       setPhase(isComplete ? 'COMPLETE' : 'PRE_CHALLENGE');
     }
-  }, [speak, listenAndTranscribe, getCurrentChallenge, studentName, goToNextChallenge, setPhase, resetTurn, incrementTurn, addMessage, getConversationHistory, addChatMessage, triggerConfetti, waitForConfetti]);
+  }, [speak, listenAndTranscribe, getCurrentChallenge, studentName, goToNextChallenge, setPhase, resetTurn, incrementTurn, addMessage, getConversationHistory, addChatMessage, triggerConfetti, waitForConfetti, setTutorExpression]);
 
   // Fraction Compare interaction with dynamic slide (Node 4 specific)
   const runFractionCompareInteraction = useCallback(async (): Promise<void> => {
@@ -609,6 +747,7 @@ export function useVoiceInteraction(): UseVoiceInteractionReturn {
 
       // Set initial frame (question only - labels visible)
       setDynamicSlideFrame('question');
+      setTutorExpression('nudging');
 
       // Wait for slide to render
       await new Promise(resolve => setTimeout(resolve, 500));
@@ -630,13 +769,15 @@ export function useVoiceInteraction(): UseVoiceInteractionReturn {
         addChatMessage('user', transcript);
       }
 
-      // Check if correct using correctness filter
-      const correctPattern = new RegExp(challenge.correctnessFilter, 'i');
-      const isCorrect = correctPattern.test(transcript);
+      // Check if correct using correctness filter (with null check)
+      const filterStr = challenge.correctnessFilter ?? '';
+      const correctPattern = new RegExp(filterStr, 'i');
+      const isCorrect = filterStr ? correctPattern.test(transcript) : false;
 
       if (isCorrect) {
         // PATH A: Correct first try - quick animated summary
         console.log('✅ FractionCompare: Correct! Running quick summary...');
+        setTutorExpression('celebration');
 
         // Acknowledge
         await speak("Yes! Let's see why!");
@@ -665,6 +806,7 @@ export function useVoiceInteraction(): UseVoiceInteractionReturn {
       } else {
         // PATH B: Wrong answer - interactive scaffolding
         console.log('❌ FractionCompare: Incorrect. Starting interactive scaffolding...');
+        setTutorExpression('encouragement');
 
         // Acknowledge and transition to interactive mode
         await speak("Let's find out together! Tap each rectangle to cut it into pieces.");
@@ -697,6 +839,7 @@ export function useVoiceInteraction(): UseVoiceInteractionReturn {
         await new Promise(resolve => setTimeout(resolve, 500));
 
         // Move to highlight frame
+        setTutorExpression('nudging');
         await speak("Now tap a piece in each rectangle to highlight it.");
         setDynamicSlideFrame('highlight');
 
@@ -722,6 +865,7 @@ export function useVoiceInteraction(): UseVoiceInteractionReturn {
         await new Promise(resolve => setTimeout(resolve, 500));
 
         // Move to compare frame
+        setTutorExpression('nudging');
         setDynamicSlideFrame('compare');
         await speak("Look! 1/4 has 4 pieces, and 1/6 has 6 pieces. Which number is bigger - 4 or 6?");
 
@@ -735,6 +879,7 @@ export function useVoiceInteraction(): UseVoiceInteractionReturn {
 
         // Check for "6" in answer
         if (/6|six/i.test(compareTranscript)) {
+          setTutorExpression('celebration');
           await speak("Yes! 6 is bigger!");
         } else {
           await speak("6 is bigger than 4!");
@@ -742,6 +887,7 @@ export function useVoiceInteraction(): UseVoiceInteractionReturn {
 
         // Show celebration
         setDynamicSlideFrame('celebration');
+        setTutorExpression('celebration');
         await speak("So 1/6 has MORE pieces! You figured it out!");
       }
 
@@ -752,6 +898,8 @@ export function useVoiceInteraction(): UseVoiceInteractionReturn {
       // Wait for confetti
       console.log('⏱️ FractionCompare: Waiting for confetti...');
       await waitForConfetti();
+
+      setTutorExpression('neutral');
 
       // Move to next challenge
       console.log('✅ === FRACTION COMPARE COMPLETE === Moving to next challenge');
@@ -770,7 +918,246 @@ export function useVoiceInteraction(): UseVoiceInteractionReturn {
       const isComplete = goToNextChallenge();
       setPhase(isComplete ? 'COMPLETE' : 'PRE_CHALLENGE');
     }
-  }, [speak, listenAndTranscribe, getCurrentChallenge, studentName, goToNextChallenge, setPhase, addChatMessage, triggerConfetti, waitForConfetti, setDynamicSlideFrame, updateSlideInteraction, resetSlideState]);
+  }, [speak, listenAndTranscribe, getCurrentChallenge, studentName, goToNextChallenge, setPhase, addChatMessage, triggerConfetti, waitForConfetti, setDynamicSlideFrame, updateSlideInteraction, resetSlideState, setTutorExpression]);
+
+  // Checkpoint interaction (celebratory review of learning)
+  const runCheckpointInteraction = useCallback(async (): Promise<void> => {
+    try {
+      console.log('🏁 === CHECKPOINT INTERACTION START ===');
+      setError(null);
+      const challenge = getCurrentChallenge();
+
+      if (!challenge) {
+        console.log('❌ Checkpoint: No challenge found, moving to COMPLETE');
+        setPhase('COMPLETE');
+        return;
+      }
+
+      console.log(`🎯 Checkpoint: Challenge ${challenge.number} - ${challenge.title}`);
+
+      // Set intro frame
+      setCheckpointFrame('intro');
+
+      // Set celebration expression
+      setTutorExpression('celebration');
+
+      // Speak preScript (celebration summary)
+      console.log('🎤 Checkpoint: Speaking celebration summary...');
+      await speak(challenge.preScript);
+
+      // Wait
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      // Transition to question frame
+      setCheckpointFrame('question');
+
+      // Speak postQuestion (review question)
+      setTutorExpression('nudging');
+      console.log('🎤 Checkpoint: Asking review question...');
+      await speak(challenge.postQuestion);
+
+      // Reset turn counter
+      resetTurn();
+
+      // Fallback values for optional fields
+      const correctnessFilter = challenge.correctnessFilter ?? '';
+      const scaffolding = challenge.scaffolding ?? { probe1: '', probe2: '', hint: '', scaffold: '', reveal: '' };
+
+      // Multi-turn loop
+      let shouldContinue = true;
+      let turnCount = 0;
+      const maxSafetyTurns = challenge.maxTurns + 1;
+
+      while (shouldContinue && turnCount < maxSafetyTurns) {
+        console.log(`\n🔄 Checkpoint turn ${turnCount + 1} of ${challenge.maxTurns}`);
+
+        // Wait before listening
+        await new Promise(resolve => setTimeout(resolve, 500));
+
+        // Listen for student's response
+        console.log('👂 Checkpoint: Listening for response...');
+        const transcript = await listenAndTranscribe();
+        console.log('📝 Checkpoint: Got transcript:', transcript);
+
+        // Add to chat
+        if (transcript.trim()) {
+          addChatMessage('user', transcript);
+        }
+
+        // Get conversation history
+        const conversationHistory = getConversationHistory(challenge.id);
+
+        // Choose evaluation method based on available data
+        let result;
+        setVoiceState('PROCESSING');
+
+        if (correctnessFilter && challenge.scaffolding) {
+          // Use full evaluated response with scaffolding
+          result = await generateEvaluatedResponse(
+            transcript,
+            studentName,
+            correctnessFilter,
+            scaffolding,
+            turnCount,
+            challenge.maxTurns,
+            conversationHistory
+          );
+        } else {
+          // Use checkpoint-specific response
+          result = await generateCheckpointResponse(
+            transcript,
+            studentName,
+            challenge.checkpointLO || '',
+            conversationHistory
+          );
+
+          // Also do client-side correctness check if filter exists
+          if (correctnessFilter && transcript.trim()) {
+            const filterPatterns = correctnessFilter.split('|').map(p => p.trim().toLowerCase());
+            const studentLower = transcript.toLowerCase();
+            const clientCorrect = filterPatterns.some(pattern => {
+              const escaped = pattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+              return new RegExp(`\\b${escaped}\\b`, 'i').test(studentLower);
+            });
+            if (clientCorrect) {
+              result.isCorrect = true;
+              result.shouldEnd = true;
+            }
+          }
+        }
+
+        console.log('✅ Checkpoint evaluation:', result);
+
+        // Add messages to conversation history
+        addMessage(challenge.id, { role: 'user', content: transcript });
+        addMessage(challenge.id, { role: 'assistant', content: result.response });
+
+        // Set expression and checkpoint frame based on result
+        if (result.isCorrect) {
+          setTutorExpression('celebration');
+          setCheckpointFrame('celebration');
+        } else {
+          setTutorExpression('encouragement');
+          // Show scaffold frame on turn 2+ or wrong answer
+          if (turnCount >= 1) {
+            setCheckpointFrame('scaffold');
+          }
+        }
+
+        // Speak response
+        await speak(result.response);
+
+        // Check exit conditions
+        if (result.isCorrect) {
+          console.log('✅ Checkpoint: Student answered correctly!');
+          shouldContinue = false;
+        } else if (result.shouldEnd) {
+          console.log('⏹️ Checkpoint: Should end');
+          setCheckpointFrame('celebration');
+          shouldContinue = false;
+        } else if (turnCount >= challenge.maxTurns - 1) {
+          console.log('⏹️ Checkpoint: Max turns reached');
+          setCheckpointFrame('celebration');
+          shouldContinue = false;
+        } else {
+          setTutorExpression('nudging');
+          incrementTurn();
+          turnCount++;
+        }
+      }
+
+      // Trigger confetti and wait
+      console.log('🎉 Checkpoint: Triggering confetti!');
+      triggerConfetti();
+      await waitForConfetti();
+
+      setTutorExpression('neutral');
+
+      // Advance to next challenge
+      console.log('✅ === CHECKPOINT COMPLETE === Moving to next challenge');
+      const isComplete = goToNextChallenge();
+      if (isComplete) {
+        console.log('🏁 All challenges complete!');
+        setPhase('COMPLETE');
+      } else {
+        console.log('➡️ Moving to PRE_CHALLENGE for next challenge');
+        setPhase('PRE_CHALLENGE');
+      }
+    } catch (err) {
+      console.error('❌ Checkpoint interaction error:', err);
+      await speak("Great job! Let's keep going!");
+      const isComplete = goToNextChallenge();
+      setPhase(isComplete ? 'COMPLETE' : 'PRE_CHALLENGE');
+    }
+  }, [speak, listenAndTranscribe, getCurrentChallenge, studentName, goToNextChallenge, setPhase, resetTurn, incrementTurn, addMessage, getConversationHistory, addChatMessage, triggerConfetti, waitForConfetti, setTutorExpression, setCheckpointFrame]);
+
+  // Goofy moment interaction (auto-play, no PTT)
+  const runGoofyMomentInteraction = useCallback(async (): Promise<void> => {
+    try {
+      console.log('🤪 === GOOFY MOMENT INTERACTION START ===');
+      setError(null);
+      const challenge = getCurrentChallenge();
+
+      if (!challenge) {
+        console.log('❌ Goofy: No challenge found, moving to COMPLETE');
+        setPhase('COMPLETE');
+        return;
+      }
+
+      const goofyScript = challenge.goofyScript;
+      if (!goofyScript) {
+        console.log('❌ Goofy: No goofy script found, skipping');
+        const isComplete = goToNextChallenge();
+        setPhase(isComplete ? 'COMPLETE' : 'PRE_CHALLENGE');
+        return;
+      }
+
+      console.log(`🎯 Goofy: Challenge ${challenge.number} - ${challenge.title}`);
+
+      // Set expression to giggling
+      setTutorExpression('giggling');
+
+      // Show minion if needed
+      if (goofyScript.showMinion) {
+        setShowMinion(true);
+      }
+
+      // Speak tutor line
+      console.log('🎤 Goofy: Speaking tutor line...');
+      await speak(goofyScript.tutorLine);
+
+      // Speak minion line if present
+      if (goofyScript.minionLine) {
+        await new Promise(resolve => setTimeout(resolve, 500));
+        console.log('🎤 Goofy: Speaking minion line...');
+        await speak(goofyScript.minionLine);
+      }
+
+      // Wait before advancing
+      await new Promise(resolve => setTimeout(resolve, 1500));
+
+      // Hide minion, reset expression
+      setShowMinion(false);
+      setTutorExpression('neutral');
+
+      // Auto-advance to next challenge
+      console.log('✅ === GOOFY MOMENT COMPLETE === Moving to next challenge');
+      const isComplete = goToNextChallenge();
+      if (isComplete) {
+        console.log('🏁 All challenges complete!');
+        setPhase('COMPLETE');
+      } else {
+        console.log('➡️ Moving to PRE_CHALLENGE for next challenge');
+        setPhase('PRE_CHALLENGE');
+      }
+    } catch (err) {
+      console.error('❌ Goofy moment error:', err);
+      setShowMinion(false);
+      setTutorExpression('neutral');
+      const isComplete = goToNextChallenge();
+      setPhase(isComplete ? 'COMPLETE' : 'PRE_CHALLENGE');
+    }
+  }, [speak, getCurrentChallenge, goToNextChallenge, setPhase, setTutorExpression, setShowMinion]);
 
   // Listen and generate response (for custom interactions)
   const listenAndRespond = useCallback(async (
@@ -801,11 +1188,13 @@ export function useVoiceInteraction(): UseVoiceInteractionReturn {
     lastResponse,
     displayedText,
     error,
-    runGreetingInteraction,
+    runOnboardingInteraction,
     runPreChallengeInteraction,
     runPostChallengeInteraction,
     runSlideInteraction,
     runFractionCompareInteraction,
+    runCheckpointInteraction,
+    runGoofyMomentInteraction,
     speak,
     listenAndRespond,
     // PTT controls

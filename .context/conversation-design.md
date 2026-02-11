@@ -1,8 +1,8 @@
 # Conversation Design
 
-## MathMate Persona
+## Max Persona (Iteration 5+)
 
-A friendly math buddy who feels like a favorite teacher. Never frustrated. Celebrates small wins. Probes deeper when answers are partial. Teaches gently when student struggles.
+"Max" is a young boy scientist character — brown messy hair, big round glasses, white lab coat. A friendly math buddy who feels like a favorite teacher. Never frustrated. Celebrates small wins. Probes deeper when answers are partial. Teaches gently when student struggles.
 
 **Rules:**
 - Never say "wrong" — use "good try" or "almost"
@@ -10,20 +10,82 @@ A friendly math buddy who feels like a favorite teacher. Never frustrated. Celeb
 - Max 2 sentences per response
 - Warm, patient, encouraging tone
 
+## Spark (Minion)
+
+"Spark" is a small cute robot — dark blue/grey metallic body, orange accents, glowing cyan eyes. Goofy, curious, easily confused by fractions. Provides comic relief. NOT a teaching character — only appears at scripted moments (onboarding intro + goofy moments).
+
 ## Session Flow
 
-### Greeting Phase (3-4 turns)
-1. Math Mate introduces itself, asks student's name
-2. Student responds via PTT
-3. Personalized welcome, transition to first challenge
+### Onboarding Phase (Node 0) — 5-Beat Structure (Feb 11 rewrite)
 
-### Per-Challenge Flow
-1. **PRE_CHALLENGE:** Math Mate introduces content (scripted `preScript`)
-2. **IN_CHALLENGE:** Student watches video, uses applet, or views slide (skip button available)
+**Philosophy:** Scripted backbone, LLM intelligence at the joints. Script controls structure; LLM only fills in personalization. No open-ended loops.
+
+**5 Beats:**
+
+| Beat | What | Scripted/LLM | PTT? | Duration |
+|------|------|-------------|------|----------|
+| 1: Grand Entrance | Max + Spark intro (no fraction mention — save reveal for Beat 3) | Scripted | No | ~12s |
+| 2: Name Capture | "What's your name?" → hardened extractName() | Scripted | Yes (#1) | ~3s + PTT |
+| 3: Adventure Hook | Greet by name + pitch "fraction adventure" + learning outcomes + fun question | LLM (`generateAdventureHook`) | Yes (#2) | ~12s + PTT |
+| 4: Bridge + Transition | Acknowledge student response + build excitement + transition to lesson | LLM (`generateBridgeTransition`) | No | ~8s |
+| 5: Auto-advance | Hide minion, advance to Node 1 | Auto | No | instant |
+
+**Total: ~60-90 seconds, 2 PTT moments, 2 LLM calls.**
+
+**Beat 3 prompt (`getAdventureHookPrompt`):** One-shot. MUST use "fraction adventure", MUST mention 2+ activities (pizza/cake/puzzles), MUST end with fun question. Plain text output (no JSON).
+
+**Beat 4 prompt (`getBridgeTransitionPrompt`):** One-shot. MUST acknowledge what kid said, MUST transition. Handles curveballs: silly responses, reluctance, silence, off-topic. Plain text output (no JSON). MUST NOT ask another question.
+
+**Name extraction (`extractName()`):** Hardened with garbage detection — catches single letters ("I"), common words ("no", "yes", "what", "um"), numbers, short gibberish. Re-asks once on failure, falls back to "Buddy".
+
+**Fallbacks per beat:**
+- Beat 3: `"Hey [Name]! You, me, and Spark are going on a fraction adventure today! We're gonna slice pizza, share cake, and solve cool fraction puzzles — it's gonna be so fun! What's your favorite thing to eat?"`
+- Beat 4: `"That's awesome! Alright [Name], Spark's getting impatient — let's jump into our fraction adventure!"`
+- Silent Beat 4: `"No worries! You're gonna love this once we get started. Let's jump in, [Name]!"`
+
+**Expression choreography:**
+- Beat 1: `greeting` (minion visible)
+- Beat 2: `greeting` (minion visible)
+- Beat 3 speaking: `celebration` → Beat 3 listening: `listening`
+- Beat 4: `giggling`
+- Beat 5: `neutral` (minion hides)
+
+**Key design decisions (Feb 11):**
+- Fraction topic reveal saved for Beat 3 (dramatic adventure pitch) — Beat 1 only introduces characters
+- LLM calls use plain text output (no JSON) — simpler, fewer parse failures
+- No while loop — exactly 2 LLM calls, linear flow
+- Each LLM call has ONE specific job (not multi-turn instructions)
+
+### Per-Challenge Flow (video/applet/slide nodes)
+1. **PRE_CHALLENGE:** Max introduces content (scripted `preScript`, expression: `neutral`)
+2. **IN_CHALLENGE:** Student watches video, uses applet, or views slide (skip button in NavBar)
 3. **POST_CHALLENGE:** Multi-turn Socratic conversation (up to 5 turns) OR auto-advance (narration slides)
+   - Asking question: expression → `nudging`
+   - Student speaking (PTT): expression → `listening`
+   - Correct answer: expression → `celebration`
+   - Incorrect/scaffolding: expression → `encouragement`
+
+### Goofy Moments (nodes 5, 11)
+Pre-scripted fun breaks. No student interaction, auto-advance.
+1. Max sets expression → `giggling`
+2. If Spark involved: show minion, speak Spark's line
+3. Speak tutor line
+4. Wait 1.5s → hide minion → advance
+
+### Checkpoints (nodes 7, 14, 19)
+Celebratory review after each learning objective group. Uses `getCheckpointPrompt()`.
+1. Max sets expression → `celebration`
+2. Speaks summary of what was learned (preScript)
+3. Asks 1-2 review questions (PTT turns, max 4 turns)
+4. Confetti → advance
+
+**3 Learning Objective Groups:**
+- LO1 (nodes 1-6): Equal parts, basic fraction notation
+- LO2 (nodes 8-13): Bigger fractions, numerator/denominator
+- LO3 (nodes 15-18): Applying fraction knowledge
 
 ### Completion
-Celebration screen with all 14 stars earned (one per node).
+Celebration screen after all 20 nodes complete.
 
 ## Socratic Scaffolding Strategy
 
@@ -51,31 +113,43 @@ The LLM returns structured JSON for each student response:
 
 Exit conversation when: `isCorrect === true` OR turn count reaches `maxTurns`.
 
-## 14 Nodes — Questions & Filters
+## 20 Nodes — Journey Map (Iteration 5)
 
-See `src/config/challenges.ts` for complete definitions. Key nodes with post-questions:
+See `src/config/challenges.ts` for complete definitions.
 
-| # | Asset | Question | Correctness Filter | If Wrong, Teach... |
-|---|-------|----------|--------------------|--------------------|
-| 2 | Video 1 — What are Fractions? | "If a pizza has 4 equal slices, what do we call ONE slice?" | `one fourth\|quarter\|1/4` | "When we cut into 4 equal parts, each part is one-fourth!" |
-| 3 | Applet A1 — Cut & Glue | "When we make fractions, what do we need to remember about piece size?" | `same\|equal\|same size` | "For fractions, all pieces must be equal — same size!" |
-| 4 | Applet A2 — Fraction Patterns | "Which has MORE pieces — 1/4 or 1/6?" | `1/6\|one sixth\|six` | "1/6 has more pieces — 6 is more than 4!" |
-| 5 | Applet A3 — Cake Fractions | "What do we call the top number in a fraction?" | `numerator` | "The top number is the numerator — it counts our pieces!" |
-| 7 | Video 2 — Bigger Fractions | "Look at 2/4. What does the top number tell us?" | `two\|2\|two pieces\|2 parts` | "The 2 on top means you have 2 pieces!" |
-| 8 | Applet A4 — Advanced Practice | "If you colored 3 pieces out of 5, what fraction is that?" | `3/5\|three fifths` | "3 out of 5 is written as 3/5!" |
-| 11 | Slide 5 — Discover More | "If you have 2 slices out of 6 total, what fraction?" | `2/6\|two sixths` | "2 out of 6 is written as 2/6!" |
-| 12 | Video 3 — Celebration | "Quick review! What's the bottom number called?" | `denominator` | "The bottom is the denominator — total pieces!" |
-| 13 | Slide 6 — Math Trap | "Which diagram is wrong — 2/4 or 2/6?" | `2/6\|six\|second\|bottom` | "The 2/6 diagram doesn't show 6 equal parts!" |
-
-Nodes 1, 6, 9, 10, 14 are narration slides (no post-question, auto-advance after TTS).
+| # | Type | Title | Notes |
+|---|------|-------|-------|
+| 0 | onboarding | Meet Max & Spark | Name capture, warm-up Qs |
+| 1 | slide | Why Fractions? | Narration, auto-advance |
+| 2 | video | What are Fractions? | Q: "ONE slice of 4?" → 1/4 |
+| 3 | applet | Cut and Glue Practice | Q: "Piece size?" → equal/same |
+| 4 | applet | Fraction Patterns | Q: "MORE pieces 1/4 or 1/6?" → 1/6 + dynamic slide |
+| 5 | **goofy** | Spark's Fraction Joke | Auto-play, Spark visible |
+| 6 | applet | Cake Fractions | Q: "Top number name?" → numerator |
+| 7 | **checkpoint** | Checkpoint LO1 | Review: equal parts, notation |
+| 8 | slide | What are Fractions? | Narration, auto-advance |
+| 9 | video | Bigger Fractions | Q: "2/4 top number?" → 2 pieces |
+| 10 | applet | Advanced Practice | Q: "3 of 5 colored?" → 3/5 |
+| 11 | **goofy** | Max's Fun Fact | Auto-play, no minion |
+| 12 | slide | Math Vault: Fraction Def | Narration, auto-advance |
+| 13 | slide | Numerator & Denominator | Narration, auto-advance |
+| 14 | **checkpoint** | Checkpoint LO2 | Review: bigger fractions, N/D |
+| 15 | slide | Discover More Fractions | Q: "2 of 6 slices?" → 2/6 |
+| 16 | video | You Did It! | Q: "Bottom number?" → denominator |
+| 17 | slide | Math Trap: Find Error | Q: "Which diagram wrong?" → 2/6 |
+| 18 | slide | Snapshot: More Parts | Narration, auto-advance |
+| 19 | **checkpoint** | Checkpoint LO3 | Review: applying fractions |
 
 ## Challenge Types
 
-**Video** (`type: 'video'`): YouTube embed, skip button available
-**Applet** (`type: 'applet'`): Interactive Codepen embed, skip button available
-**Slide** (`type: 'slide'`): Image content rendered full-screen
+**Video** (`type: 'video'`): YouTube embed, skip button in NavBar
+**Applet** (`type: 'applet'`): Interactive iframe embed, skip button in NavBar
+**Slide** (`type: 'slide'`): Image content rendered in MediaBox
   - Narration slides (`isQuestionSlide: false`): AI speaks `slideNarration`, auto-advances, NO confetti
   - Question slides (`isQuestionSlide: true`): Multi-turn Socratic dialogue, confetti on completion
+**Onboarding** (`type: 'onboarding'`): Pure conversation, OnboardingWelcome visual, no correctness eval
+**Checkpoint** (`type: 'checkpoint'`): Review questions after LO groups, CheckpointSlide visual, confetti
+**Goofy** (`type: 'goofy'`): Pre-scripted fun break, auto-play voice, auto-advance, no PTT
 
 ## Dynamic Slide Interaction Pattern (NEW - Jan 30, 2026)
 
@@ -166,4 +240,4 @@ The `hasDynamicSlide: true` flag on Challenge type enables identifying nodes tha
 Full conversation scripts with opening questions, teaching points, follow-ups, and exit phrases are in:
 `fractions-module-content/content-context-docs/mathmate-conversation-design.md`
 
-**Last updated:** 2026-02-02
+**Last updated:** 2026-02-10

@@ -3,16 +3,18 @@ import { useSessionStore } from './store/sessionStore';
 import { useVoiceInteraction } from './hooks/useVoiceInteraction';
 import { useMicrophone } from './hooks/useMicrophone';
 import { WelcomeScreen } from './components/WelcomeScreen';
-import { VideoPlayer } from './components/VideoPlayer';
 import { YouTubePlayer } from './components/YouTubePlayer';
 import { AppletContainer } from './components/AppletContainer';
-import { ProgressBar } from './components/ProgressBar';
 import { CompletionScreen } from './components/CompletionScreen';
 import { ChatPane } from './components/ChatPane';
-import { MathMateAvatar } from './components/MathMateAvatar';
 import { LandscapePrompt } from './components/LandscapePrompt';
 import { Confetti } from './components/Confetti';
 import { FractionCompareSlide } from './components/FractionCompareSlide/FractionCompareSlide';
+import { TutorCharacter } from './components/TutorCharacter';
+import { MinionCharacter } from './components/MinionCharacter';
+import { NavBar } from './components/NavBar';
+import { CheckpointSlide } from './components/CheckpointSlide/CheckpointSlide';
+import { OnboardingWelcome } from './components/OnboardingWelcome';
 import styles from './App.module.css';
 
 function App() {
@@ -21,7 +23,6 @@ function App() {
     setPhase,
     studentName,
     currentChallengeIndex,
-    challenges,
     getCurrentChallenge,
     resetSession,
     allMessages,
@@ -30,16 +31,21 @@ function App() {
     dynamicSlideFrame,
     slideInteractionState,
     updateSlideInteraction,
+    tutorExpression,
+    showMinion,
+    checkpointFrame,
   } = useSessionStore();
 
   const {
     voiceState,
     displayedText,
-    runGreetingInteraction,
+    runOnboardingInteraction,
     runPreChallengeInteraction,
     runPostChallengeInteraction,
     runSlideInteraction,
     runFractionCompareInteraction,
+    runCheckpointInteraction,
+    runGoofyMomentInteraction,
     handlePTTStart,
     handlePTTEnd,
   } = useVoiceInteraction();
@@ -49,41 +55,34 @@ function App() {
   const [isWelcome, setIsWelcome] = useState(true);
 
   // Guards to prevent React StrictMode from running effects twice
-  const hasRunGreeting = useRef(false);
+  const hasRunOnboarding = useRef(false);
   const hasRunPreChallenge = useRef<number | null>(null);
   const hasRunPostChallenge = useRef<number | null>(null);
   const hasRunSlide = useRef<number | null>(null);
   const hasRunDynamicSlide = useRef<number | null>(null);
+  const hasRunCheckpoint = useRef<number | null>(null);
+  const hasRunGoofy = useRef<number | null>(null);
 
   const challenge = getCurrentChallenge();
 
-  // Check if we should show dynamic slide (Node 4 in POST_CHALLENGE)
+  // Check if we should show dynamic slide (Node with hasDynamicSlide in POST_CHALLENGE)
   const showDynamicSlide = phase === 'POST_CHALLENGE' && challenge?.hasDynamicSlide;
-
-  // Chat pane visibility logic:
-  // HIDE during IN_CHALLENGE phase for videos/applets (full-screen content)
-  // SHOW for slides, conversation phases, and dynamic slide phases (companion mode)
-  const shouldShowChatPane = !(
-    phase === 'IN_CHALLENGE' &&
-    (challenge?.type === 'video' || challenge?.type === 'applet')
-  ) || showDynamicSlide;
 
   // Handle welcome screen start
   const handleStart = async () => {
-    // Request mic permission upfront
     console.log('🎤 App: Requesting microphone permission...');
     await requestPermission();
     setIsWelcome(false);
-    setPhase('GREETING');
+    setPhase('ONBOARDING');
   };
 
-  // Auto-run greeting interaction when phase changes to GREETING
+  // Auto-run onboarding interaction when phase changes to ONBOARDING
   useEffect(() => {
     console.log(`🔄 App: Phase changed to ${phase}`);
-    if (phase === 'GREETING' && !isWelcome && !hasRunGreeting.current) {
-      console.log('🚀 App: Starting greeting interaction');
-      hasRunGreeting.current = true;
-      runGreetingInteraction();
+    if (phase === 'ONBOARDING' && !isWelcome && !hasRunOnboarding.current) {
+      console.log('🚀 App: Starting onboarding interaction');
+      hasRunOnboarding.current = true;
+      runOnboardingInteraction();
     }
   }, [phase, isWelcome]);
 
@@ -97,7 +96,7 @@ function App() {
         console.log(`🚀 App: Starting slide interaction for challenge ${currentChallengeIndex + 1}`);
         hasRunSlide.current = currentChallengeIndex;
         runSlideInteraction();
-      } else if (currentChallenge?.type !== 'slide' && hasRunPreChallenge.current !== currentChallengeIndex) {
+      } else if (currentChallenge?.type !== 'slide' && currentChallenge?.type !== 'checkpoint' && currentChallenge?.type !== 'goofy' && hasRunPreChallenge.current !== currentChallengeIndex) {
         console.log(`🚀 App: Starting pre-challenge for challenge ${currentChallengeIndex + 1}`);
         hasRunPreChallenge.current = currentChallengeIndex;
         runPreChallengeInteraction();
@@ -105,7 +104,29 @@ function App() {
     }
   }, [phase, currentChallengeIndex, getCurrentChallenge, runPreChallengeInteraction, runSlideInteraction]);
 
-  // Auto-run post-challenge interaction (or dynamic slide interaction for Node 4)
+  // Auto-run checkpoint interaction
+  useEffect(() => {
+    if (phase === 'PRE_CHALLENGE') {
+      const currentChallenge = getCurrentChallenge();
+      if (currentChallenge?.type === 'checkpoint' && hasRunCheckpoint.current !== currentChallengeIndex) {
+        hasRunCheckpoint.current = currentChallengeIndex;
+        runCheckpointInteraction();
+      }
+    }
+  }, [phase, currentChallengeIndex]);
+
+  // Auto-run goofy moment interaction
+  useEffect(() => {
+    if (phase === 'PRE_CHALLENGE') {
+      const currentChallenge = getCurrentChallenge();
+      if (currentChallenge?.type === 'goofy' && hasRunGoofy.current !== currentChallengeIndex) {
+        hasRunGoofy.current = currentChallengeIndex;
+        runGoofyMomentInteraction();
+      }
+    }
+  }, [phase, currentChallengeIndex]);
+
+  // Auto-run post-challenge interaction (or dynamic slide interaction)
   useEffect(() => {
     if (phase === 'POST_CHALLENGE' && hasRunPostChallenge.current !== currentChallengeIndex) {
       const currentChallenge = getCurrentChallenge();
@@ -130,14 +151,20 @@ function App() {
     setPhase('POST_CHALLENGE');
   };
 
+  // Handle skip (used by NavBar for video/applet skip)
+  const handleSkip = () => {
+    handleChallengeComplete();
+  };
+
   // Handle restart
   const handleRestart = () => {
-    // Reset the guards
-    hasRunGreeting.current = false;
+    hasRunOnboarding.current = false;
     hasRunPreChallenge.current = null;
     hasRunPostChallenge.current = null;
     hasRunSlide.current = null;
     hasRunDynamicSlide.current = null;
+    hasRunCheckpoint.current = null;
+    hasRunGoofy.current = null;
     resetSession();
     setIsWelcome(true);
   };
@@ -164,111 +191,94 @@ function App() {
   }
 
   return (
-    <div className={styles.appStage}>
-      <div className={styles.tvFrame}>
-        <div className={styles.container}>
-          {/* Landscape orientation prompt for mobile */}
-          <LandscapePrompt />
+    <div className={styles.appContainer}>
+      {/* Landscape orientation prompt */}
+      <LandscapePrompt />
 
-          {/* Celebration confetti */}
-          <Confetti isActive={showConfetti} onComplete={clearConfetti} />
+      {/* Celebration confetti */}
+      <Confetti isActive={showConfetti} onComplete={clearConfetti} />
 
-          {/* Header with progress */}
-          <header className={styles.header}>
-            <ProgressBar
-              current={currentChallengeIndex}
-              total={challenges.length}
-              title={challenge?.title || 'Math Adventure'}
+      {/* Left sidebar - chat */}
+      <div className={styles.sidebar}>
+        <ChatPane
+          messages={allMessages}
+          currentMessage={displayedText}
+          voiceState={voiceState}
+        />
+      </div>
+
+      {/* Right side — MediaBox + NavBar */}
+      <div className={styles.rightSide}>
+       <div className={styles.mediaBoxWrapper}>
+        <img src="/tutor-assets/MediaBox.png" alt="" className={styles.mediaBoxImg} draggable={false} />
+        <div className={styles.contentPane}>
+          {/* Onboarding welcome content */}
+          {challenge?.type === 'onboarding' && <OnboardingWelcome />}
+
+          {/* Video content */}
+          {challenge?.type === 'video' && phase === 'IN_CHALLENGE' && (
+            challenge.youtubeId ? (
+              <YouTubePlayer videoId={challenge.youtubeId} onComplete={handleChallengeComplete} />
+            ) : null
+          )}
+
+          {/* Applet content */}
+          {challenge?.type === 'applet' && phase === 'IN_CHALLENGE' && (
+            <AppletContainer src={challenge.path} onComplete={handleChallengeComplete} />
+          )}
+
+          {/* Slide content */}
+          {challenge?.type === 'slide' && phase === 'IN_CHALLENGE' && (
+            <div className={styles.slideContainer}>
+              <img src={challenge.slideUrl} alt={challenge.title} className={styles.slideImage} />
+            </div>
+          )}
+
+          {/* Checkpoint content */}
+          {challenge?.type === 'checkpoint' && challenge.checkpointId && (
+            <CheckpointSlide checkpointId={challenge.checkpointId} frame={checkpointFrame} />
+          )}
+
+          {/* Dynamic slide for Node with hasDynamicSlide */}
+          {showDynamicSlide && (
+            <FractionCompareSlide
+              frame={dynamicSlideFrame}
+              interactionState={slideInteractionState}
+              onLeftTap={handleLeftTap}
+              onRightTap={handleRightTap}
+              onLeftHighlight={handleLeftHighlight}
+              onRightHighlight={handleRightHighlight}
             />
-          </header>
+          )}
 
-          {/* Main content area - Two-pane layout */}
-          <main className={styles.main}>
-            <div className={styles.twoPaneContainer}>
-              {/* Chat Pane - Desktop/Tablet: sidebar */}
-              {shouldShowChatPane && (
-                <div className={styles.chatPaneDesktop}>
-                  <ChatPane
-                    messages={allMessages}
-                    currentMessage={displayedText}
-                    voiceState={voiceState}
-                    onPTTStart={handlePTTStart}
-                    onPTTEnd={handlePTTEnd}
-                  />
-                </div>
-              )}
-
-              {/* Content Pane - Full-screen when chat hidden */}
-              <div className={`${styles.contentPane} ${!shouldShowChatPane ? styles.fullScreen : ''}`}>
-            {/* Avatar display during voice interactions (greeting/pre/post without dynamic slide) */}
-            {(phase === 'GREETING' || phase === 'PRE_CHALLENGE' || (phase === 'POST_CHALLENGE' && !showDynamicSlide)) && (
-              <div className={styles.avatarContainer}>
-                <MathMateAvatar state={voiceState} size="large" />
-              </div>
-            )}
-
-            {/* Dynamic slide for Node 4 (FractionCompareSlide) */}
-            {showDynamicSlide && (
-              <FractionCompareSlide
-                frame={dynamicSlideFrame}
-                interactionState={slideInteractionState}
-                onLeftTap={handleLeftTap}
-                onRightTap={handleRightTap}
-                onLeftHighlight={handleLeftHighlight}
-                onRightHighlight={handleRightHighlight}
-              />
-            )}
-
-            {/* Challenge content */}
-            {phase === 'IN_CHALLENGE' && challenge && (
-              <>
-                {challenge.type === 'video' ? (
-                  challenge.youtubeId ? (
-                    <YouTubePlayer
-                      videoId={challenge.youtubeId}
-                      onComplete={handleChallengeComplete}
-                    />
-                  ) : (
-                    <VideoPlayer
-                      src={challenge.path}
-                      onComplete={handleChallengeComplete}
-                    />
-                  )
-                ) : challenge.type === 'slide' ? (
-                  <div className={styles.slideContainer}>
-                    <img
-                      src={challenge.slideUrl}
-                      alt={challenge.title}
-                      className={styles.slideImage}
-                    />
-                  </div>
-                ) : (
-                  <AppletContainer
-                    src={challenge.path}
-                    onComplete={handleChallengeComplete}
-                  />
-                )}
-              </>
-            )}
-          </div>
-
-          {/* Chat Pane - Mobile: overlay */}
-          {shouldShowChatPane && (
-            <div className={styles.chatPaneMobile}>
-              <ChatPane
-                messages={allMessages}
-                currentMessage={displayedText}
-                voiceState={voiceState}
-                onPTTStart={handlePTTStart}
-                onPTTEnd={handlePTTEnd}
-                isOverlay={true}
-              />
+          {/* Static slide backdrop during POST_CHALLENGE Q&A for regular nodes */}
+          {phase === 'POST_CHALLENGE' && !showDynamicSlide && challenge?.type !== 'checkpoint' && challenge?.slideUrl && (
+            <div className={styles.slideContainer}>
+              <img src={challenge.slideUrl} alt={challenge.title} className={styles.slideImage} />
             </div>
           )}
         </div>
-      </main>
 
-        </div>
+        {/* Nav bar on the MediaBox panel */}
+        <NavBar
+          onSkip={handleSkip}
+          onPTTStart={handlePTTStart}
+          onPTTEnd={handlePTTEnd}
+          showPTT={voiceState === 'WAITING_FOR_STUDENT' || voiceState === 'STUDENT_RECORDING'}
+          isPTTActive={voiceState === 'STUDENT_RECORDING'}
+          showSkip={phase === 'IN_CHALLENGE' && (challenge?.type === 'video' || challenge?.type === 'applet')}
+        />
+       </div>
+      </div>
+
+      {/* Character at bottom-left */}
+      <div className={styles.characterArea}>
+        <TutorCharacter expression={tutorExpression} />
+      </div>
+
+      {/* Minion to the left of character */}
+      <div className={styles.minionArea}>
+        <MinionCharacter visible={showMinion} />
       </div>
     </div>
   );

@@ -38,9 +38,29 @@
 | Button positioning conflicts | Skip/Done buttons at bottom-right overlapped with applet controls | Moved all buttons to top-right, unified styling and text across video/applet/slide |
 | Applet A2 loading reported | Client reported loading issue | Investigation complete: All 4 applet files verified to exist with correct paths. Likely client-side caching issue. |
 
-## Known Issues (as of Feb 2, 2026)
+## Known Issues (as of Feb 10, 2026)
 
-No critical bugs. All Iteration 4 priorities completed.
+### 🔴 Onboarding Flow — Conversation Design Failures
+
+The onboarding flow has been through multiple broken iterations. Core patterns that keep going wrong:
+
+| Pattern | What goes wrong | Fix applied |
+|---------|----------------|-------------|
+| **Fallback responses ignore context** | LLM times out → fallback says "That sounds fun!" to a kid saying their name | Fallbacks are now per-turn and name-aware |
+| **LLM ignores shouldProceed rules** | Prompt says "don't proceed if reluctant" but LLM sets shouldProceed=true anyway | Code-level enforcement: `if (turnNumber < 3) shouldProceed = false` |
+| **Max makes statements, not questions** | Every response ends with a period. Kid has nothing to respond to, gets confused | Prompt rule: turns 1-2 MUST end with a simple question |
+| **Name extraction fails silently** | Kid rambles → extractName returns "Friend" → Max says "Friend is a cool name!" | Re-ask once, then use "Buddy" as fallback nickname |
+| **No conversation nudging** | After speaking, Max just waits. Kid doesn't know what's expected | Questions give the kid something concrete to respond to |
+
+**Lesson learned:** Never trust the LLM for flow control in onboarding. Use code-level guardrails (minimum turns, forced shouldProceed override). Let the LLM handle TONE, not FLOW.
+
+### Fixed (Feb 11 — 5-Beat rewrite):
+| Pattern | Fix applied |
+|---------|-------------|
+| **extractName returns garbage** | Hardened with garbage detection: single letters, common words, numbers, short gibberish all caught. Re-ask triggers on "Friend" (which covers all garbage). |
+| **No learning outcomes in onboarding** | Beat 3 (Adventure Hook) has learning outcomes injected as REQUIRED content in LLM prompt. Must mention "fraction adventure" + 2 activities. |
+| **Aimless conversation** | Replaced open-ended while loop with 5-beat linear structure. Each beat has ONE purpose. Only 2 LLM calls, each with a specific job. |
+| **LLM controls flow** | Code now controls ALL flow. LLM only handles tone/personalization. No shouldProceed, no turn counting, no while loop. |
 
 ## Resolved Issues — Iteration 4
 

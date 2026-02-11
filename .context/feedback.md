@@ -108,4 +108,59 @@ Source: `meeting-transcripts-with-client/feedback-iteration-3.md`
 - Upgraded TTS voice from `aura-asteria-en` to `aura-2-asteria-en` (more natural with breaths/pacing)
 - Added `hasDynamicSlide: true` flag to Challenge type for future expansion
 
-**Last updated:** 2026-02-02
+---
+
+### Companion Character Proposal — Revised Thinking (Feb 5, 2026)
+
+**Status:** Proposal under consideration. Leaning towards this over the buddy system.
+
+**Context:** After the initial discussion about introducing buddies (multiple AI characters — one per purpose like Math Vault, Math Trap, misconception handling, doubt resolution, etc.), a revised simpler approach emerged.
+
+**Problem with the buddy approach:** Having a master tutor plus multiple purpose-specific buddies is cognitive overload for a Grade 4 student. Too many characters, each appearing for a different reason, makes the experience fragmented and harder to follow.
+
+**Revised proposal — Master Tutor + Minion:**
+- **Master Tutor:** The primary AI voice companion. Handles all teaching, Socratic questioning, scaffolding, and narration — same as today.
+- **Minion:** A single, cute sidekick character with a light-touch role:
+  - **Nudging:** If the student is supposed to respond but stays silent, the minion gently prods them (instead of the tutor nagging).
+  - **Ambient animations:** Occasional small animations to make the kid smile or laugh — keeps energy up without interrupting the lesson.
+  - **Light questioning:** Can occasionally surface misconception-style questions or playful prompts, but nothing heavy — just enough to add variety.
+
+**Why this is better:** Two characters is a manageable cast. The tutor stays authoritative and pedagogically focused. The minion adds personality and keeps engagement up without fragmenting the teaching voice. Kids get a "friend" without the confusion of multiple characters rotating in and out.
+
+**Decision status:** **APPROVED (Feb 10, 2026).** Master Tutor + single Minion confirmed. No multi-buddy system. Assets received: young scientist boy (7 expressions) + small cute robot (1 image). Full Iteration 5 requirements documented in `.context/iteration-5-requirements.md`.
+
+---
+
+### Iteration 5 Decisions (Feb 10, 2026)
+
+**Confirmed scope:**
+- Master Tutor (young scientist, 7 expressions) + Minion (cute robot, 1-2 interventions)
+- Sci-fi/tech UI theme replacing Candy-Land (assets received from design team)
+- Onboarding flow (Node 0): warm-up conversation, max 5 turns, no correctness
+- Checkpoint dynamic slides: 3 checkpoints after each learning objective group (voice + interactive)
+- Fun/goofy moments: pre-scripted, voice-only, 2-3 placements
+- Remove progress bar, laptop-first design
+- Hold-to-Talk stays (laptop, not mobile)
+- No prev button — forward-only
+- No ElevenLabs yet, no personalized quiz yet
+
+---
+
+### Onboarding Flow Feedback (Feb 10, 2026) — OWNER EXTREMELY FRUSTRATED
+
+**Context:** Multiple failed iterations of the onboarding flow. Claude repeatedly failed to think through the conversation design properly, producing robotic flows that no real teacher would use. Owner is signing off for the night with extreme disappointment.
+
+**Status:** Current version is "decently okay" mechanically — guardrails work, name re-ask works (partially), questions at end of turns work. But the CONTENT and PURPOSE of the conversation is wrong.
+
+**Core feedback (must address Feb 11):**
+
+| # | Feedback | What Claude keeps getting wrong |
+|---|----------|---------------------------------|
+| 1 | **Learning outcomes in kid-speak** | Max never tells the kid what they'll actually learn. Must preview: sharing pizza, cutting cakes, fraction games. Fun language, not academic. Claude keeps omitting this entirely. |
+| 2 | **Purposeful nudging, not aimless chat** | Every turn should build excitement about learning fractions. Not random "Do you like pizza?" without connecting it to anything. Set the stage: "we're going to have fun while learning fractions." |
+| 3 | **Adaptive conversation length** | Min 2-3 turns, max 5. If kid is eager, transition earlier. If reluctant, warm them up. Don't force a fixed number of turns. Current code forces exactly 3 minimum regardless. |
+| 4 | **Name extraction still buggy** | "I don't know" → extracts "I". Re-ask logic only checks for "Friend", not garbage single-letter or common-word names. |
+
+**Owner's exact words:** "I am so pissed off at Claude fucking everything up, behaving like an idiot, not thinking. This is definitely not the world's best model like it is marketed around. The onboarding flow is god awful."
+
+**Last updated:** 2026-02-10

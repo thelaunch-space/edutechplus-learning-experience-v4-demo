@@ -1,5 +1,5 @@
-// Deepgram Aura TTS - supports browser CORS
-const DEEPGRAM_TTS_URL = 'https://api.deepgram.com/v1/speak';
+// ElevenLabs TTS with browser fallback
+const ELEVENLABS_TTS_URL = 'https://api.elevenlabs.io/v1/text-to-speech';
 
 // Result type for synchronized playback
 export interface TTSResult {
@@ -7,12 +7,11 @@ export interface TTSResult {
   playbackDone: Promise<void>;  // Resolves when audio finishes
 }
 
-// Aura-2 voices (more natural with breaths, pacing, expressiveness)
-// Format: aura-2-[voicename]-en
-// Popular English voices: thalia, andromeda, helena, apollo, asteria, luna, stella
-// See: https://developers.deepgram.com/docs/tts-models
-
-const VOICE = 'aura-2-asteria-en'; // Warm female voice with natural Aura-2 quality
+// ElevenLabs voice config
+// Using "Aria" — expressive, warm, young female voice (good for kid-facing tutor)
+// Fallback to any available voice if this one isn't on the account
+const VOICE_ID = '9BWtsMINqrJLrRacOk9x'; // Aria
+const MODEL_ID = 'eleven_turbo_v2_5'; // Lowest latency model
 
 let isAudioUnlocked = false;
 
@@ -39,35 +38,42 @@ export function unlockAudio(): void {
 
 export async function speakText(text: string): Promise<TTSResult> {
   console.log('🔊 TTS: Starting to speak:', text.substring(0, 50) + '...');
-  const apiKey = import.meta.env.VITE_DEEPGRAM_KEY;
+  const apiKey = import.meta.env.VITE_ELEVENLABS_KEY;
 
   if (!apiKey) {
-    console.warn('⚠️ TTS: Deepgram API key not configured, using browser TTS fallback');
+    console.warn('⚠️ TTS: ElevenLabs API key not configured, using browser TTS fallback');
     return browserTTSFallback(text);
   }
 
   try {
-    const url = `${DEEPGRAM_TTS_URL}?model=${VOICE}`;
-    console.log('📡 TTS: Calling Deepgram API with voice:', VOICE);
+    const url = `${ELEVENLABS_TTS_URL}/${VOICE_ID}`;
+    console.log('📡 TTS: Calling ElevenLabs API with model:', MODEL_ID);
 
     const response = await fetch(url, {
       method: 'POST',
       headers: {
-        'Authorization': `Token ${apiKey}`,
+        'xi-api-key': apiKey,
         'Content-Type': 'application/json',
+        'Accept': 'audio/mpeg',
       },
       body: JSON.stringify({
-        text: text,
+        text,
+        model_id: MODEL_ID,
+        voice_settings: {
+          stability: 0.5,
+          similarity_boost: 0.75,
+          style: 0.4,
+        },
       }),
     });
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('❌ TTS: Deepgram API error:', response.status, errorText);
+      console.error('❌ TTS: ElevenLabs API error:', response.status, errorText);
       return browserTTSFallback(text);
     }
 
-    console.log('✅ TTS: Deepgram API success, got audio blob');
+    console.log('✅ TTS: ElevenLabs API success, got audio');
     const audioBlob = await response.blob();
     console.log('🎵 TTS: Audio blob size:', audioBlob.size, 'bytes');
     const audioUrl = URL.createObjectURL(audioBlob);
@@ -99,14 +105,11 @@ export async function speakText(text: string): Promise<TTSResult> {
         console.log('▶️ TTS: Starting audio playback...');
         audio.play()
           .then(() => {
-            // Audio started playing - return immediately with duration
             resolve({ duration, playbackDone });
           })
           .catch(async (error) => {
             console.error('❌ TTS: Audio play() failed:', error);
-            console.log('⚠️ TTS: Falling back to browser TTS');
             URL.revokeObjectURL(audioUrl);
-            // Try browser TTS as fallback
             try {
               const fallbackResult = await browserTTSFallback(text);
               resolve(fallbackResult);
@@ -119,12 +122,11 @@ export async function speakText(text: string): Promise<TTSResult> {
       audio.onerror = (e) => {
         console.error('❌ TTS: Audio load error:', e);
         URL.revokeObjectURL(audioUrl);
-        // Try browser TTS as fallback
         browserTTSFallback(text).then(resolve).catch(reject);
       };
     });
   } catch (error) {
-    console.error('❌ TTS: Deepgram error:', error);
+    console.error('❌ TTS: ElevenLabs error:', error);
     console.log('⚠️ TTS: Falling back to browser TTS');
     return browserTTSFallback(text);
   }
@@ -141,8 +143,17 @@ function browserTTSFallback(text: string): Promise<TTSResult> {
   return new Promise((resolve) => {
     if ('speechSynthesis' in window) {
       const utterance = new SpeechSynthesisUtterance(text);
-      utterance.rate = 0.9;
-      utterance.pitch = 1.1;
+      utterance.rate = 0.95;
+      utterance.pitch = 1.15;
+
+      // Try to pick a female English voice
+      const voices = window.speechSynthesis.getVoices();
+      const preferred = voices.find(v => v.name.includes('Samantha')) // macOS
+        || voices.find(v => v.name.includes('Karen'))
+        || voices.find(v => v.name.includes('Google UK English Female'))
+        || voices.find(v => /female/i.test(v.name) && v.lang.startsWith('en'))
+        || voices.find(v => v.lang.startsWith('en'));
+      if (preferred) utterance.voice = preferred;
 
       const playbackDone = new Promise<void>((doneResolve) => {
         utterance.onend = () => {
@@ -151,18 +162,15 @@ function browserTTSFallback(text: string): Promise<TTSResult> {
         };
         utterance.onerror = (e) => {
           console.error('❌ TTS Fallback: Browser speech error:', e);
-          doneResolve(); // Resolve even on error to not block
+          doneResolve();
         };
       });
 
       console.log('▶️ TTS Fallback: Starting browser speech...');
       window.speechSynthesis.speak(utterance);
-
-      // Return immediately after starting speech
       resolve({ duration: estimatedDuration, playbackDone });
     } else {
       console.warn('⚠️ TTS Fallback: Speech synthesis not supported');
-      // No TTS available - return zero duration with immediately resolved promise
       resolve({ duration: 0, playbackDone: Promise.resolve() });
     }
   });
