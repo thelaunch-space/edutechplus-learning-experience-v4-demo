@@ -228,16 +228,51 @@ Built a React component `FractionCompareSlide` that demonstrates the vision. Use
 - Piece count badges with pop-in animation
 - Celebration banner with sparkle effects
 
-### Future Expansion
+### Generalized Dynamic Question Slides (NEW - Feb 11, 2026)
 
-The `hasDynamicSlide: true` flag on Challenge type enables identifying nodes that use this pattern. If experiment proves successful:
-- Generalize to nodes 11, 13 (question slides)
-- Create reusable dynamic slide framework
-- Consider SVG-based slides for easier content authoring
+Expanded the dynamic slide approach to ALL post-challenge questions across the journey. 8 nodes now use tap-based dynamic slides instead of voice-only Q&A on empty screens.
+
+**3 Reusable Templates:**
+
+| Template | Component | Used in Nodes | Mechanic |
+|----------|-----------|---------------|----------|
+| `fraction-builder` | `FractionBuilder` | 2, 10, 15 | Tap pieces to count → number fills fraction slot (numerator then denominator) |
+| `multiple-choice` | `MultipleChoice` | 6, 9, 16 | Tap word/answer buttons. Wrong → wobble + eliminate. Right → celebrate |
+| `tap-to-select` | `TapToSelect` | 3, 17 | Tap correct diagram/bar. Wrong → hint + try again. Right → reveal |
+
+**Architecture:**
+- Types: `DynamicSlideTemplate`, `QuestionSlideFrame`, `QuestionSlideState` in `src/types/index.ts`
+- Content config: `src/config/dynamicSlideContent.ts` (per-node configs for each template)
+- Components: `src/components/DynamicSlides/{FractionBuilder,MultipleChoice,TapToSelect}/`
+- Renderer: `src/components/DynamicSlides/DynamicSlideRenderer.tsx` (picks template by challenge config)
+- Store: `questionSlideFrame`, `questionSlideState`, `resetQuestionSlideState()` in sessionStore
+- Voice: `runDynamicQuestionInteraction()` in useVoiceInteraction.ts (orchestrates taps + voice)
+- Challenge flags: `dynamicSlideTemplate` and `dynamicSlideId` on Challenge type
+
+**Interaction Flow (all templates) — Voice-First Check:**
+1. Max speaks the question (voice)
+2. Dynamic slide appears on `question` frame
+3. **Student answers verbally (PTT)** — voice-first check
+4. **If correct (regex match):** Quick auto-animation through scaffold→reveal frames (no taps needed), celebrate
+5. **If wrong:** Tap-based scaffold appears — student interacts by tapping
+6. If wrong tap: visual feedback (wobble/eliminate) + Max speaks scaffold hint
+7. If correct/complete: reveal frame with celebration
+8. Confetti → advance to next node
+
+**Frame state machine (simpler than FractionCompareSlide):**
+`question` → `scaffold` (tapping enabled) → `reveal` (celebration)
+
+**Timeout:** 20-second auto-complete if student doesn't tap (same pattern as FractionCompareSlide).
+
+**Design:** All templates follow the 3-zone layout (Question pane / Visual area / Answer pane) and use the same CSS variables, animation patterns, and design system as FractionCompareSlide.
+
+### Legacy: FractionCompareSlide (Node 4)
+
+The original `FractionCompareSlide` for Node 4 is preserved as-is. It uses the `hasDynamicSlide: true` flag and its own 5-frame state machine. The new templates use `dynamicSlideTemplate` + `dynamicSlideId` flags instead.
 
 ## Source Material
 
 Full conversation scripts with opening questions, teaching points, follow-ups, and exit phrases are in:
 `fractions-module-content/content-context-docs/mathmate-conversation-design.md`
 
-**Last updated:** 2026-02-10
+**Last updated:** 2026-02-11

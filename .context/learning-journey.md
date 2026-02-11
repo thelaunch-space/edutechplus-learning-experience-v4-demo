@@ -46,12 +46,23 @@ Each video/applet node follows:
 - Narration slides (1, 8, 12, 13, 18): AI narrates → auto-advance. No Q&A.
 - Question slides (15, 17): AI asks question → multi-turn Socratic dialogue with confetti.
 
-## Dynamic Interactive Slide (Node 4)
+## Dynamic Interactive Slides
+
+### Original: FractionCompareSlide (Node 4)
 
 Post-challenge for Applet A2. `FractionCompareSlide` — 5-frame state machine:
 1. `question` → 2. `cut` (tap to split) → 3. `highlight` (tap to count) → 4. `compare` → 5. `celebration`
 
 Two paths: correct first try (quick animated summary) vs wrong answer (interactive scaffolding with taps).
+
+### Generalized: Dynamic Question Slides (Nodes 2, 3, 6, 9, 10, 15, 16, 17)
+
+All post-challenge questions now use dynamic slides with **voice-first check** before tap scaffold. 3 reusable templates:
+- **FractionBuilder** (Nodes 2, 10, 15): Tap pieces to count → fill fraction slots
+- **MultipleChoice** (Nodes 6, 9, 16): Tap answer buttons, wrong → wobble + eliminate
+- **TapToSelect** (Nodes 3, 17): Tap correct/wrong diagram, detective-style
+
+All use 3-frame state machine: `question` → `scaffold` → `reveal`. **Voice-first pattern:** Max asks question → student answers verbally (PTT) → if correct, quick auto-animation through frames (no taps); if wrong, tap-based scaffold appears. Same pattern as FractionCompareSlide (Node 4).
 
 ## Learning Objective Groups
 

@@ -319,13 +319,77 @@ Claude has been repeatedly messing up the onboarding conversation design. Multip
 
 - All Iteration 5 changes committed and pushed to both `main` and `staging` branches
 - Netlify auto-deploys from `main`
-- Env vars needed on Netlify: `VITE_DEEPGRAM_API_KEY`, `VITE_OPENROUTER_API_KEY`
+- Env vars needed on Netlify: `VITE_DEEPGRAM_KEY`, `VITE_ANTHROPIC_KEY`, `VITE_ELEVENLABS_KEY`
+
+### Dynamic Question Slides — Full Implementation (Feb 11, 2026)
+
+**Goal:** Replace voice-only Q&A on empty screens with tap-based visual dynamic slides for all 8 post-challenge question nodes, then add voice-first correctness check.
+
+**Phase 1: 3 Reusable Templates**
+- **FractionBuilder** (Nodes 2, 10, 15): Tap pieces to count → fill fraction slots
+- **MultipleChoice** (Nodes 6, 9, 16): Tap answer buttons, wrong → wobble + eliminate
+- **TapToSelect** (Nodes 3, 17): Tap correct option from visual choices
+
+**Files created:**
+- `src/components/DynamicSlides/FractionBuilder/` (tsx + css)
+- `src/components/DynamicSlides/MultipleChoice/` (tsx + css)
+- `src/components/DynamicSlides/TapToSelect/` (tsx + css)
+- `src/components/DynamicSlides/DynamicSlideRenderer.tsx`
+- `src/config/dynamicSlideContent.ts` (per-node content configs)
+
+**Files modified:** `types/index.ts`, `sessionStore.ts`, `useVoiceInteraction.ts`, `challenges.ts`, `App.tsx`
+
+**Phase 2: Voice-First Check + Conversational Flow Polish**
+- Added voice-first check to `runDynamicQuestionInteraction()`:
+  1. Max speaks question → student answers verbally (PTT)
+  2. Check against `correctnessFilter` regex
+  3. **Path A (correct):** "That's right!" + quick auto-animation through frames
+  4. **Path B (wrong):** "Good try! Let me help you figure this out." + tap scaffold
+- Added per-choice MCQ hints (`choiceHints[]` on `MultipleChoiceConfig`) — each wrong button gives unique feedback instead of repeating the same hint
+- Added tap instructions for all templates before scaffold ("Tap the answer you think is right!")
+- Added timeout speech for all templates ("No worries! Let me show you.") — no more silent auto-reveals
+- Added post-completion wrap-up after confetti ("Nice work! You're learning so fast.")
+- Fixed hint bubble: only shows after a wrong tap (not always), updates per-choice, CSS overflow fixed
+
+### ⏳ Next Up: Asset Replacement (Planned)
+
+**Status:** Assets not yet received. User will upload later.
+
+**Scope:** Replace current static PNGs with new design assets:
+- **Character Max:** Animation frames per expression (replacing 7 static PNGs in `public/tutor-assets/Character/`)
+- **Layout:** Separate ScreenFrame.png + Panel.png (replacing single MediaBox.png)
+- **Buttons:** New button assets (replacing current Button.png + CSS-based nav buttons)
+
+**Current asset structure (to be replaced):**
+- `public/tutor-assets/BG.jpg` — Full-screen background
+- `public/tutor-assets/MediaBox.png` — Combined screen frame + panel
+- `public/tutor-assets/Button.png` — PTT button
+- `public/tutor-assets/Character/*.png` — 7 static expression images
+- `public/tutor-assets/bot.png` — Spark minion
+
+**Implementation notes when assets arrive:**
+- `TutorCharacter.tsx` needs to swap from `<img>` crossfade to frame-based animation (sprite sheet or sequential frames)
+- `App.module.css` needs new layout approach for separate screen + panel assets
+- `NavBar.tsx` needs updated button assets
+- May need new animation logic (requestAnimationFrame or CSS sprite animation)
+
+### Dead Code Candidates
+
+3 orphaned components from earlier iterations (safe to delete):
+- `src/components/VideoPlayer.tsx` — replaced by YouTubePlayer
+- `src/components/Waveform.tsx` — old audio visualization, unused
+- `src/components/VoiceInteraction.tsx` — old voice UI, replaced by useVoiceInteraction hook
+
+### Code Health Notes
+
+- `useVoiceInteraction.ts` is 1,543 lines — largest file by far. Contains all 6 interaction flows (onboarding, pre-challenge, post-challenge, dynamic question, checkpoint, goofy). Could benefit from splitting into per-flow modules if it grows further.
+- `openrouter.ts` retains legacy filename (was OpenRouter, now Anthropic direct). Low priority rename.
+- Total codebase: ~6,275 lines of TS/TSX. Manageable.
 
 ### Deferred
 
 - Flexible voice nodes (`skipPreVoice`/`skipPostVoice` flags)
 - Correctness filter improvements
-- ElevenLabs TTS switch
 - Personalized quiz
 - Platform build (Convex + Clerk, authoring GUI, analytics)
 - Separate MediaBox assets (ScreenFrame, Panel, Buttons) from design team

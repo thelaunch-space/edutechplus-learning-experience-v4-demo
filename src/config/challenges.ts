@@ -51,6 +51,8 @@ export const challenges: Challenge[] = [
     postQuestion: "If a pizza has 4 equal slices, what do we call ONE slice?",
     contextInfo: "This video teaches basic fraction concepts using pizza and cake examples. Kids learn that fractions are parts of a whole.",
     correctnessFilter: "one fourth|quarter|1/4|one-fourth|a fourth",
+    dynamicSlideTemplate: 'fraction-builder',
+    dynamicSlideId: 'node-2-pizza-slice',
     scaffolding: {
       probe1: "Fractions have special names! When there are 4 equal pieces, what's the special name for just ONE piece?",
       probe2: "Think about the number FOUR. Each piece is called a 'fourth'. So what do we call ONE of them?",
@@ -72,6 +74,8 @@ export const challenges: Challenge[] = [
     postQuestion: "When we make fractions, what do we need to remember about the size of the pieces?",
     contextInfo: "Interactive paper cutting activity. Kids practice making equal parts (halves, quarters). They use virtual scissors and glue.",
     correctnessFilter: "same|equal|same size",
+    dynamicSlideTemplate: 'tap-to-select',
+    dynamicSlideId: 'node-3-fair-share',
     scaffolding: {
       probe1: "If you share a chocolate bar with your friend, would it be fair if one piece is big and one tiny?",
       probe2: "When we share equally, what must be true about each piece?",
@@ -133,6 +137,8 @@ export const challenges: Challenge[] = [
     postQuestion: "What do we call the top number in a fraction?",
     contextInfo: "Cake-based vocabulary lesson. Teaches: equal parts (same size pieces), numerator (top number), denominator (bottom number).",
     correctnessFilter: "numerator",
+    dynamicSlideTemplate: 'multiple-choice',
+    dynamicSlideId: 'node-6-fraction-anatomy',
     scaffolding: {
       probe1: "In 3/4, the 3 is on top. It counts how many pieces you have. What's its special name?",
       probe2: "The top number has a fancy math name. It starts with 'N'...",
@@ -203,6 +209,8 @@ export const challenges: Challenge[] = [
     postQuestion: "Look at the fraction 2/4. What does the top number tell us?",
     contextInfo: "Advanced concept: numerators greater than 1. Examples: 2/4 (two quarters), 3/6 (three sixths).",
     correctnessFilter: "two|2|two pieces|2 pieces|2 parts|two parts",
+    dynamicSlideTemplate: 'multiple-choice',
+    dynamicSlideId: 'node-9-what-does-2-mean',
     scaffolding: {
       probe1: "Look at 2/4. The top number is 2. What does that 2 tell us?",
       probe2: "If the top number is 2, how many pieces do you have?",
@@ -224,6 +232,8 @@ export const challenges: Challenge[] = [
     postQuestion: "If you colored 3 pieces out of 5, what fraction is that?",
     contextInfo: "Advanced cutting practice. Kids create fractions like 2/5, 3/5. They should say both numerator and denominator.",
     correctnessFilter: "3/5|three fifths|three-fifths|3 over 5|three over five",
+    dynamicSlideTemplate: 'fraction-builder',
+    dynamicSlideId: 'node-10-build-fraction',
     scaffolding: {
       probe1: "You colored 3 pieces. Total is 5 pieces. How do we write that?",
       probe2: "Remember: colored pieces go on TOP, total pieces go on BOTTOM. What do you get?",
@@ -335,6 +345,8 @@ export const challenges: Challenge[] = [
     postQuestion: "If you have 2 slices out of 6 total slices, what fraction is that?",
     contextInfo: 'Quick check question - student should identify 2/6 as the fraction.',
     correctnessFilter: "2/6|two sixths|two-sixths|2 over 6|two over six",
+    dynamicSlideTemplate: 'fraction-builder',
+    dynamicSlideId: 'node-15-pizza-builder',
     scaffolding: {
       probe1: "You have 2 slices. There are 6 total. Which number goes on top?",
       probe2: "The pieces you have go on top. The total goes on bottom. What do you get?",
@@ -358,6 +370,8 @@ export const challenges: Challenge[] = [
     postQuestion: "Quick review! What's the bottom number called?",
     contextInfo: "Celebration video. End of session. Kid should feel accomplished and proud.",
     correctnessFilter: "denominator",
+    dynamicSlideTemplate: 'multiple-choice',
+    dynamicSlideId: 'node-16-bottom-number',
     scaffolding: {
       probe1: "In 3/4, the 4 is on the bottom. It shows total pieces. What's its name?",
       probe2: "The bottom number has a name that starts with 'D'...",
@@ -380,6 +394,8 @@ export const challenges: Challenge[] = [
     postQuestion: "Look at the two bar diagrams. One shows 2/4 and one shows 2/6. Which diagram is wrong?",
     contextInfo: 'Diagnostic slide - student should identify the incorrect fraction diagram.',
     correctnessFilter: "2/6|two sixths|second|bottom|six",
+    dynamicSlideTemplate: 'tap-to-select',
+    dynamicSlideId: 'node-17-math-detective',
     scaffolding: {
       probe1: "Count the shaded parts in each diagram. Do they match the fractions written?",
       probe2: "Look carefully - does 2/6 really have 2 out of 6 parts shaded?",

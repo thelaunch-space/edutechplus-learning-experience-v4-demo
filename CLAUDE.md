@@ -2,24 +2,24 @@
 
 ## Quick Context
 
-Math Mate is a voice-guided learning experience for Grade 4 fractions. An AI companion guides students through 14 nodes (videos + applets + slides) with multi-turn Socratic conversations, evaluating understanding and scaffolding when students struggle. Built for EdutechPlus B2C mobile app — no teacher present.
+Math Mate is a voice-guided learning experience for Grade 4 fractions. An AI companion guides students through 20 nodes (onboarding + videos + applets + slides + checkpoints + goofy moments) with multi-turn Socratic conversations, evaluating understanding and scaffolding when students struggle. Built for EdutechPlus B2C mobile app — no teacher present.
 
 ## Tech Stack
 
 - **Frontend:** React 18 + Vite + TypeScript
 - **State:** Zustand
-- **STT:** Deepgram Nova-2 (WebSocket)
-- **LLM:** OpenRouter GPT-4.1-nano (JSON response format)
-- **TTS:** Deepgram Aura-2 (`aura-2-asteria-en`)
+- **STT:** Deepgram Nova-2 (REST API)
+- **LLM:** Anthropic Claude Haiku 4.5 (`claude-haiku-4-5-20251001`)
+- **TTS:** ElevenLabs Aria (`eleven_turbo_v2_5`), browser TTS fallback
 
 ## Key Files
 
 | File | Purpose |
 |------|---------|
-| `src/config/challenges.ts` | 14 challenge definitions (videos, applets, slides) with questions, correctness filters, scaffolding |
+| `src/config/challenges.ts` | 20 node definitions (onboarding, videos, applets, slides, checkpoints, goofy) with questions, correctness filters, scaffolding |
 | `src/config/prompts.ts` | LLM system prompts (Socratic evaluation) |
 | `src/hooks/useVoiceInteraction.ts` | Voice interaction + PTT + multi-turn loop + slide interaction |
-| `src/services/openrouter.ts` | OpenRouter LLM service |
+| `src/services/openrouter.ts` | Anthropic LLM service (Claude Haiku 4.5) — file retains legacy name |
 | `src/services/deepgram.ts` | Speech-to-text service |
 | `src/services/tts.ts` | Text-to-speech service |
 | `src/store/sessionStore.ts` | Session state + conversation history (allMessages array) |
@@ -32,6 +32,8 @@ Math Mate is a voice-guided learning experience for Grade 4 fractions. An AI com
 | `src/components/YouTubePlayer.tsx` | YouTube embed with Skip button |
 | `src/components/AppletContainer.tsx` | iframe wrapper for interactive applets |
 | `src/components/FractionCompareSlide/` | Dynamic interactive slide for Node 4 (5-frame state machine with tap interactions) |
+| `src/components/DynamicSlides/` | 3 reusable dynamic question slide templates: FractionBuilder, MultipleChoice, TapToSelect |
+| `src/config/dynamicSlideContent.ts` | Content configs for all 8 dynamic question slides (per-node visual + text definitions) |
 | `src/components/` | Other React components with CSS Modules |
 
 ## Context Files
@@ -44,7 +46,7 @@ Math Mate is a voice-guided learning experience for Grade 4 fractions. An AI com
 | `.context/feedback.md` | You need client feedback context or decision rationale |
 | `.context/bugs-and-recurring-issues.md` | You're debugging or investigating unexpected behavior |
 | `.context/feature-wishlist.md` | You need to know what's planned or deferred |
-| `.context/learning-journey.md` | You need the complete content roadmap (14 nodes) and implementation status |
+| `.context/learning-journey.md` | You need the complete content roadmap (20 nodes) and implementation status |
 | `.context/framework-wip.md` | You need to understand what content teams control (client-friendly doc) |
 | `.context/framework-technical.md` | You're building the scalable platform (schemas, architecture, migration) |
 | `.context/iteration-5-requirements.md` | You're working on Iteration 5 features (UI overhaul, onboarding, expressions, checkpoints) |
@@ -56,7 +58,7 @@ npm install
 npm run dev
 ```
 
-Requires `.env` with: `VITE_DEEPGRAM_API_KEY`, `VITE_OPENROUTER_API_KEY`
+Requires `.env` with: `VITE_DEEPGRAM_KEY`, `VITE_ANTHROPIC_KEY`, `VITE_ELEVENLABS_KEY`
 
 ## Code Style & Conventions
 
@@ -71,7 +73,11 @@ Requires `.env` with: `VITE_DEEPGRAM_API_KEY`, `VITE_OPENROUTER_API_KEY`
 - **MUST** update relevant `.context/` files after any meaningful codebase change
 - **MUST** read `.context/conversation-design.md` before touching voice/LLM logic
 - **MUST** read `.context/bugs-and-recurring-issues.md` before debugging
-- **MUST** use `response_format: { type: "json_object" }` for all OpenRouter calls
+- **MUST** ensure LLM responses are parsed as JSON (regex extraction from Anthropic plain-text responses)
 - **MUST** keep LLM responses under 2 sentences for student-facing text
 - **MUST** use AskUserQuestion tool for any product/requirements/design ambiguity — never guess or assume. For technical decisions (implementation approach, code architecture), use your own judgement. For anything the user/client cares about (UX, flow, wording, placement, feature scope), ask first.
-- **MUST** read `.context/iteration-5-requirements.md` before working on Iteration 5 features
+- **MUST** read `.context/progress.md` "Next Up" section before starting new work — it tracks upcoming tasks and asset dependencies
+
+## ⚠️ Start-of-Session Reminder
+
+**Refactor `useVoiceInteraction.ts` first** — 1,543 lines, largest file by far. Contains all 6 interaction flows (onboarding, pre-challenge, post-challenge, dynamic question, checkpoint, goofy). Split into per-flow modules (e.g. `flows/onboarding.ts`, `flows/dynamicQuestion.ts`) before adding more features. Also delete 3 dead components: `VideoPlayer.tsx`, `Waveform.tsx`, `VoiceInteraction.tsx`.

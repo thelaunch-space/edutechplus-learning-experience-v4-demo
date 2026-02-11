@@ -5,6 +5,7 @@ import { speakText, type TTSResult } from '../services/tts';
 import { generateResponse, generateEvaluatedResponse, generateAdventureHook, generateBridgeTransition, generateCheckpointResponse } from '../services/openrouter';
 import { useSessionStore } from '../store/sessionStore';
 import type { VoiceState } from '../types';
+import { fractionBuilderSlides, multipleChoiceSlides, tapToSelectSlides } from '../config/dynamicSlideContent';
 
 const MAX_RECORDING_MS = 15000; // 15 seconds safety cap for PTT
 
@@ -65,6 +66,7 @@ interface UseVoiceInteractionReturn {
   runFractionCompareInteraction: () => Promise<void>;
   runCheckpointInteraction: () => Promise<void>;
   runGoofyMomentInteraction: () => Promise<void>;
+  runDynamicQuestionInteraction: () => Promise<void>;
 
   // Low-level controls
   speak: (text: string) => Promise<void>;
@@ -107,6 +109,8 @@ export function useVoiceInteraction(): UseVoiceInteractionReturn {
     setTutorExpression,
     setShowMinion,
     setCheckpointFrame,
+    setQuestionSlideFrame,
+    resetQuestionSlideState,
   } = useSessionStore();
 
   // Speak text using TTS with word-by-word reveal synchronized to audio
@@ -1091,6 +1095,340 @@ export function useVoiceInteraction(): UseVoiceInteractionReturn {
     }
   }, [speak, listenAndTranscribe, getCurrentChallenge, studentName, goToNextChallenge, setPhase, resetTurn, incrementTurn, addMessage, getConversationHistory, addChatMessage, triggerConfetti, waitForConfetti, setTutorExpression, setCheckpointFrame]);
 
+  // Dynamic question slide interaction (voice-first check + tap scaffold — FractionBuilder, MultipleChoice, TapToSelect)
+  const runDynamicQuestionInteraction = useCallback(async (): Promise<void> => {
+    try {
+      console.log('🎯 === DYNAMIC QUESTION INTERACTION START ===');
+      setError(null);
+      const challenge = getCurrentChallenge();
+
+      if (!challenge || !challenge.dynamicSlideTemplate || !challenge.dynamicSlideId) {
+        console.log('❌ DynamicQuestion: No challenge or template found, skipping');
+        const isComplete = goToNextChallenge();
+        setPhase(isComplete ? 'COMPLETE' : 'PRE_CHALLENGE');
+        return;
+      }
+
+      const template = challenge.dynamicSlideTemplate;
+      const slideId = challenge.dynamicSlideId;
+      console.log(`🎯 DynamicQuestion: Template=${template}, SlideId=${slideId}`);
+
+      // Reset question slide state
+      resetQuestionSlideState();
+
+      // Set initial frame
+      setQuestionSlideFrame('question');
+      setTutorExpression('nudging');
+
+      // Wait for slide to render
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      // Speak the question
+      console.log('🎤 DynamicQuestion: Asking question...');
+      await speak(challenge.postQuestion);
+
+      // ===== VOICE-FIRST CHECK: Listen for verbal answer =====
+      await new Promise(resolve => setTimeout(resolve, 500));
+      console.log('👂 DynamicQuestion: Listening for answer...');
+      const transcript = await listenAndTranscribe();
+      console.log('📝 DynamicQuestion: Got transcript:', transcript);
+
+      if (transcript.trim()) {
+        addChatMessage('user', transcript);
+      }
+
+      // Check correctness using filter
+      const filterStr = challenge.correctnessFilter ?? '';
+      const correctPattern = new RegExp(filterStr, 'i');
+      const isCorrect = filterStr ? correctPattern.test(transcript) : false;
+      console.log(`🧠 DynamicQuestion: isCorrect=${isCorrect} (filter="${filterStr}", transcript="${transcript}")`);
+
+      if (isCorrect) {
+        // ===== PATH A: Correct first try — quick auto-animation, no taps =====
+        console.log('✅ DynamicQuestion: Correct! Quick animation...');
+        setTutorExpression('celebration');
+        await speak("That's right!");
+
+        // Quick fly-through: question → scaffold (auto-filled) → reveal
+        setQuestionSlideFrame('scaffold');
+
+        if (template === 'fraction-builder') {
+          const config = fractionBuilderSlides[slideId];
+          if (config) {
+            const allPieces = Array.from({ length: config.totalPieces }, (_, i) => i);
+            useSessionStore.getState().updateQuestionSlideState({
+              tappedPieces: allPieces,
+              numeratorFilled: true,
+              denominatorFilled: true,
+            });
+          }
+        } else if (template === 'multiple-choice') {
+          const config = multipleChoiceSlides[slideId];
+          if (config) {
+            useSessionStore.getState().updateQuestionSlideState({
+              selectedIndex: config.correctIndex,
+            });
+          }
+        } else if (template === 'tap-to-select') {
+          const config = tapToSelectSlides[slideId];
+          if (config) {
+            const correctIdx = config.options.findIndex(o => o.isCorrect);
+            useSessionStore.getState().updateQuestionSlideState({
+              selectedIndex: correctIdx,
+            });
+          }
+        }
+
+        await new Promise(resolve => setTimeout(resolve, 800));
+
+        // Show reveal
+        setQuestionSlideFrame('reveal');
+        if (template === 'fraction-builder') {
+          const config = fractionBuilderSlides[slideId];
+          if (config) await speak(config.fractionLabel);
+        } else if (template === 'multiple-choice') {
+          const config = multipleChoiceSlides[slideId];
+          if (config) await speak(config.revealLabel);
+        } else if (template === 'tap-to-select') {
+          const config = tapToSelectSlides[slideId];
+          if (config) await speak(config.correctFeedback);
+        }
+
+      } else {
+        // ===== PATH B: Wrong answer — interactive tap scaffolding =====
+        console.log('❌ DynamicQuestion: Wrong answer, showing tap scaffold...');
+        setTutorExpression('encouragement');
+        await speak("Good try! Let me help you figure this out.");
+        setTutorExpression('nudging');
+        await new Promise(resolve => setTimeout(resolve, 500));
+
+      // ===== TEMPLATE-SPECIFIC INTERACTION FLOW =====
+
+      if (template === 'fraction-builder') {
+        const config = fractionBuilderSlides[slideId];
+        if (!config) throw new Error(`No FractionBuilder config for ${slideId}`);
+
+        // Transition to scaffold frame (tapping enabled)
+        setQuestionSlideFrame('scaffold');
+        await speak("Tap the colored pieces to count them!");
+
+        // Phase 1: Wait for all highlighted pieces to be tapped
+        console.log(`⏳ DynamicQuestion: Waiting for ${config.highlightedPieces} highlighted pieces to be tapped...`);
+        let waitTime = 0;
+        const maxWait = 20000;
+        while (waitTime < maxWait) {
+          const state = useSessionStore.getState().questionSlideState;
+          if (state.tappedPieces.length >= config.highlightedPieces) break;
+          await new Promise(resolve => setTimeout(resolve, 200));
+          waitTime += 200;
+        }
+
+        // Auto-complete if timeout
+        const state1 = useSessionStore.getState().questionSlideState;
+        if (state1.tappedPieces.length < config.highlightedPieces) {
+          console.log('⏱️ DynamicQuestion: Auto-completing highlighted piece taps');
+          await speak("Let me help! Watch...");
+          const autoTapped = Array.from({ length: config.highlightedPieces }, (_, i) => i);
+          useSessionStore.getState().updateQuestionSlideState({ tappedPieces: autoTapped });
+        }
+
+        // Fill numerator
+        await new Promise(resolve => setTimeout(resolve, 300));
+        useSessionStore.getState().updateQuestionSlideState({ numeratorFilled: true });
+        await speak(`${config.highlightedPieces}! Now tap ALL the pieces to count the total!`);
+
+        // Phase 2: Wait for ALL pieces to be tapped
+        console.log(`⏳ DynamicQuestion: Waiting for all ${config.totalPieces} pieces to be tapped...`);
+        waitTime = 0;
+        while (waitTime < maxWait) {
+          const state = useSessionStore.getState().questionSlideState;
+          if (state.tappedPieces.length >= config.totalPieces) break;
+          await new Promise(resolve => setTimeout(resolve, 200));
+          waitTime += 200;
+        }
+
+        // Auto-complete if timeout
+        const state2 = useSessionStore.getState().questionSlideState;
+        if (state2.tappedPieces.length < config.totalPieces) {
+          console.log('⏱️ DynamicQuestion: Auto-completing all piece taps');
+          await speak("Let me count the rest!");
+          const autoTapped = Array.from({ length: config.totalPieces }, (_, i) => i);
+          useSessionStore.getState().updateQuestionSlideState({ tappedPieces: autoTapped });
+        }
+
+        // Fill denominator
+        await new Promise(resolve => setTimeout(resolve, 300));
+        useSessionStore.getState().updateQuestionSlideState({ denominatorFilled: true });
+
+        // Reveal
+        await new Promise(resolve => setTimeout(resolve, 500));
+        setQuestionSlideFrame('reveal');
+        setTutorExpression('celebration');
+        await speak(`${config.fractionLabel} You built it!`);
+
+      } else if (template === 'multiple-choice') {
+        const config = multipleChoiceSlides[slideId];
+        if (!config) throw new Error(`No MultipleChoice config for ${slideId}`);
+
+        // Set scaffold frame (choices tappable)
+        setQuestionSlideFrame('scaffold');
+        await speak("Tap the answer you think is right!");
+
+        // Wait for tap — loop until correct or all eliminated
+        let attempts = 0;
+        const maxAttempts = config.choices.length;
+
+        while (attempts < maxAttempts) {
+          console.log(`⏳ DynamicQuestion: Waiting for choice tap (attempt ${attempts + 1})...`);
+
+          // Wait for selectedIndex to change
+          let waitTime = 0;
+          const prevSelected = useSessionStore.getState().questionSlideState.selectedIndex;
+          while (waitTime < 20000) {
+            const state = useSessionStore.getState().questionSlideState;
+            if (state.selectedIndex !== null && state.selectedIndex !== prevSelected) break;
+            await new Promise(resolve => setTimeout(resolve, 200));
+            waitTime += 200;
+          }
+
+          const state = useSessionStore.getState().questionSlideState;
+          const selected = state.selectedIndex;
+
+          if (selected === null) {
+            // Timeout — auto-select correct
+            console.log('⏱️ DynamicQuestion: Auto-selecting correct answer');
+            setTutorExpression('encouragement');
+            await speak("No worries! Let me show you.");
+            useSessionStore.getState().updateQuestionSlideState({ selectedIndex: config.correctIndex });
+            break;
+          }
+
+          if (selected === config.correctIndex) {
+            // Correct!
+            console.log('✅ DynamicQuestion: Correct choice tapped!');
+            break;
+          } else {
+            // Wrong — eliminate and give choice-specific hint
+            console.log(`❌ DynamicQuestion: Wrong choice ${selected}, eliminating...`);
+            const currentEliminated = useSessionStore.getState().questionSlideState.eliminatedIndices;
+            useSessionStore.getState().updateQuestionSlideState({
+              eliminatedIndices: [...currentEliminated, selected],
+              selectedIndex: null, // Reset so they can tap again
+            });
+            setTutorExpression('encouragement');
+            const hint = config.choiceHints?.[selected] || config.scaffoldHint;
+            await speak(hint);
+            setTutorExpression('nudging');
+            attempts++;
+          }
+        }
+
+        // Reveal
+        await new Promise(resolve => setTimeout(resolve, 300));
+        useSessionStore.getState().updateQuestionSlideState({ selectedIndex: config.correctIndex });
+        setQuestionSlideFrame('reveal');
+        setTutorExpression('celebration');
+        await speak(config.revealLabel);
+
+      } else if (template === 'tap-to-select') {
+        const config = tapToSelectSlides[slideId];
+        if (!config) throw new Error(`No TapToSelect config for ${slideId}`);
+
+        // Set scaffold frame (options tappable)
+        setQuestionSlideFrame('scaffold');
+        await speak("Tap the one you think is right!");
+
+        // Wait for tap
+        let resolved = false;
+        let attempts = 0;
+
+        while (!resolved && attempts < 3) {
+          console.log(`⏳ DynamicQuestion: Waiting for option tap (attempt ${attempts + 1})...`);
+
+          let waitTime = 0;
+          while (waitTime < 20000) {
+            const state = useSessionStore.getState().questionSlideState;
+            if (state.selectedIndex !== null) break;
+            await new Promise(resolve => setTimeout(resolve, 200));
+            waitTime += 200;
+          }
+
+          const state = useSessionStore.getState().questionSlideState;
+          const selected = state.selectedIndex;
+
+          if (selected === null) {
+            // Timeout — auto-select correct
+            console.log('⏱️ DynamicQuestion: Tap timeout, showing answer');
+            setTutorExpression('encouragement');
+            await speak("No worries! Let me show you.");
+            const correctIdx = config.options.findIndex(o => o.isCorrect);
+            useSessionStore.getState().updateQuestionSlideState({ selectedIndex: correctIdx });
+            resolved = true;
+          } else {
+            const tappedOption = config.options[selected];
+            if (tappedOption?.isCorrect) {
+              // Correct tap
+              console.log('✅ DynamicQuestion: Correct option tapped!');
+              resolved = true;
+            } else {
+              // Wrong tap — give feedback, reset selection
+              console.log('❌ DynamicQuestion: Wrong option tapped');
+              setTutorExpression('encouragement');
+              await speak(config.wrongFeedback);
+              setTutorExpression('nudging');
+              useSessionStore.getState().updateQuestionSlideState({ selectedIndex: null });
+              attempts++;
+            }
+          }
+        }
+
+        // If still not resolved, force correct
+        if (!resolved) {
+          const correctIdx = config.options.findIndex(o => o.isCorrect);
+          useSessionStore.getState().updateQuestionSlideState({ selectedIndex: correctIdx });
+        }
+
+        // Reveal
+        await new Promise(resolve => setTimeout(resolve, 300));
+        setQuestionSlideFrame('reveal');
+        setTutorExpression('celebration');
+        await speak(config.correctFeedback);
+      }
+
+      } // end PATH B (else)
+
+      // ===== CELEBRATION & ADVANCE =====
+
+      // Trigger confetti
+      console.log('🎉 DynamicQuestion: Triggering confetti!');
+      triggerConfetti();
+      await waitForConfetti();
+
+      // Brief wrap-up before advancing
+      setTutorExpression('celebration');
+      await speak("Nice work! You're learning so fast. Let's keep going!");
+      await new Promise(resolve => setTimeout(resolve, 300));
+
+      setTutorExpression('neutral');
+
+      // Move to next challenge
+      console.log('✅ === DYNAMIC QUESTION COMPLETE === Moving to next challenge');
+      const isComplete = goToNextChallenge();
+      if (isComplete) {
+        console.log('🏁 All challenges complete!');
+        setPhase('COMPLETE');
+      } else {
+        console.log('➡️ Moving to PRE_CHALLENGE for next challenge');
+        setPhase('PRE_CHALLENGE');
+      }
+    } catch (err) {
+      console.error('❌ Dynamic question interaction error:', err);
+      await speak("Great job! Let's keep going!");
+      const isComplete = goToNextChallenge();
+      setPhase(isComplete ? 'COMPLETE' : 'PRE_CHALLENGE');
+    }
+  }, [speak, listenAndTranscribe, addChatMessage, getCurrentChallenge, goToNextChallenge, setPhase, triggerConfetti, waitForConfetti, setTutorExpression, setQuestionSlideFrame, resetQuestionSlideState]);
+
   // Goofy moment interaction (auto-play, no PTT)
   const runGoofyMomentInteraction = useCallback(async (): Promise<void> => {
     try {
@@ -1195,6 +1533,7 @@ export function useVoiceInteraction(): UseVoiceInteractionReturn {
     runFractionCompareInteraction,
     runCheckpointInteraction,
     runGoofyMomentInteraction,
+    runDynamicQuestionInteraction,
     speak,
     listenAndRespond,
     // PTT controls

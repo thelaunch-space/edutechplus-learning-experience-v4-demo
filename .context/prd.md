@@ -6,7 +6,7 @@ EdutechPlus has B2G math content (videos + applets) that needs an engagement lay
 
 ## Solution
 
-**Math Mate** — an AI voice companion that guides students through 14 learning nodes (videos, applets, slides) covering fractions. Inspired by Synthesis AI's scripted lessons, but with LLM-powered teaching intelligence.
+**Math Mate** — an AI voice companion that guides students through 20 learning nodes (onboarding, videos, applets, slides, checkpoints, goofy moments) covering fractions. Inspired by Synthesis AI's scripted lessons, but with LLM-powered teaching intelligence.
 
 Core capabilities:
 - Two-way voice interaction at content transitions
@@ -14,8 +14,9 @@ Core capabilities:
 - Correctness evaluation with scaffolded follow-up
 - Hold-to-talk (PTT) for natural conversation
 - Slide content with narration and interactive questions
-- Dynamic interactive slides with voice-visual synchronization (Node 4)
-- Character system: Master Tutor (7 expressions) + Minion robot sidekick
+- Dynamic interactive slides with voice-visual synchronization (Node 4 custom + 8 nodes via 3 reusable templates)
+- Voice-first correctness check: student answers verbally → correct = quick animation, wrong = tap scaffold
+- Character system: Master Tutor "Max" (7 expressions) + Minion "Spark" robot sidekick
 - Sci-fi/tech classroom UI theme (Iteration 5+, replacing earlier Candy-Land theme)
 
 ## User Persona
@@ -27,7 +28,7 @@ Core capabilities:
 
 ## Success Criteria
 
-- Student stays engaged for full 20-minute session (14 nodes)
+- Student stays engaged for full 20-minute session (20 nodes)
 - Demonstrates understanding through Socratic Q&A after interactive content
 - Feels like talking to a tutor, not a traffic controller
 - Content-first display with AI as companion (not centerpiece)
@@ -38,15 +39,15 @@ Core capabilities:
 |-------|-----------|
 | Frontend | React 18 + Vite + TypeScript |
 | State | Zustand |
-| STT | Deepgram Nova-2 (WebSocket streaming) |
-| LLM | OpenRouter GPT-4.1-nano (JSON response format) |
-| TTS | Deepgram Aura-2 (`aura-2-asteria-en`) |
+| STT | Deepgram Nova-2 (REST API) |
+| LLM | Anthropic Claude Haiku 4.5 (`claude-haiku-4-5-20251001`) |
+| TTS | ElevenLabs Aria (`eleven_turbo_v2_5`), browser TTS fallback |
 | Styling | CSS Modules, Fredoka + Nunito fonts |
 
 ## Architecture
 
 ```
-Student speaks → Deepgram STT → OpenRouter LLM → Deepgram TTS → Student hears
+Student speaks → Deepgram STT → Anthropic LLM → ElevenLabs TTS → Student hears
                                     ↑
                         challenges.ts config
                         (questions, filters, scaffolding)
@@ -66,9 +67,10 @@ Content is defined in `src/config/challenges.ts`. Each challenge bundles:
 **Slide:** Static image content rendered full-screen
   - Narration slides: AI speaks scripted narration, auto-advances
   - Question slides: Multi-turn Socratic dialogue with confetti
+**Dynamic Question Slides:** 3 reusable templates (FractionBuilder, MultipleChoice, TapToSelect) for 8 nodes. Voice-first pattern: ask → listen → correct=auto-animate, wrong=tap scaffold.
 
 ## License
 
 Proprietary — EdutechPlus
 
-**Last updated:** 2026-02-10
+**Last updated:** 2026-02-11 (dynamic question slides + voice-first check)

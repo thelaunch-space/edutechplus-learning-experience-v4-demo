@@ -15,6 +15,7 @@ import { MinionCharacter } from './components/MinionCharacter';
 import { NavBar } from './components/NavBar';
 import { CheckpointSlide } from './components/CheckpointSlide/CheckpointSlide';
 import { OnboardingWelcome } from './components/OnboardingWelcome';
+import { DynamicSlideRenderer } from './components/DynamicSlides/DynamicSlideRenderer';
 import styles from './App.module.css';
 
 function App() {
@@ -32,8 +33,12 @@ function App() {
     slideInteractionState,
     updateSlideInteraction,
     tutorExpression,
+    setTutorExpression,
     showMinion,
     checkpointFrame,
+    questionSlideFrame,
+    questionSlideState,
+    updateQuestionSlideState,
   } = useSessionStore();
 
   const {
@@ -46,6 +51,8 @@ function App() {
     runFractionCompareInteraction,
     runCheckpointInteraction,
     runGoofyMomentInteraction,
+    runDynamicQuestionInteraction,
+    speak,
     handlePTTStart,
     handlePTTEnd,
   } = useVoiceInteraction();
@@ -62,11 +69,17 @@ function App() {
   const hasRunDynamicSlide = useRef<number | null>(null);
   const hasRunCheckpoint = useRef<number | null>(null);
   const hasRunGoofy = useRef<number | null>(null);
+  const hasRunDynamicQuestion = useRef<number | null>(null);
 
   const challenge = getCurrentChallenge();
 
   // Check if we should show dynamic slide (Node with hasDynamicSlide in POST_CHALLENGE)
   const showDynamicSlide = phase === 'POST_CHALLENGE' && challenge?.hasDynamicSlide;
+
+  // Check if we should show dynamic question slide (nodes with dynamicSlideTemplate)
+  const showDynamicQuestion = phase === 'POST_CHALLENGE' && challenge?.dynamicSlideTemplate && !challenge?.hasDynamicSlide;
+  // Also show during question slide Q&A (nodes 15, 17 — type=slide with dynamicSlideTemplate)
+  const showDynamicQuestionSlide = challenge?.type === 'slide' && challenge?.dynamicSlideTemplate && phase === 'IN_CHALLENGE';
 
   // Handle welcome screen start
   const handleStart = async () => {
@@ -93,16 +106,32 @@ function App() {
 
       // Check if current challenge is a slide
       if (currentChallenge?.type === 'slide' && hasRunSlide.current !== currentChallengeIndex) {
-        console.log(`🚀 App: Starting slide interaction for challenge ${currentChallengeIndex + 1}`);
-        hasRunSlide.current = currentChallengeIndex;
-        runSlideInteraction();
+        // Question slides with dynamic templates use the dynamic question flow
+        if (currentChallenge.dynamicSlideTemplate && currentChallenge.isQuestionSlide) {
+          console.log(`🚀 App: Starting dynamic question slide for challenge ${currentChallengeIndex + 1}`);
+          hasRunSlide.current = currentChallengeIndex;
+          hasRunDynamicQuestion.current = currentChallengeIndex;
+          // Speak preScript, show slide, then run dynamic interaction
+          (async () => {
+            setTutorExpression('neutral');
+            await speak(currentChallenge.preScript);
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            setPhase('IN_CHALLENGE');
+            await new Promise(resolve => setTimeout(resolve, 500));
+            runDynamicQuestionInteraction();
+          })();
+        } else {
+          console.log(`🚀 App: Starting slide interaction for challenge ${currentChallengeIndex + 1}`);
+          hasRunSlide.current = currentChallengeIndex;
+          runSlideInteraction();
+        }
       } else if (currentChallenge?.type !== 'slide' && currentChallenge?.type !== 'checkpoint' && currentChallenge?.type !== 'goofy' && hasRunPreChallenge.current !== currentChallengeIndex) {
         console.log(`🚀 App: Starting pre-challenge for challenge ${currentChallengeIndex + 1}`);
         hasRunPreChallenge.current = currentChallengeIndex;
         runPreChallengeInteraction();
       }
     }
-  }, [phase, currentChallengeIndex, getCurrentChallenge, runPreChallengeInteraction, runSlideInteraction]);
+  }, [phase, currentChallengeIndex, getCurrentChallenge, runPreChallengeInteraction, runSlideInteraction, runDynamicQuestionInteraction]);
 
   // Auto-run checkpoint interaction
   useEffect(() => {
@@ -131,19 +160,28 @@ function App() {
     if (phase === 'POST_CHALLENGE' && hasRunPostChallenge.current !== currentChallengeIndex) {
       const currentChallenge = getCurrentChallenge();
 
-      // Check if this challenge uses dynamic slide
+      // Check if this challenge uses the original FractionCompareSlide (Node 4)
       if (currentChallenge?.hasDynamicSlide && hasRunDynamicSlide.current !== currentChallengeIndex) {
         console.log(`🚀 App: Starting dynamic slide interaction for challenge ${currentChallengeIndex + 1}`);
         hasRunPostChallenge.current = currentChallengeIndex;
         hasRunDynamicSlide.current = currentChallengeIndex;
         runFractionCompareInteraction();
-      } else if (!currentChallenge?.hasDynamicSlide) {
+      }
+      // Check if this challenge uses new dynamic question templates (tap-based)
+      else if (currentChallenge?.dynamicSlideTemplate && !currentChallenge?.hasDynamicSlide && hasRunDynamicQuestion.current !== currentChallengeIndex) {
+        console.log(`🚀 App: Starting dynamic question interaction (${currentChallenge.dynamicSlideTemplate}) for challenge ${currentChallengeIndex + 1}`);
+        hasRunPostChallenge.current = currentChallengeIndex;
+        hasRunDynamicQuestion.current = currentChallengeIndex;
+        runDynamicQuestionInteraction();
+      }
+      // Regular voice-only post-challenge
+      else if (!currentChallenge?.hasDynamicSlide && !currentChallenge?.dynamicSlideTemplate) {
         console.log(`🚀 App: Starting post-challenge for challenge ${currentChallengeIndex + 1}`);
         hasRunPostChallenge.current = currentChallengeIndex;
         runPostChallengeInteraction();
       }
     }
-  }, [phase, currentChallengeIndex, getCurrentChallenge, runPostChallengeInteraction, runFractionCompareInteraction]);
+  }, [phase, currentChallengeIndex, getCurrentChallenge, runPostChallengeInteraction, runFractionCompareInteraction, runDynamicQuestionInteraction]);
 
   // Handle challenge completion
   const handleChallengeComplete = () => {
@@ -165,15 +203,30 @@ function App() {
     hasRunDynamicSlide.current = null;
     hasRunCheckpoint.current = null;
     hasRunGoofy.current = null;
+    hasRunDynamicQuestion.current = null;
     resetSession();
     setIsWelcome(true);
   };
 
-  // Dynamic slide tap handlers
+  // Dynamic slide tap handlers (FractionCompareSlide — Node 4)
   const handleLeftTap = () => updateSlideInteraction({ leftTapped: true });
   const handleRightTap = () => updateSlideInteraction({ rightTapped: true });
   const handleLeftHighlight = () => updateSlideInteraction({ leftHighlighted: true });
   const handleRightHighlight = () => updateSlideInteraction({ rightHighlighted: true });
+
+  // Dynamic question slide tap handlers (new templates)
+  const handlePieceTap = (index: number) => {
+    const current = useSessionStore.getState().questionSlideState;
+    if (!current.tappedPieces.includes(index)) {
+      updateQuestionSlideState({ tappedPieces: [...current.tappedPieces, index] });
+    }
+  };
+  const handleChoiceTap = (index: number) => {
+    updateQuestionSlideState({ selectedIndex: index });
+  };
+  const handleOptionTap = (index: number) => {
+    updateQuestionSlideState({ selectedIndex: index });
+  };
 
   // Render welcome screen
   if (isWelcome) {
@@ -227,8 +280,8 @@ function App() {
             <AppletContainer src={challenge.path} onComplete={handleChallengeComplete} />
           )}
 
-          {/* Slide content */}
-          {challenge?.type === 'slide' && phase === 'IN_CHALLENGE' && (
+          {/* Slide content — static image (only if no dynamic template) */}
+          {challenge?.type === 'slide' && phase === 'IN_CHALLENGE' && !challenge.dynamicSlideTemplate && (
             <div className={styles.slideContainer}>
               <img src={challenge.slideUrl} alt={challenge.title} className={styles.slideImage} />
             </div>
@@ -251,8 +304,21 @@ function App() {
             />
           )}
 
+          {/* Dynamic question slides (new templates — FractionBuilder, MultipleChoice, TapToSelect) */}
+          {(showDynamicQuestion || showDynamicQuestionSlide) && challenge?.dynamicSlideTemplate && challenge?.dynamicSlideId && (
+            <DynamicSlideRenderer
+              template={challenge.dynamicSlideTemplate}
+              slideId={challenge.dynamicSlideId}
+              frame={questionSlideFrame}
+              state={questionSlideState}
+              onPieceTap={handlePieceTap}
+              onChoiceTap={handleChoiceTap}
+              onOptionTap={handleOptionTap}
+            />
+          )}
+
           {/* Static slide backdrop during POST_CHALLENGE Q&A for regular nodes */}
-          {phase === 'POST_CHALLENGE' && !showDynamicSlide && challenge?.type !== 'checkpoint' && challenge?.slideUrl && (
+          {phase === 'POST_CHALLENGE' && !showDynamicSlide && !showDynamicQuestion && challenge?.type !== 'checkpoint' && challenge?.slideUrl && (
             <div className={styles.slideContainer}>
               <img src={challenge.slideUrl} alt={challenge.title} className={styles.slideImage} />
             </div>

@@ -47,6 +47,17 @@
 | Onboarding robotic/aimless | Multi-turn LLM loop, LLM controlled flow | 5-beat linear structure, code controls flow, LLM handles tone only |
 | extractName returns garbage | Only checked for "Friend", not single letters/common words | Hardened with 40+ blocked words, garbage detection for single chars, numbers, short strings |
 
+## Bugs Fixed — Dynamic Question Slides (Feb 11, 2026)
+
+| Bug | Cause | Fix |
+|-----|-------|-----|
+| No wrong-answer acknowledgement | Voice-first check jumped straight to tap scaffold on wrong answer | Added "Good try! Let me help you figure this out." with `encouragement` expression before scaffold |
+| Node 3 tap-to-select auto-revealed | No tap instruction spoken + 20s timeout silently auto-selected correct answer | Added "Tap the one you think is right!" instruction + "No worries! Let me show you." on timeout |
+| MCQ repeats same hint for every wrong tap | Single `scaffoldHint` string used for all wrong choices | Added `choiceHints[]` array with per-choice feedback. Hint bubble now shows choice-specific text |
+| Hint bubble text garbled/overlapping | No max-width constraint, animation replayed on re-render causing overlap | Added `max-width: 320px`, text wrapping, keyed by last eliminated index for clean animation restart |
+| No post-node wrap-up | After confetti, immediate advance to next node with no transitional beat | Added "Nice work! You're learning so fast. Let's keep going!" with `celebration` expression |
+| All template timeouts silent | Auto-complete on timeout just showed answer with no speech | Added timeout speech for all 3 templates: "No worries! Let me show you." / "Let me help! Watch..." |
+
 ## Known Issues (as of Feb 11, 2026)
 
 ### 🔴 Onboarding Flow — Conversation Design Failures

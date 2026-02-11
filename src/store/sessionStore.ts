@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { challenges } from '../config/challenges';
-import type { SessionPhase, VoiceState, Challenge, Message, SlideFrame, SlideInteractionState, TutorExpression, CheckpointFrame } from '../types';
+import type { SessionPhase, VoiceState, Challenge, Message, SlideFrame, SlideInteractionState, TutorExpression, CheckpointFrame, QuestionSlideFrame, QuestionSlideState } from '../types';
+import { INITIAL_QUESTION_SLIDE_STATE } from '../types';
 
 // Module-level promise resolver for confetti completion
 let confettiResolver: (() => void) | null = null;
@@ -81,6 +82,13 @@ interface SessionState {
   // Minion visibility
   showMinion: boolean;
   setShowMinion: (show: boolean) => void;
+
+  // Dynamic question slide state (for FractionBuilder, MultipleChoice, TapToSelect templates)
+  questionSlideFrame: QuestionSlideFrame;
+  setQuestionSlideFrame: (frame: QuestionSlideFrame) => void;
+  questionSlideState: QuestionSlideState;
+  updateQuestionSlideState: (update: Partial<QuestionSlideState>) => void;
+  resetQuestionSlideState: () => void;
 }
 
 export const useSessionStore = create<SessionState>((set, get) => ({
@@ -199,6 +207,8 @@ export const useSessionStore = create<SessionState>((set, get) => ({
     tutorExpression: 'neutral',
     checkpointFrame: 'intro',
     showMinion: false,
+    questionSlideFrame: 'question',
+    questionSlideState: { ...INITIAL_QUESTION_SLIDE_STATE },
   }),
   skipToChallenge: (index) => set({
     currentChallengeIndex: Math.min(index, challenges.length - 1),
@@ -241,4 +251,16 @@ export const useSessionStore = create<SessionState>((set, get) => ({
   // Minion visibility
   showMinion: false,
   setShowMinion: (show) => set({ showMinion: show }),
+
+  // Dynamic question slide state
+  questionSlideFrame: 'question' as QuestionSlideFrame,
+  setQuestionSlideFrame: (frame) => set({ questionSlideFrame: frame }),
+  questionSlideState: { ...INITIAL_QUESTION_SLIDE_STATE },
+  updateQuestionSlideState: (update) => set((state) => ({
+    questionSlideState: { ...state.questionSlideState, ...update },
+  })),
+  resetQuestionSlideState: () => set({
+    questionSlideFrame: 'question',
+    questionSlideState: { ...INITIAL_QUESTION_SLIDE_STATE },
+  }),
 }));

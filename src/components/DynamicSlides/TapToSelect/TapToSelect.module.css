@@ -1,0 +1,432 @@
+/* ===== TAP TO SELECT SLIDE ===== */
+
+.slideContainer {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  gap: 24px;
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.2) 0%, rgba(118, 75, 162, 0.2) 100%);
+  border-radius: 20px;
+}
+
+/* ===== QUESTION AREA ===== */
+
+.questionArea {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 14px 28px;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 100px;
+  box-shadow:
+    0 8px 32px rgba(168, 85, 247, 0.2),
+    0 4px 0 rgba(168, 85, 247, 0.3);
+  animation: questionPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+@keyframes questionPop {
+  0% {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.questionIcon {
+  font-size: clamp(20px, 4vw, 28px);
+  animation: wobble 2s ease-in-out infinite;
+}
+
+@keyframes wobble {
+  0%, 100% { transform: rotate(-5deg); }
+  50% { transform: rotate(5deg); }
+}
+
+.questionText {
+  font-family: var(--font-display);
+  font-size: clamp(18px, 4vw, 24px);
+  font-weight: 700;
+  color: var(--text-dark);
+}
+
+/* ===== OPTIONS AREA ===== */
+
+.optionsArea {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  width: 100%;
+  max-width: 500px;
+}
+
+.optionWrapper {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ===== OPTION CARD ===== */
+
+.optionCard {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  width: 100%;
+  padding: 16px 24px;
+  background: rgba(255, 255, 255, 0.95);
+  border: 3px solid rgba(168, 85, 247, 0.25);
+  border-radius: 16px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow:
+    0 4px 0 rgba(168, 85, 247, 0.15),
+    0 8px 20px rgba(0, 0, 0, 0.08);
+  font-family: inherit;
+  font-size: inherit;
+  text-align: left;
+}
+
+.optionCard:disabled {
+  cursor: default;
+}
+
+.optionCard:not(:disabled):hover {
+  transform: translateY(-3px);
+  box-shadow:
+    0 8px 0 rgba(168, 85, 247, 0.2),
+    0 16px 32px rgba(0, 0, 0, 0.12);
+  border-color: rgba(168, 85, 247, 0.5);
+}
+
+.optionCard:not(:disabled):active {
+  transform: translateY(1px);
+  box-shadow:
+    0 2px 0 rgba(168, 85, 247, 0.15),
+    0 4px 10px rgba(0, 0, 0, 0.08);
+}
+
+/* Tappable state — gentle pulse */
+.cardTappable {
+  animation: cardPulse 2s ease-in-out infinite;
+}
+
+@keyframes cardPulse {
+  0%, 100% {
+    box-shadow:
+      0 4px 0 rgba(168, 85, 247, 0.15),
+      0 8px 20px rgba(0, 0, 0, 0.08),
+      0 0 0 0 rgba(168, 85, 247, 0.3);
+  }
+  50% {
+    box-shadow:
+      0 4px 0 rgba(168, 85, 247, 0.15),
+      0 8px 20px rgba(0, 0, 0, 0.08),
+      0 0 0 10px rgba(168, 85, 247, 0);
+  }
+}
+
+/* Stronger pulse for scaffold hint */
+.cardPulseStrong {
+  animation: cardPulseStrong 1.2s ease-in-out infinite;
+}
+
+@keyframes cardPulseStrong {
+  0%, 100% {
+    box-shadow:
+      0 4px 0 rgba(168, 85, 247, 0.2),
+      0 8px 20px rgba(0, 0, 0, 0.1),
+      0 0 0 0 rgba(168, 85, 247, 0.5);
+    border-color: rgba(168, 85, 247, 0.6);
+  }
+  50% {
+    box-shadow:
+      0 4px 0 rgba(168, 85, 247, 0.2),
+      0 8px 20px rgba(0, 0, 0, 0.1),
+      0 0 0 16px rgba(168, 85, 247, 0);
+    border-color: rgba(168, 85, 247, 0.3);
+  }
+}
+
+/* Wobble for wrong selection */
+.cardWobble {
+  animation: cardWobbleAnim 0.5s ease-in-out;
+  border-color: #ef4444;
+  box-shadow:
+    0 4px 0 rgba(239, 68, 68, 0.3),
+    0 8px 20px rgba(239, 68, 68, 0.15);
+}
+
+@keyframes cardWobbleAnim {
+  0% { transform: translateX(0); }
+  15% { transform: translateX(-8px); }
+  30% { transform: translateX(8px); }
+  45% { transform: translateX(-5px); }
+  60% { transform: translateX(5px); }
+  75% { transform: translateX(-2px); }
+  90% { transform: translateX(2px); }
+  100% { transform: translateX(0); }
+}
+
+/* Correct card state */
+.cardCorrect {
+  border-color: #22c55e;
+  background: rgba(34, 197, 94, 0.08);
+  box-shadow:
+    0 4px 0 rgba(34, 197, 94, 0.3),
+    0 8px 20px rgba(34, 197, 94, 0.15);
+  animation: none;
+}
+
+/* Wrong card state (reveal) */
+.cardWrong {
+  border-color: #ef4444;
+  background: rgba(239, 68, 68, 0.05);
+  box-shadow:
+    0 4px 0 rgba(239, 68, 68, 0.2),
+    0 8px 20px rgba(239, 68, 68, 0.1);
+  opacity: 0.8;
+  animation: none;
+}
+
+/* ===== BADGE ===== */
+
+.badgeCorrect,
+.badgeWrong {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 800;
+  color: white;
+  animation: badgePop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+}
+
+.badgeCorrect {
+  background: #22c55e;
+}
+
+.badgeWrong {
+  background: #ef4444;
+}
+
+@keyframes badgePop {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* ===== OPTION LABEL ===== */
+
+.optionLabel {
+  font-family: var(--font-display);
+  font-size: clamp(20px, 4vw, 28px);
+  font-weight: 800;
+  color: var(--purple);
+  min-width: 60px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+/* ===== BAR DIAGRAM ===== */
+
+.bar {
+  flex: 1;
+  height: clamp(48px, 10vw, 64px);
+  display: flex;
+  border: 3px solid var(--purple);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.barSmall {
+  height: clamp(32px, 6vw, 40px);
+  max-width: 280px;
+}
+
+.barSection {
+  height: 100%;
+  border-right: 2px solid var(--purple);
+  transition: background 0.3s ease;
+}
+
+.barSection:last-child {
+  border-right: none;
+}
+
+.barHighlighted {
+  background: var(--coral);
+  box-shadow: inset 0 0 16px rgba(255, 255, 255, 0.25);
+}
+
+.barEmpty {
+  background: #f8f4ff;
+}
+
+/* ===== HINT BUBBLE (scaffold) ===== */
+
+.hintBubble {
+  padding: 10px 20px;
+  background: rgba(255, 255, 255, 0.95);
+  border: 2px solid var(--coral);
+  border-radius: 100px;
+  box-shadow: 0 4px 12px rgba(255, 107, 107, 0.2);
+  animation: hintSlideUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.hintText {
+  font-family: var(--font-body);
+  font-size: clamp(14px, 3vw, 17px);
+  font-weight: 600;
+  color: var(--text-dark);
+}
+
+@keyframes hintSlideUp {
+  0% {
+    transform: translateY(10px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* ===== CORRECTED DIAGRAM (reveal) ===== */
+
+.correctedArea {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 20px;
+  background: rgba(34, 197, 94, 0.08);
+  border: 2px dashed #22c55e;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 400px;
+  animation: hintSlideUp 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.correctedLabel {
+  font-family: var(--font-display);
+  font-size: clamp(14px, 3vw, 17px);
+  font-weight: 700;
+  color: #22c55e;
+  flex-shrink: 0;
+}
+
+/* ===== FEEDBACK AREA ===== */
+
+.feedbackArea {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 18px 36px;
+  background: linear-gradient(135deg, var(--coral) 0%, var(--pink) 100%);
+  border-radius: 100px;
+  box-shadow:
+    0 8px 0 rgba(228, 85, 85, 0.4),
+    0 16px 32px rgba(0, 0, 0, 0.2);
+  animation: answerReveal 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+@keyframes answerReveal {
+  0% {
+    transform: translateY(30px) scale(0.8);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+.sparkle {
+  font-size: clamp(18px, 3.5vw, 24px);
+  animation: sparkleRotate 1s ease-in-out infinite;
+}
+
+@keyframes sparkleRotate {
+  0%, 100% { transform: rotate(-10deg) scale(1); }
+  50% { transform: rotate(10deg) scale(1.2); }
+}
+
+.answerText {
+  font-family: var(--font-display);
+  font-size: clamp(16px, 3.5vw, 22px);
+  font-weight: 700;
+  color: white;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* ===== RESPONSIVE ===== */
+
+@media (max-width: 480px) {
+  .slideContainer {
+    padding: 16px;
+    gap: 16px;
+  }
+
+  .questionArea {
+    padding: 10px 20px;
+  }
+
+  .optionCard {
+    padding: 12px 16px;
+    gap: 14px;
+  }
+
+  .feedbackArea {
+    padding: 12px 20px;
+    flex-wrap: wrap;
+    text-align: center;
+  }
+}
+
+@media (max-height: 500px) {
+  .slideContainer {
+    gap: 12px;
+    padding: 12px;
+  }
+
+  .questionArea {
+    padding: 8px 16px;
+  }
+
+  .optionsArea {
+    gap: 12px;
+  }
+
+  .optionCard {
+    padding: 10px 16px;
+  }
+
+  .bar {
+    height: 40px;
+  }
+}

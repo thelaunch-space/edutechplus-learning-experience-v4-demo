@@ -22,9 +22,11 @@
 
 ## Future Iterations
 
-### Medium Priority
-4. **Acknowledge student responses** — AI must reference what the student said before moving on, not just traverse a fixed scaffolding tree *(transcript-2)* [PARTIALLY ADDRESSED via prompt improvements]
-5. **Fix correctness filter strictness** — valid answers like "one six" / "six slices" should match. Filter was too strict *(transcript-2)*
+### Completed (post-Iteration 5)
+4. ✅ **Acknowledge student responses** — Prompts now explicitly acknowledge correct/wrong/off-topic before scaffolding *(transcript-2)*
+5. ✅ **Correctness filter improvements** — Word boundary matching + negation detection (15 negation words). Dual-layer: client-side regex + LLM eval *(transcript-2)*
+6. ✅ **ElevenLabs TTS** — Switched from Deepgram Aura-2 to ElevenLabs Aria (`eleven_turbo_v2_5`). Browser TTS fallback.
+7. ✅ **Anthropic LLM** — Switched from OpenRouter GPT-4.1-nano to Anthropic Claude Haiku 4.5 (`claude-haiku-4-5-20251001`)
 
 ### Lower Priority (Deferred)
 7. **Flexible voice nodes** — `skipPreVoice` / `skipPostVoice` flags per challenge. Content team controls where AI intervenes *(feedback-iter-3)*
@@ -44,11 +46,25 @@ Full spec: `.context/iteration-5-requirements.md`
 7. ✅ **Remove progress bar** — Deleted ProgressBar component entirely
 8. ✅ **Unified nav buttons** — NavBar with Next/Skip (center) + PTT (right, Button.png) in fixed positions
 
+## Completed (Post-Iteration 5 — Feb 11, 2026)
+
+9. ✅ **Dynamic question slides (8 nodes)** — 3 reusable templates (FractionBuilder, MultipleChoice, TapToSelect) replacing voice-only Q&A on empty screens. Per-node visual configs in `dynamicSlideContent.ts`.
+10. ✅ **Voice-first correctness check** — Student answers verbally first. If correct → quick auto-animation (no taps). If wrong → tap-based scaffold.
+11. ✅ **Per-choice MCQ hints** — Each wrong button gives unique feedback instead of repeating generic hint.
+12. ✅ **Conversational flow polish** — Wrong answer acknowledgement, tap instructions, timeout speech, post-completion wrap-up.
+
+## Upcoming: Asset Replacement
+
+- **Character animation frames** — Replace 7 static Max PNGs with animation frames per expression
+- **Separate layout assets** — ScreenFrame.png + Panel.png replacing single MediaBox.png
+- **New button assets** — Replacing current Button.png + CSS-based nav buttons
+- **Status:** Awaiting upload from design team
+
 ## Deferred / Future
 
 - **Corrective slides / routing logic** — branch to remedial content if student struggles *(feedback-iter-3, transcript-2)*
 - **On-demand doubts** — tap-to-speak outside structured conversation for ad-hoc questions *(impl-plan-iter-2)*
-- **ElevenLabs TTS switch** — More voice options, better quality. Staying on Deepgram Aura-2 for now. *(feedback-iter-4)*
+- ~~**ElevenLabs TTS switch**~~ ✅ Done — now using ElevenLabs Aria
 - **Personalized quiz** — AI-generated quiz based on conversation history and struggle areas *(feedback-iter-4)*
 - **Content authoring portal** — GUI for content team to drag/drop nodes *(feedback-iter-3)* **[FRAMEWORK DESIGNED — see `.context/framework-wip.md` and `content-inputs/`]**
 
@@ -65,4 +81,4 @@ Framework documentation and reference implementation complete:
 3. Content authoring GUI
 4. Analytics dashboard
 
-**Last updated:** 2026-02-10
+**Last updated:** 2026-02-11
