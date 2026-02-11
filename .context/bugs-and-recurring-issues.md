@@ -38,7 +38,16 @@
 | Button positioning conflicts | Skip/Done buttons at bottom-right overlapped with applet controls | Moved all buttons to top-right, unified styling and text across video/applet/slide |
 | Applet A2 loading reported | Client reported loading issue | Investigation complete: All 4 applet files verified to exist with correct paths. Likely client-side caching issue. |
 
-## Known Issues (as of Feb 10, 2026)
+## Bugs Fixed — Iteration 5
+
+| Bug | Cause | Fix |
+|-----|-------|-----|
+| MediaBox content misaligned | Single background image stretched with `100% 100%`, wrong `bottom: 32%` offset | Replaced with `<img>` element + wrapper div. Aspect ratio preserved. Content pane `bottom: 36%` matches actual screen area. |
+| MediaBox distorts on different screens | `background-size: 100% 100%` ignores aspect ratio | Image element uses `max-width/max-height` with natural aspect ratio (1408:1080) |
+| Onboarding robotic/aimless | Multi-turn LLM loop, LLM controlled flow | 5-beat linear structure, code controls flow, LLM handles tone only |
+| extractName returns garbage | Only checked for "Friend", not single letters/common words | Hardened with 40+ blocked words, garbage detection for single chars, numbers, short strings |
+
+## Known Issues (as of Feb 11, 2026)
 
 ### 🔴 Onboarding Flow — Conversation Design Failures
 

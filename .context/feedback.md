@@ -163,4 +163,21 @@ Source: `meeting-transcripts-with-client/feedback-iteration-3.md`
 
 **Owner's exact words:** "I am so pissed off at Claude fucking everything up, behaving like an idiot, not thinking. This is definitely not the world's best model like it is marketed around. The onboarding flow is god awful."
 
-**Last updated:** 2026-02-10
+### ✅ Onboarding Feedback RESOLVED (Feb 11, 2026)
+
+All 4 issues from Feb 10 addressed with 5-beat rewrite:
+
+| # | Issue | Resolution |
+|---|-------|------------|
+| 1 | Learning outcomes missing | Beat 3 (Adventure Hook) LLM prompt REQUIRES mentioning "fraction adventure" + 2 concrete activities |
+| 2 | Aimless chat | Replaced open-ended loop with 5 purposeful beats. Each beat has exactly one job. |
+| 3 | Adaptive conversation length | Fixed at 5 beats (~90 sec). 2 PTT moments (name + response to hook). No dragging, no rushing. |
+| 4 | Name extraction buggy | `extractName()` hardened: 40+ blocked words, single letters, numbers, common words all caught |
+
+### MediaBox Layout Feedback (Feb 11, 2026)
+
+**Context:** Content not fitting properly inside MediaBox screen area. Gap at bottom, distortion on different screen sizes.
+
+**Resolution:** Fixed with `<img>` element approach preserving aspect ratio. Separate asset request sent to design team for long-term solution (ScreenFrame, Panel, Buttons as individual PNGs).
+
+**Last updated:** 2026-02-11

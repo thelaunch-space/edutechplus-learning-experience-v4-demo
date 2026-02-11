@@ -1,78 +1,76 @@
 # Learning Journey - Fractions Module
 
-## Complete Node Sequence (14 nodes)
+## Complete Node Sequence (20 nodes: 0-19)
 
-| # | Type | Title | Description | Status |
-|---|------|-------|-------------|--------|
-| 1 | Slide | Why Fractions? | Motivation hook - sharing cake with friends | ✅ Implemented |
-| 2 | Video | What are Fractions? | Intro to fractions using pizza/cake examples | ✅ Implemented |
-| 3 | Applet | Cut and Glue Practice | Hands-on: cutting paper into equal parts (halves, quarters) | ✅ Implemented |
-| 4 | Applet | Fraction Patterns | Visual comparison: 1/2, 1/4, 1/6 - which has more pieces? | ✅ Implemented + **Dynamic Slide** |
-| 5 | Applet | Cake Fractions | Vocabulary lesson: numerator (top), denominator (bottom) | ✅ Implemented |
-| 6 | Slide | What are Fractions? | Preview for Video 2 - cutting objects into equal parts | ✅ Implemented |
-| 7 | Video | Bigger Fractions | Numerators > 1: examples like 2/4, 3/6 | ✅ Implemented |
-| 8 | Applet | Advanced Practice | Create fractions with bigger numerators: 2/5, 3/5 | ✅ Implemented |
-| 9 | Slide | Math Vault: Fraction Definition | Formal definition - fraction = part of whole, has 2 parts | ✅ Implemented |
-| 10 | Slide | Numerator and Denominator | Visual breakdown of 1/4 with labeled parts | ✅ Implemented |
-| 11 | Slide | Discover More Fractions | Quick check: "What fraction is 2 slices out of 6?" | ✅ Implemented |
-| 12 | Video | You Did It! | Celebration + final review: "What's the bottom number called?" | ✅ Implemented |
-| 13 | Slide | Math Trap: Find the Error | Diagnostic - spot mistake in 2/4 vs 2/6 bar diagrams | ✅ Implemented |
-| 14 | Slide | Snapshot: More Parts | Final summary - fractions can show multiple parts (2/5, 3/5, 4/6) | ✅ Implemented |
+| # | ID | Type | Title | LO Group | Status |
+|---|-----|------|-------|----------|--------|
+| 0 | onboarding | onboarding | Meet Max & Spark | — | ✅ 5-Beat flow |
+| 1 | slide-1 | slide | Why Fractions? | LO1 | ✅ Narration |
+| 2 | video-1 | video | What are Fractions? | LO1 | ✅ + Post-Q |
+| 3 | applet-a1 | applet | Cut and Glue Practice | LO1 | ✅ + Post-Q |
+| 4 | applet-a2 | applet | Fraction Patterns | LO1 | ✅ + Dynamic Slide |
+| 5 | goofy-1 | goofy | Spark's Fraction Joke | — | ✅ Voice-only |
+| 6 | applet-a3 | applet | Cake Fractions | LO1 | ✅ + Post-Q |
+| 7 | checkpoint-lo1 | checkpoint | Checkpoint: Equal Parts | LO1 | ✅ Interactive |
+| 8 | slide-2 | slide | What are Fractions? | LO2 | ✅ Narration |
+| 9 | video-2 | video | Bigger Fractions | LO2 | ✅ + Post-Q |
+| 10 | applet-a4 | applet | Advanced Practice | LO2 | ✅ + Post-Q |
+| 11 | goofy-2 | goofy | Max's Fun Fact | — | ✅ Voice-only |
+| 12 | slide-3 | slide | Math Vault: Fraction Definition | LO2 | ✅ Narration |
+| 13 | slide-4 | slide | Numerator and Denominator | LO2 | ✅ Narration |
+| 14 | checkpoint-lo2 | checkpoint | Checkpoint: Bigger Fractions | LO2 | ✅ Interactive |
+| 15 | slide-5 | slide (Q) | Discover More Fractions | LO3 | ✅ Question slide |
+| 16 | video-3 | video | You Did It! | LO3 | ✅ + Post-Q |
+| 17 | slide-6 | slide (Q) | Math Trap: Find the Error | LO3 | ✅ Question slide |
+| 18 | slide-7 | slide | Snapshot: More Parts | LO3 | ✅ Narration |
+| 19 | checkpoint-lo3 | checkpoint | Checkpoint: Fraction Master | LO3 | ✅ Interactive |
 
 ## Node Type Definitions
 
-- **Video**: YouTube embed or MP4, student watches passively, skip button available
-- **Applet**: Interactive HTML activity, student completes task, skip button available
-- **Slide**: Static image shown full-screen (right pane), AI narrates over it using side pane (left)
-- **Conversation**: Voice interaction - AI speaks (TTS or LLM-based), student responds via PTT
+- **Onboarding**: 5-beat scripted flow with 2 LLM calls. Name capture + adventure hook + transition to lesson.
+- **Video**: YouTube embed, student watches passively, skip button available.
+- **Applet**: Interactive HTML iframe, student completes task, skip button available.
+- **Slide**: Static image in MediaBox screen area. Narration slides auto-advance after TTS. Question slides trigger multi-turn Socratic dialogue.
+- **Checkpoint**: Interactive review after each LO group. Multi-frame dynamic slide (CheckpointSlide component) + voice Q&A.
+- **Goofy**: Voice-only fun break. Pre-scripted lines for Max (and optionally Spark). Auto-advance after TTS. No student response.
 
 ## Voice Interaction Pattern
 
-Each node (video/applet/slide) follows this pattern:
+Each video/applet node follows:
 1. **Pre-node**: AI introduces the content (scripted TTS)
-2. **Content consumption**: Student views/interacts with content
+2. **Content consumption**: Student views/interacts
 3. **Post-node**: AI asks comprehension question (multi-turn Socratic dialogue, up to 5 turns)
 
 ## Slide-Specific Behavior
 
-- **Layout**: Right pane = slide image, Left pane = chat + AI
-- **Pre-slide intro**: AI says "Let me show you something..." (scripted)
-- **During slide**:
-  - Content slides (1,2,9,10,14): AI narrates what's on slide (TTS)
-  - Question slides (11,13): AI asks question, student responds (LLM-based Socratic dialogue)
-- **Post-slide**: Move to next node (no additional Q&A for most slides)
-
-## Implementation Notes
-
-- Total journey: 14 nodes (all implemented as of 2026-01-29)
-- Slide content type added with `slideUrl`, `slideNarration`, `isQuestionSlide` fields
-- 7 slide images located in: `/public/fractions-module-content/slides/`
-- SlideViewer component handles full-screen slide rendering
-- Narration slides (nodes 1,6,9,10,14): Auto-advance after TTS narration
-- Question slides (nodes 11,13): Multi-turn Socratic dialogue with confetti
+- Narration slides (1, 8, 12, 13, 18): AI narrates → auto-advance. No Q&A.
+- Question slides (15, 17): AI asks question → multi-turn Socratic dialogue with confetti.
 
 ## Dynamic Interactive Slide (Node 4)
 
-Node 4 (Applet A2 - Fraction Patterns) has a special post-challenge interaction that uses an interactive dynamic slide instead of the standard voice-only post-challenge flow.
+Post-challenge for Applet A2. `FractionCompareSlide` — 5-frame state machine:
+1. `question` → 2. `cut` (tap to split) → 3. `highlight` (tap to count) → 4. `compare` → 5. `celebration`
 
-**Component:** `FractionCompareSlide`
+Two paths: correct first try (quick animated summary) vs wrong answer (interactive scaffolding with taps).
 
-**Question:** "Which has MORE pieces - 1/4 or 1/6?"
+## Learning Objective Groups
 
-**5-Frame State Machine:**
-1. `question` - Shows question text and fraction labels (1/4, 1/6)
-2. `cut` - Shows empty rectangles with tap indicators; student taps to split
-3. `highlight` - Shows split rectangles; student taps pieces to highlight them
-4. `compare` - Shows piece counts (4 pieces, 6 pieces)
-5. `celebration` - Shows answer banner with confetti
+- **LO1** (Nodes 1-7): Understanding equal parts and basic fraction notation (1/2, 1/4, 1/6)
+- **LO2** (Nodes 8-14): Bigger fractions, numerator/denominator vocabulary
+- **LO3** (Nodes 15-19): Applying fraction knowledge, error spotting, final review
 
-**Two Interaction Paths:**
-- **Path A (Correct first try):** Student says "1/6" → Quick animated summary showing all frames automatically
-- **Path B (Wrong answer):** Student gives wrong answer → Interactive scaffolding with tap-to-split, tap-to-highlight, then verbal "6 is bigger" question
+## Checkpoint Structure
 
-**Key Features:**
-- Voice-visual synchronization: Math Mate speaks while slide animates
-- Tap interactions with 15-second auto-timeout fallback
-- Uses `hasDynamicSlide: true` flag on Challenge type
+3 checkpoints (Nodes 7, 14, 19), one after each LO group. Each uses:
+- `CheckpointSlide` component with multi-frame visual
+- Voice Q&A with scaffolding (max 4 turns)
+- `checkpointId` field linking to `checkpointContent.ts` frame definitions
 
-**Last updated:** 2026-02-02
+## Goofy Moment Structure
+
+2 goofy moments (Nodes 5, 11) placed between LO groups as fun breaks:
+- Pre-scripted `goofyScript` with `tutorLine` and optional `minionLine`
+- `showMinion: true` shows Spark character during the moment
+- Auto-advance after TTS, no student interaction
+
+**Last updated:** 2026-02-11

@@ -301,6 +301,26 @@ Claude has been repeatedly messing up the onboarding conversation design. Multip
 **Files modified:** `useVoiceInteraction.ts`, `prompts.ts`, `openrouter.ts`, `challenges.ts`
 **Files updated:** `.context/conversation-design.md`, `.context/bugs-and-recurring-issues.md`
 
+### ✅ MediaBox Layout Fix (Feb 11, 2026)
+
+**Problem:** MediaBox.png was used as a CSS background with `background-size: 100% 100%`, stretching it to fill the container regardless of aspect ratio. Content positioning (`bottom: 32%`) was wrong — content bled into the panel zone. On different screen resolutions the image distorted and content didn't align with the screen borders.
+
+**Solution:** Replaced background-image approach with an actual `<img>` element inside a wrapper div:
+- `mediaBoxWrapper` sizes itself to the rendered image
+- `mediaBoxImg` uses `max-width: 100%; max-height: 100vh` — scales to fit while preserving native 1408:1080 aspect ratio
+- Content pane positioned with corrected percentages (`bottom: 36%`) relative to the wrapper (= image dimensions)
+- Works correctly on any screen resolution without distortion
+
+**Files modified:** `App.tsx` (wrapper + img element), `App.module.css` (new layout classes)
+
+**Asset request sent to design team:** Separate assets (ScreenFrame.png, Panel.png, buttons) for long-term solution. Current single-image approach works but separate assets would be more flexible.
+
+### Deployment (Feb 11, 2026)
+
+- All Iteration 5 changes committed and pushed to both `main` and `staging` branches
+- Netlify auto-deploys from `main`
+- Env vars needed on Netlify: `VITE_DEEPGRAM_API_KEY`, `VITE_OPENROUTER_API_KEY`
+
 ### Deferred
 
 - Flexible voice nodes (`skipPreVoice`/`skipPostVoice` flags)
@@ -308,7 +328,8 @@ Claude has been repeatedly messing up the onboarding conversation design. Multip
 - ElevenLabs TTS switch
 - Personalized quiz
 - Platform build (Convex + Clerk, authoring GUI, analytics)
+- Separate MediaBox assets (ScreenFrame, Panel, Buttons) from design team
 
 See `.context/feature-wishlist.md` for detailed feature list.
 
-**Last updated:** 2026-02-10
+**Last updated:** 2026-02-11
