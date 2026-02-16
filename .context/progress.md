@@ -151,8 +151,8 @@
 - Buddy system (configurable AI personas) planned for future
 
 **Files created:**
-- `.context/framework-wip.md`
-- `.context/framework-technical.md`
+- `.context/platform/framework-client-facing.md`
+- `.context/platform/framework-technical.md`
 - `content-inputs/` folder (34 files)
 
 ---
@@ -163,7 +163,17 @@
 
 **Status:** Implementation complete. Build passing.
 
-**Full spec:** `.context/iteration-5-requirements.md`
+**Scope boundaries (explicitly decided NOT to do):**
+- No multiple buddy system — just Master Tutor + 1 Minion (revised from earlier 3-buddy proposal in iteration-4 feedback)
+- No personalized quiz — deferred
+- Existing Socratic scaffolding logic unchanged
+- Existing FractionCompareSlide (Node 4) unchanged
+- Forward-only progression (no prev button)
+- Nav button assets: using CSS placeholders until design team provides separate assets
+
+**Key naming decisions:** Tutor = "Max" (short, friendly, easy for ESL kids). Minion = "Spark" (fits the glowing eyes/antenna).
+
+**UI layer stack:** BG.jpg (full screen) → MediaBox.png (right ~70%, white interior) → sidebar (left ~30%, BG shows through naturally, no separate asset) → characters (bottom-left, overlapping sidebar/content boundary) → nav buttons (bottom).
 
 ### ✅ Completed
 
@@ -351,34 +361,73 @@ Claude has been repeatedly messing up the onboarding conversation design. Multip
 - Added post-completion wrap-up after confetti ("Nice work! You're learning so fast.")
 - Fixed hint bubble: only shows after a wrong tap (not always), updates per-choice, CSS overflow fixed
 
-### ⏳ Next Up: Asset Replacement (Planned)
+### Post-Iteration 5 — Feb 16, 2026
 
-**Status:** Assets not yet received. User will upload later.
+**Minion Moments (8 embedded):**
+- 8 minionMoment fields embedded across regular nodes (1, 3, 7, 9, 11, 14, 17, 19)
+- Spark speaks first → Max responds → Spark hides → normal flow continues
+- Mix of silly jokes, misconception doubts, and hype moments
 
-**Scope:** Replace current static PNGs with new design assets:
-- **Character Max:** Animation frames per expression (replacing 7 static PNGs in `public/tutor-assets/Character/`)
-- **Layout:** Separate ScreenFrame.png + Panel.png (replacing single MediaBox.png)
-- **Buttons:** New button assets (replacing current Button.png + CSS-based nav buttons)
+**Scaffold Quality Fixes:**
+- Enriched preScripts for 14+ nodes (warm, contextual introductions replacing navigational placeholders)
+- Enriched slideNarrations for 4 narration slides
+- Fixed Node 3 correctness filter (was too broad: "same" matched false positives)
+- LLM prompt enhancement: warmer tone, response variability, turn-awareness, natural scaffold delivery
+- Removed dead code: generateResponse(), generateGreeting(), GREETING_PROMPT, GREETING_SYSTEM_PROMPT
 
-**Current asset structure (to be replaced):**
-- `public/tutor-assets/BG.jpg` — Full-screen background
-- `public/tutor-assets/MediaBox.png` — Combined screen frame + panel
-- `public/tutor-assets/Button.png` — PTT button
-- `public/tutor-assets/Character/*.png` — 7 static expression images
-- `public/tutor-assets/bot.png` — Spark minion
+**5 Learning Outcomes Restructuring:**
+- Expanded from 3 LO groups to 5 LO groups
+- 5 checkpoints (nodes 4, 8, 12, 15, 20) — one after each LO group
+- LO1: Equal parts and first fraction names (nodes 1-3)
+- LO2: Comparing fractions and naming the numerator (nodes 5, 7)
+- LO3: Building bigger fractions (nodes 9-11)
+- LO4: Fraction vocabulary — numerator and denominator (nodes 13-14)
+- LO5: Applying fraction knowledge, error spotting, final review (nodes 16-19)
 
-**Implementation notes when assets arrive:**
-- `TutorCharacter.tsx` needs to swap from `<img>` crossfade to frame-based animation (sprite sheet or sequential frames)
-- `App.module.css` needs new layout approach for separate screen + panel assets
-- `NavBar.tsx` needs updated button assets
-- May need new animation logic (requestAnimationFrame or CSS sprite animation)
+### Voice Differentiation + UX Polish (Feb 16, 2026)
+
+**Problem:** QA testing revealed: (1) Max and Spark use the same Aria voice — Spark auditorily invisible, (2) Aria (young female) doesn't match Max's teen boy look, (3) some preScripts are wordy with filler, (4) 5s confetti wait is dead time, (5) identical wrap-up phrase after every dynamic question.
+
+**Changes:**
+- **Two distinct voices:** Max → Liam (young male, `TX3LPaxmHKxFdv7VOQHJ`), Spark keeps Aria (female, `9BWtsMINqrJLrRacOk9x`) with more animated settings
+- `speakText()` now accepts `voice: 'max' | 'spark'` parameter (defaults to `'max'`)
+- `speakAsSpark()` helper in useVoiceInteraction — used at all 4 minionLine call sites
+- Tightened 6 wordy preScripts (nodes 1, 3, 5, 7, 8, 11) — cut filler, kept teaching content
+- Confetti duration: 5000ms → 3000ms
+- Rotating wrap-up phrases (5 variants, no consecutive repeats) replacing hardcoded "Nice work! You're learning so fast."
+
+**Files modified:** `tts.ts`, `useVoiceInteraction.ts`, `challenges.ts`, `Confetti.tsx`
+
+### ⏳ Next Up
+
+1. **UI asset replacement** — Waiting for new character animations, ScreenFrame.png, Panel.png from design team
+2. **FTUE rewrite** — Deferred. Onboarding 5-beat structure works but could be more engaging
+3. **useVoiceInteraction.ts refactor** — Split 1,543-line file into per-flow modules
+4. **Dead component cleanup** — Delete VideoPlayer, Waveform, VoiceInteraction, SlideViewer
 
 ### Dead Code Candidates
 
-3 orphaned components from earlier iterations (safe to delete):
+**Dead components (4 pairs — tsx + css module each):**
 - `src/components/VideoPlayer.tsx` — replaced by YouTubePlayer
 - `src/components/Waveform.tsx` — old audio visualization, unused
-- `src/components/VoiceInteraction.tsx` — old voice UI, replaced by useVoiceInteraction hook
+- `src/components/VoiceInteraction.tsx` — old voice UI, replaced by ChatPane + NavBar
+- `src/components/SlideViewer.tsx` — superseded, App.tsx renders slides inline as `<img>`
+
+**Dead exports:**
+- `generateGreeting()` in `services/openrouter.ts` — unused, onboarding uses different functions
+- `GREETING_PROMPT` in `config/prompts.ts` — never imported
+- `config/goofyMoments.ts` (entire file) — goofy content lives inline in challenges.ts `goofyScript` fields
+- `SessionState` interface in `types/index.ts:174–210` — stale duplicate, real one is in sessionStore.ts
+- `lastTranscript`, `lastResponse`, `error`, `listenAndRespond` returned by useVoiceInteraction but never consumed by App.tsx
+- `skipToChallenge()`, `clearChatMessages()` in sessionStore.ts — never called (debug panel removed)
+
+**Dead CSS:**
+- `.debug` panel styles in `App.module.css:103–143`
+
+**Dead assets:**
+- `public/fractions-module-content/content-context-docs/` — reference docs, not runtime assets
+- `public/fractions-module-content/videos/` — empty directory
+- Multiple `.DS_Store` files in public/ (add to .gitignore)
 
 ### Code Health Notes
 
@@ -396,4 +445,4 @@ Claude has been repeatedly messing up the onboarding conversation design. Multip
 
 See `.context/feature-wishlist.md` for detailed feature list.
 
-**Last updated:** 2026-02-11
+**Last updated:** 2026-02-16

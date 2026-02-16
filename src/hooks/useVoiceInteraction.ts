@@ -2,12 +2,22 @@ import { useCallback, useState, useRef } from 'react';
 import { useMicrophone } from './useMicrophone';
 import { transcribeAudio } from '../services/deepgram';
 import { speakText, type TTSResult } from '../services/tts';
-import { generateResponse, generateEvaluatedResponse, generateAdventureHook, generateBridgeTransition, generateCheckpointResponse } from '../services/openrouter';
+import { generateEvaluatedResponse, generateAdventureHook, generateBridgeTransition, generateCheckpointResponse } from '../services/openrouter';
 import { useSessionStore } from '../store/sessionStore';
 import type { VoiceState } from '../types';
 import { fractionBuilderSlides, multipleChoiceSlides, tapToSelectSlides } from '../config/dynamicSlideContent';
 
 const MAX_RECORDING_MS = 15000; // 15 seconds safety cap for PTT
+
+// Rotating wrap-up phrases for dynamic question slides (avoid repetition)
+const WRAP_UP_PHRASES = [
+  "Nice work! Let's keep going!",
+  "You're getting the hang of this! Ready for the next one?",
+  "Awesome! Onward!",
+  "Look at you go! Next one!",
+  "Great job! Let's see what's next!",
+];
+let lastWrapUpIndex = -1;
 
 // Extract name from transcript like "I'm Krishna Gautam" -> "Krishna"
 // Hardened: catches garbage single-letter names, common words, numbers
@@ -70,7 +80,6 @@ interface UseVoiceInteractionReturn {
 
   // Low-level controls
   speak: (text: string) => Promise<void>;
-  listenAndRespond: (question: string, contextInfo: string) => Promise<string>;
 
   // PTT (Push-to-Talk) controls
   handlePTTStart: () => Promise<void>;
@@ -156,6 +165,38 @@ export function useVoiceInteraction(): UseVoiceInteractionReturn {
       setVoiceState('IDLE');
     } catch (err) {
       console.error('❌ Voice: Speech error:', err);
+      setVoiceState('ERROR');
+      setError('Failed to play audio');
+    }
+  }, [addChatMessage]);
+
+  // Speak as Spark (robot sidekick) using Aria voice
+  const speakAsSpark = useCallback(async (text: string): Promise<void> => {
+    try {
+      console.log('🤖 Voice: Spark speaking:', text.substring(0, 50) + '...');
+      setVoiceState('MATH_MATE_SPEAKING');
+      setLastResponse(text);
+      setDisplayedText('');
+
+      const words = text.split(' ');
+      const { duration, playbackDone }: TTSResult = await speakText(text, 'spark');
+
+      const wordDuration = duration > 0
+        ? Math.max(100, (duration * 1000) / words.length)
+        : 280;
+
+      for (let i = 0; i < words.length; i++) {
+        setDisplayedText(words.slice(0, i + 1).join(' '));
+        await new Promise(resolve => setTimeout(resolve, wordDuration));
+      }
+
+      await playbackDone;
+      addChatMessage('assistant', text);
+      setDisplayedText('');
+      console.log('✅ Voice: Spark finished speaking');
+      setVoiceState('IDLE');
+    } catch (err) {
+      console.error('❌ Voice: Spark speech error:', err);
       setVoiceState('ERROR');
       setError('Failed to play audio');
     }
@@ -405,6 +446,20 @@ export function useVoiceInteraction(): UseVoiceInteractionReturn {
       }
 
       console.log(`🎯 Pre-Challenge: Challenge ${challenge.number} - ${challenge.title}`);
+
+      // Play minion moment if present (Spark speaks first, tutor responds)
+      if (challenge.minionMoment) {
+        console.log('🤖 Pre-Challenge: Playing minion moment...');
+        setTutorExpression('giggling');
+        setShowMinion(true);
+        await speakAsSpark(challenge.minionMoment.minionLine);
+        await new Promise(resolve => setTimeout(resolve, 500));
+        await speak(challenge.minionMoment.tutorLine);
+        await new Promise(resolve => setTimeout(resolve, 800));
+        setShowMinion(false);
+        setTutorExpression('neutral');
+      }
+
       console.log('🎤 Pre-Challenge: Speaking introduction...');
 
       // Speak the pre-script
@@ -420,7 +475,7 @@ export function useVoiceInteraction(): UseVoiceInteractionReturn {
       console.error('❌ Pre-challenge interaction error:', err);
       setPhase('IN_CHALLENGE');
     }
-  }, [speak, getCurrentChallenge, setPhase, setTutorExpression]);
+  }, [speak, speakAsSpark, getCurrentChallenge, setPhase, setTutorExpression, setShowMinion]);
 
   // Slide interaction with conditional multi-turn for question slides
   const runSlideInteraction = useCallback(async (): Promise<void> => {
@@ -443,6 +498,19 @@ export function useVoiceInteraction(): UseVoiceInteractionReturn {
 
       console.log(`🎯 Slide: Challenge ${challenge.number} - ${challenge.title}`);
       console.log(`📊 Question slide: ${challenge.isQuestionSlide || false}`);
+
+      // Play minion moment if present (Spark speaks first, tutor responds)
+      if (challenge.minionMoment) {
+        console.log('🤖 Slide: Playing minion moment...');
+        setTutorExpression('giggling');
+        setShowMinion(true);
+        await speakAsSpark(challenge.minionMoment.minionLine);
+        await new Promise(resolve => setTimeout(resolve, 500));
+        await speak(challenge.minionMoment.tutorLine);
+        await new Promise(resolve => setTimeout(resolve, 800));
+        setShowMinion(false);
+        setTutorExpression('neutral');
+      }
 
       // Speak the pre-script
       console.log('🎤 Slide: Speaking pre-script...');
@@ -598,7 +666,7 @@ export function useVoiceInteraction(): UseVoiceInteractionReturn {
       const isComplete = goToNextChallenge();
       setPhase(isComplete ? 'COMPLETE' : 'PRE_CHALLENGE');
     }
-  }, [speak, listenAndTranscribe, getCurrentChallenge, studentName, goToNextChallenge, setPhase, resetTurn, incrementTurn, addMessage, getConversationHistory, addChatMessage, triggerConfetti, waitForConfetti, setVoiceState, setError, setTutorExpression]);
+  }, [speak, speakAsSpark, listenAndTranscribe, getCurrentChallenge, studentName, goToNextChallenge, setPhase, resetTurn, incrementTurn, addMessage, getConversationHistory, addChatMessage, triggerConfetti, waitForConfetti, setVoiceState, setError, setTutorExpression, setShowMinion]);
 
   // Post-challenge interaction with multi-turn loop
   const runPostChallengeInteraction = useCallback(async (): Promise<void> => {
@@ -939,6 +1007,18 @@ export function useVoiceInteraction(): UseVoiceInteractionReturn {
 
       console.log(`🎯 Checkpoint: Challenge ${challenge.number} - ${challenge.title}`);
 
+      // Play minion moment if present (Spark speaks first, tutor responds)
+      if (challenge.minionMoment) {
+        console.log('🤖 Checkpoint: Playing minion moment...');
+        setTutorExpression('giggling');
+        setShowMinion(true);
+        await speakAsSpark(challenge.minionMoment.minionLine);
+        await new Promise(resolve => setTimeout(resolve, 500));
+        await speak(challenge.minionMoment.tutorLine);
+        await new Promise(resolve => setTimeout(resolve, 800));
+        setShowMinion(false);
+      }
+
       // Set intro frame
       setCheckpointFrame('intro');
 
@@ -1093,7 +1173,7 @@ export function useVoiceInteraction(): UseVoiceInteractionReturn {
       const isComplete = goToNextChallenge();
       setPhase(isComplete ? 'COMPLETE' : 'PRE_CHALLENGE');
     }
-  }, [speak, listenAndTranscribe, getCurrentChallenge, studentName, goToNextChallenge, setPhase, resetTurn, incrementTurn, addMessage, getConversationHistory, addChatMessage, triggerConfetti, waitForConfetti, setTutorExpression, setCheckpointFrame]);
+  }, [speak, speakAsSpark, listenAndTranscribe, getCurrentChallenge, studentName, goToNextChallenge, setPhase, resetTurn, incrementTurn, addMessage, getConversationHistory, addChatMessage, triggerConfetti, waitForConfetti, setTutorExpression, setCheckpointFrame, setShowMinion]);
 
   // Dynamic question slide interaction (voice-first check + tap scaffold — FractionBuilder, MultipleChoice, TapToSelect)
   const runDynamicQuestionInteraction = useCallback(async (): Promise<void> => {
@@ -1404,9 +1484,14 @@ export function useVoiceInteraction(): UseVoiceInteractionReturn {
       triggerConfetti();
       await waitForConfetti();
 
-      // Brief wrap-up before advancing
+      // Brief wrap-up before advancing (rotate phrases to avoid repetition)
       setTutorExpression('celebration');
-      await speak("Nice work! You're learning so fast. Let's keep going!");
+      let wrapUpIndex = Math.floor(Math.random() * WRAP_UP_PHRASES.length);
+      if (wrapUpIndex === lastWrapUpIndex) {
+        wrapUpIndex = (wrapUpIndex + 1) % WRAP_UP_PHRASES.length;
+      }
+      lastWrapUpIndex = wrapUpIndex;
+      await speak(WRAP_UP_PHRASES[wrapUpIndex]);
       await new Promise(resolve => setTimeout(resolve, 300));
 
       setTutorExpression('neutral');
@@ -1464,11 +1549,11 @@ export function useVoiceInteraction(): UseVoiceInteractionReturn {
       console.log('🎤 Goofy: Speaking tutor line...');
       await speak(goofyScript.tutorLine);
 
-      // Speak minion line if present
+      // Speak minion line if present (Spark's voice)
       if (goofyScript.minionLine) {
         await new Promise(resolve => setTimeout(resolve, 500));
         console.log('🎤 Goofy: Speaking minion line...');
-        await speak(goofyScript.minionLine);
+        await speakAsSpark(goofyScript.minionLine);
       }
 
       // Wait before advancing
@@ -1495,30 +1580,7 @@ export function useVoiceInteraction(): UseVoiceInteractionReturn {
       const isComplete = goToNextChallenge();
       setPhase(isComplete ? 'COMPLETE' : 'PRE_CHALLENGE');
     }
-  }, [speak, getCurrentChallenge, goToNextChallenge, setPhase, setTutorExpression, setShowMinion]);
-
-  // Listen and generate response (for custom interactions)
-  const listenAndRespond = useCallback(async (
-    question: string,
-    contextInfo: string
-  ): Promise<string> => {
-    const transcript = await listenAndTranscribe();
-
-    if (!transcript) {
-      return "Great! Let's keep going!";
-    }
-
-    const challenge = getCurrentChallenge();
-    const response = await generateResponse(
-      transcript,
-      studentName,
-      challenge?.number || 0,
-      question,
-      contextInfo
-    );
-
-    return response;
-  }, [listenAndTranscribe, getCurrentChallenge, studentName]);
+  }, [speak, speakAsSpark, getCurrentChallenge, goToNextChallenge, setPhase, setTutorExpression, setShowMinion]);
 
   return {
     voiceState,
@@ -1535,7 +1597,6 @@ export function useVoiceInteraction(): UseVoiceInteractionReturn {
     runGoofyMomentInteraction,
     runDynamicQuestionInteraction,
     speak,
-    listenAndRespond,
     // PTT controls
     handlePTTStart,
     handlePTTEnd,

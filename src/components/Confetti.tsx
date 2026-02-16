@@ -79,7 +79,7 @@ export function Confetti({ isActive, onComplete }: ConfettiProps) {
       const timeout = setTimeout(() => {
         setPieces([]);
         onComplete?.();
-      }, 5000);
+      }, 3000);
 
       return () => {
         clearTimeout(timeout);

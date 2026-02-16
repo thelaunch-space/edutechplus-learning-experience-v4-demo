@@ -7,10 +7,12 @@ export interface TTSResult {
   playbackDone: Promise<void>;  // Resolves when audio finishes
 }
 
-// ElevenLabs voice config
-// Using "Aria" — expressive, warm, young female voice (good for kid-facing tutor)
-// Fallback to any available voice if this one isn't on the account
-const VOICE_ID = '9BWtsMINqrJLrRacOk9x'; // Aria
+// ElevenLabs voice configs — two distinct characters
+// Max: Liam — young American male, matches Max's teen scientist look
+const MAX_VOICE = { id: 'TX3LPaxmHKxFdv7VOQHJ', stability: 0.5, similarity_boost: 0.75, style: 0.4 };
+// Spark: Aria — expressive, warm female, animated delivery for the robot sidekick
+const SPARK_VOICE = { id: '9BWtsMINqrJLrRacOk9x', stability: 0.35, similarity_boost: 0.7, style: 0.65 };
+
 const MODEL_ID = 'eleven_turbo_v2_5'; // Lowest latency model
 
 let isAudioUnlocked = false;
@@ -36,8 +38,8 @@ export function unlockAudio(): void {
   }
 }
 
-export async function speakText(text: string): Promise<TTSResult> {
-  console.log('🔊 TTS: Starting to speak:', text.substring(0, 50) + '...');
+export async function speakText(text: string, voice: 'max' | 'spark' = 'max'): Promise<TTSResult> {
+  console.log(`🔊 TTS [${voice}]: Starting to speak:`, text.substring(0, 50) + '...');
   const apiKey = import.meta.env.VITE_ELEVENLABS_KEY;
 
   if (!apiKey) {
@@ -46,8 +48,9 @@ export async function speakText(text: string): Promise<TTSResult> {
   }
 
   try {
-    const url = `${ELEVENLABS_TTS_URL}/${VOICE_ID}`;
-    console.log('📡 TTS: Calling ElevenLabs API with model:', MODEL_ID);
+    const voiceConfig = voice === 'spark' ? SPARK_VOICE : MAX_VOICE;
+    const url = `${ELEVENLABS_TTS_URL}/${voiceConfig.id}`;
+    console.log(`📡 TTS [${voice}]: Calling ElevenLabs API with model:`, MODEL_ID);
 
     const response = await fetch(url, {
       method: 'POST',
@@ -60,9 +63,9 @@ export async function speakText(text: string): Promise<TTSResult> {
         text,
         model_id: MODEL_ID,
         voice_settings: {
-          stability: 0.5,
-          similarity_boost: 0.75,
-          style: 0.4,
+          stability: voiceConfig.stability,
+          similarity_boost: voiceConfig.similarity_boost,
+          style: voiceConfig.style,
         },
       }),
     });
