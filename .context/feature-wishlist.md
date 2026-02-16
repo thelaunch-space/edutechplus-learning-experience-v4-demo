@@ -35,7 +35,7 @@
 
 ## Completed (Iteration 5 — Feb 10, 2026)
 
-Full spec: `.context/iteration-5-requirements.md`
+Details merged into `progress.md` (Iteration 5 section) and `conversation-design.md`.
 
 1. ✅ **UI overhaul** — Sci-fi/tech theme replacing Candy-Land. BG.jpg + MediaBox.png layout, laptop-first.
 2. ✅ **Master Tutor "Max" expressions** — 7 expression states, phase-based switching, crossfade transitions
@@ -53,6 +53,19 @@ Full spec: `.context/iteration-5-requirements.md`
 11. ✅ **Per-choice MCQ hints** — Each wrong button gives unique feedback instead of repeating generic hint.
 12. ✅ **Conversational flow polish** — Wrong answer acknowledgement, tap instructions, timeout speech, post-completion wrap-up.
 
+## Completed (Post-Iteration 5 — Feb 16, 2026)
+
+13. ✅ **Minion moments (8 embedded)** — `minionMoment` field on regular nodes. Spark speaks first, Max responds. Mix of silly jokes, misconception doubts, and hype. Plays before preScript. Nodes: 1, 3, 7, 9, 11, 14, 17, 19.
+14. ✅ **Scaffold quality fixes** — Removed phonetic spelling hints ("one-f..."), forced parroting ("Can you say that?"), and ambiguous questions. Reduced scaffold turns from 5→4 where parroting turn was removed.
+15. ✅ **5 Learning Outcomes with "Level Up!" checkpoints** — Restructured from 3 LOs (6-7 nodes each) to 5 LOs (2-4 nodes each). 5 checkpoints at nodes 4, 8, 12, 15, 20. Spacing: 3, 3, 3, 2, 4. Converted goofy-2 to checkpoint-lo3. Journey expanded from 20 to 21 nodes.
+
+## Completed (Post-Iteration 5 — Feb 16, 2026) — UX Polish
+
+16. ✅ **Voice differentiation** — Max uses Liam (young male), Spark uses Aria (expressive female). `speakText()` accepts voice parameter. All minionLine calls use `speakAsSpark()`.
+17. ✅ **Tighter preScripts** — Cut filler from 6 wordy nodes (1, 3, 5, 7, 8, 11). Teaching content preserved, removed redundancy and padding.
+18. ✅ **Faster confetti** — Reduced from 5s → 3s. Still celebratory, less dead time.
+19. ✅ **Rotating wrap-up phrases** — 5 variants replacing hardcoded "Nice work! You're learning so fast." No consecutive repeats.
+
 ## Upcoming: Asset Replacement
 
 - **Character animation frames** — Replace 7 static Max PNGs with animation frames per expression
@@ -66,13 +79,13 @@ Full spec: `.context/iteration-5-requirements.md`
 - **On-demand doubts** — tap-to-speak outside structured conversation for ad-hoc questions *(impl-plan-iter-2)*
 - ~~**ElevenLabs TTS switch**~~ ✅ Done — now using ElevenLabs Aria
 - **Personalized quiz** — AI-generated quiz based on conversation history and struggle areas *(feedback-iter-4)*
-- **Content authoring portal** — GUI for content team to drag/drop nodes *(feedback-iter-3)* **[FRAMEWORK DESIGNED — see `.context/framework-wip.md` and `content-inputs/`]**
+- **Content authoring portal** — GUI for content team to drag/drop nodes *(feedback-iter-3)* **[FRAMEWORK DESIGNED — see `.context/platform/` and `content-inputs/`]**
 
 ## Platform Scaling (Framework Designed, Build Deferred)
 
 Framework documentation and reference implementation complete:
-- `.context/framework-wip.md` — Client-friendly guide
-- `.context/framework-technical.md` — Technical spec
+- `.context/platform/framework-client-facing.md` — Client-friendly guide
+- `.context/platform/framework-technical.md` — Technical spec
 - `content-inputs/` — Reference content structure
 
 **Build phases when ready:**
@@ -81,4 +94,4 @@ Framework documentation and reference implementation complete:
 3. Content authoring GUI
 4. Analytics dashboard
 
-**Last updated:** 2026-02-11
+**Last updated:** 2026-02-16

@@ -12,7 +12,42 @@
 
 ## Spark (Minion)
 
-"Spark" is a small cute robot — dark blue/grey metallic body, orange accents, glowing cyan eyes. Goofy, curious, easily confused by fractions. Provides comic relief. NOT a teaching character — only appears at scripted moments (onboarding intro + goofy moments).
+"Spark" is a small cute robot — dark blue/grey metallic body, orange accents (headphones, antenna, joints), glowing cyan eyes with a smile, cyan chest light. Goofy, curious, easily confused by fractions. Provides comic relief. Think of Spark as the kid in class who means well but gets things hilariously wrong.
+
+NOT a teaching character — appears via `minionMoment` fields embedded in regular nodes (8 moments across the journey). Spark speaks FIRST, then Max responds. Positioned left of tutor at bottom-left, smaller than Max. Uses Aria voice (distinct female voice vs Max's Liam male voice).
+
+**Moment types (mixed throughout):**
+- Silly jokes / bad puns (pure comedy relief)
+- Silly noises / confusion (endearing confusion)
+- Misconception doubts (common student mistakes — Max corrects gently, teaching moment)
+- Hype / excitement (energy boost before milestones)
+
+**Implementation:** `minionMoment?: MinionMoment` on any Challenge node. Plays before preScript — Spark appears, speaks `minionLine`, Max responds with `tutorLine`, Spark hides, then normal flow continues. Name-agnostic field (`minionMoment`) so character can be renamed later.
+
+## Max Expression System
+
+7 expression states (static PNGs in `public/tutor-assets/Character/`, transparent background). Start with static image swaps; designed to be replaced with sprite animations later. Full-body character, positioned to overlap sidebar bottom edge.
+
+| File | Expression | Visual | When to use |
+|------|-----------|--------|-------------|
+| `Neutral.png` | Hands in pockets, calm smile | Default/idle | Narrating content, pre-challenge intros |
+| `Greeting.png` | Waving, open smile | Welcome | Onboarding welcome, start of session |
+| `Celebration.png` | Both fists raised, excited | Victory | Student correct, checkpoint complete, confetti |
+| `Encouragment.png` | Thumbs up with sparkle | Reinforcement | Positive reinforcement ("good try!"), partial correct |
+| `Giggling.png` | Hand over mouth laughing | Humor | Goofy moments, jokes, fun breaks |
+| `Listening.png` | Hand cupped to ear | Attentive | Student speaking (PTT held down) |
+| `Nudging.png` | Pointing forward, leaning in | Prompting | Prompting to respond, giving hints, scaffolding |
+
+**Phase-based mapping (code-driven, not LLM-driven):**
+- `greeting` phase / onboarding → `Greeting`
+- `pre_challenge` narration → `Neutral`
+- `in_challenge` (student watching) → `Neutral`
+- `post_challenge` (asking question) → `Nudging`
+- Student speaking (PTT active) → `Listening`
+- Student correct (`isCorrect: true`) → `Celebration`
+- Student incorrect / scaffolding → `Encouragement`
+- Goofy moment nodes → `Giggling`
+- Checkpoint summary → `Celebration`
 
 ## Session Flow
 
@@ -66,26 +101,30 @@
    - Incorrect/scaffolding: expression → `encouragement`
 
 ### Goofy Moments (nodes 5, 11)
-Pre-scripted fun breaks. No student interaction, auto-advance.
+Pre-scripted fun breaks. No student interaction, auto-advance. Placed as natural breathers between heavy content nodes (after applets, before new sections). A third placement after Node 12 was considered but not implemented.
 1. Max sets expression → `giggling`
 2. If Spark involved: show minion, speak Spark's line
 3. Speak tutor line
 4. Wait 1.5s → hide minion → advance
 
-### Checkpoints (nodes 7, 14, 19)
-Celebratory review after each learning objective group. Uses `getCheckpointPrompt()`.
+### Checkpoints (nodes 4, 8, 12, 15, 20)
+Celebratory review after each of 5 learning objective groups. Uses `getCheckpointPrompt()`. Dynamic slide fills content area with question pane layout (same pattern as FractionCompareSlide). Voice + tap interactions.
 1. Max sets expression → `celebration`
-2. Speaks summary of what was learned (preScript)
-3. Asks 1-2 review questions (PTT turns, max 4 turns)
-4. Confetti → advance
+2. Dynamic slide appears — visually summarizes concepts covered in that LO group
+3. Speaks summary of what was learned (preScript)
+4. Asks 1-2 review/recall questions — steers toward student articulating what they learned
+5. Confetti → advance
+**Design intent:** Questions are review/recall, not new teaching. Tone: celebratory + reflective ("look how much you've learned!"). Keep short — 3-4 turns max. LLM-driven (not fully scripted) so it feels natural.
 
-**3 Learning Objective Groups:**
-- LO1 (nodes 1-6): Equal parts, basic fraction notation
-- LO2 (nodes 8-13): Bigger fractions, numerator/denominator
-- LO3 (nodes 15-18): Applying fraction knowledge
+**5 Learning Objective Groups:**
+- LO1 (nodes 1-3): Equal parts, first fraction names
+- LO2 (nodes 5, 7): Comparing fractions, naming the numerator
+- LO3 (nodes 9-11): Building bigger fractions (numerator > 1)
+- LO4 (nodes 13-14): Fraction vocabulary — numerator and denominator
+- LO5 (nodes 16-19): Applying fraction knowledge, error spotting
 
 ### Completion
-Celebration screen after all 20 nodes complete.
+Celebration screen after all 21 nodes (0-20) complete.
 
 ## Socratic Scaffolding Strategy
 
@@ -113,7 +152,7 @@ The LLM returns structured JSON for each student response:
 
 Exit conversation when: `isCorrect === true` OR turn count reaches `maxTurns`.
 
-## 20 Nodes — Journey Map (Iteration 5)
+## 21 Nodes — Journey Map (0-20)
 
 See `src/config/challenges.ts` for complete definitions.
 
@@ -123,22 +162,23 @@ See `src/config/challenges.ts` for complete definitions.
 | 1 | slide | Why Fractions? | Narration, auto-advance |
 | 2 | video | What are Fractions? | Q: "ONE slice of 4?" → 1/4 |
 | 3 | applet | Cut and Glue Practice | Q: "Piece size?" → equal/same |
-| 4 | applet | Fraction Patterns | Q: "MORE pieces 1/4 or 1/6?" → 1/6 + dynamic slide |
-| 5 | **goofy** | Spark's Fraction Joke | Auto-play, Spark visible |
-| 6 | applet | Cake Fractions | Q: "Top number name?" → numerator |
-| 7 | **checkpoint** | Checkpoint LO1 | Review: equal parts, notation |
-| 8 | slide | What are Fractions? | Narration, auto-advance |
-| 9 | video | Bigger Fractions | Q: "2/4 top number?" → 2 pieces |
-| 10 | applet | Advanced Practice | Q: "3 of 5 colored?" → 3/5 |
-| 11 | **goofy** | Max's Fun Fact | Auto-play, no minion |
-| 12 | slide | Math Vault: Fraction Def | Narration, auto-advance |
-| 13 | slide | Numerator & Denominator | Narration, auto-advance |
-| 14 | **checkpoint** | Checkpoint LO2 | Review: bigger fractions, N/D |
-| 15 | slide | Discover More Fractions | Q: "2 of 6 slices?" → 2/6 |
-| 16 | video | You Did It! | Q: "Bottom number?" → denominator |
-| 17 | slide | Math Trap: Find Error | Q: "Which diagram wrong?" → 2/6 |
-| 18 | slide | Snapshot: More Parts | Narration, auto-advance |
-| 19 | **checkpoint** | Checkpoint LO3 | Review: applying fractions |
+| 4 | **checkpoint** | Level Up: Equal Parts! | Review: LO1 |
+| 5 | applet | Fraction Patterns | Q: "MORE pieces 1/4 or 1/6?" → 1/6 + dynamic slide |
+| 6 | **goofy** | Spark's Fraction Joke | Auto-play, Spark visible |
+| 7 | applet | Cake Fractions | Q: "Top number name?" → numerator |
+| 8 | **checkpoint** | Level Up: Fraction Expert! | Review: LO2 |
+| 9 | slide | What are Fractions? | Narration, auto-advance |
+| 10 | video | Bigger Fractions | Q: "2/4 top number?" → 2 pieces |
+| 11 | applet | Advanced Practice | Q: "3 of 5 colored?" → 3/5 |
+| 12 | **checkpoint** | Level Up: Fraction Builder! | Review: LO3 |
+| 13 | slide | Math Vault: Fraction Def | Narration, auto-advance |
+| 14 | slide | Numerator & Denominator | Narration, auto-advance |
+| 15 | **checkpoint** | Level Up: Vocabulary Master! | Review: LO4 |
+| 16 | slide | Discover More Fractions | Q: "2 of 6 slices?" → 2/6 |
+| 17 | video | You Did It! | Q: "Bottom number?" → denominator |
+| 18 | slide | Math Trap: Find Error | Q: "Which diagram wrong?" → 2/6 |
+| 19 | slide | Snapshot: More Parts | Narration, auto-advance |
+| 20 | **checkpoint** | Level Up: Fraction Master! | Review: LO5 |
 
 ## Challenge Types
 
@@ -266,13 +306,30 @@ Expanded the dynamic slide approach to ALL post-challenge questions across the j
 
 **Design:** All templates follow the 3-zone layout (Question pane / Visual area / Answer pane) and use the same CSS variables, animation patterns, and design system as FractionCompareSlide.
 
+**Voice-First Check Pattern:** All dynamic question slides use a voice-first check before showing the tap scaffold. Max asks the question verbally, the student answers via PTT, and the answer is checked against `correctnessFilter`. If correct, the slide auto-animates through scaffold/reveal frames without requiring taps. If wrong, the tap-based scaffold appears for interactive learning.
+
+**Scaffold Field:** The `scaffold` field in the Scaffolding type is optional. When present, it is used on turn 4 before the reveal. When absent, the reveal is used directly.
+
 ### Legacy: FractionCompareSlide (Node 4)
 
 The original `FractionCompareSlide` for Node 4 is preserved as-is. It uses the `hasDynamicSlide: true` flag and its own 5-frame state machine. The new templates use `dynamicSlideTemplate` + `dynamicSlideId` flags instead.
+
+## Voice System (Feb 16, 2026)
+
+Two distinct ElevenLabs voices for auditory differentiation:
+
+| Character | Voice | ID | Settings | Rationale |
+|-----------|-------|-----|----------|-----------|
+| **Max** | Liam (young male) | `TX3LPaxmHKxFdv7VOQHJ` | stability: 0.5, similarity: 0.75, style: 0.4 | Matches Max's teen boy scientist look |
+| **Spark** | Aria (expressive female) | `9BWtsMINqrJLrRacOk9x` | stability: 0.35, similarity: 0.7, style: 0.65 | Animated delivery, immediately distinct from Max |
+
+**Implementation:** `speakText(text, voice)` in `tts.ts` accepts `'max'` (default) or `'spark'`. `speakAsSpark()` helper in `useVoiceInteraction.ts` wraps all `minionLine` calls. All `tutorLine` uses default `speak()` (Max's voice). No extra API cost — same ElevenLabs tier.
+
+**Post-question wrap-up:** 5 rotating phrases (no consecutive repeats) replace the hardcoded "Nice work! You're learning so fast." after dynamic question confetti.
 
 ## Source Material
 
 Full conversation scripts with opening questions, teaching points, follow-ups, and exit phrases are in:
 `fractions-module-content/content-context-docs/mathmate-conversation-design.md`
 
-**Last updated:** 2026-02-11
+**Last updated:** 2026-02-16 (voice differentiation added)
