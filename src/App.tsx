@@ -2,6 +2,7 @@ import { useEffect, useState, useRef, useCallback } from 'react';
 import { useSessionStore } from './store/sessionStore';
 import { useVoiceInteraction } from './hooks/useVoiceInteraction';
 import { useMicrophone } from './hooks/useMicrophone';
+import { LoadingScreen } from './components/LoadingScreen';
 import { WelcomeScreen } from './components/WelcomeScreen';
 import { YouTubePlayer } from './components/YouTubePlayer';
 import { AppletContainer } from './components/AppletContainer';
@@ -60,6 +61,7 @@ function App() {
 
   const { requestPermission } = useMicrophone();
 
+  const [isLoading, setIsLoading] = useState(true);
   const [isWelcome, setIsWelcome] = useState(true);
 
   // Track whether Max is mid-portal-animation — interactions wait for this
@@ -240,6 +242,7 @@ function App() {
     hasRunDynamicQuestion.current = null;
     setIsTutorEntering(true);
     resetSession();
+    setIsLoading(true);
     setIsWelcome(true);
   };
 
@@ -262,6 +265,11 @@ function App() {
   const handleOptionTap = (index: number) => {
     updateQuestionSlideState({ selectedIndex: index });
   };
+
+  // Render loading screen (asset preloader)
+  if (isLoading) {
+    return <LoadingScreen onComplete={() => setIsLoading(false)} />;
+  }
 
   // Render welcome screen
   if (isWelcome) {
