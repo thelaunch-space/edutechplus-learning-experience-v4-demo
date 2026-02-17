@@ -1,5 +1,5 @@
-import { getAdventureHookPrompt, getBridgeTransitionPrompt, getEvaluationPrompt, getCheckpointPrompt } from '../config/prompts';
-import type { Message, EvaluationResult, Scaffolding } from '../types';
+import { getNameAcknowledgmentPrompt, getSparkGoofyResponsePrompt, getEvaluationPrompt, getCheckpointPrompt, getMicroConversationPrompt } from '../config/prompts';
+import type { Message, EvaluationResult, Scaffolding, MicroConversationType } from '../types';
 
 // Anthropic API — direct browser access with CORS header
 const ANTHROPIC_API_URL = 'https://api.anthropic.com/v1/messages';
@@ -173,55 +173,70 @@ export async function generateEvaluatedResponse(
   return { response: content, isCorrect: clientSideCorrect, shouldEnd: clientSideCorrect };
 }
 
-// Beat 3: Adventure Hook
-export async function generateAdventureHook(studentName: string): Promise<string> {
-  const fallback = `Hey ${studentName}! You, me, and Spark are going on a fraction adventure today! We're gonna slice pizza, share cake, and solve cool fraction puzzles — it's gonna be so fun! What's your favorite thing to eat?`;
+// Beat 4: Name Acknowledgment — Max greets student by name
+export async function generateNameAcknowledgment(studentName: string): Promise<string> {
+  const fallback = `Hey ${studentName}, awesome to meet you!`;
 
   const result = await callAnthropic(
-    getAdventureHookPrompt(studentName),
-    [{ role: 'user', content: `Student just said their name. Their name is: ${studentName}. Greet them and pitch the adventure!` }],
-    60,
+    getNameAcknowledgmentPrompt(studentName),
+    [{ role: 'user', content: `Student's name is: ${studentName}. Greet them warmly!` }],
+    40,
     0.8
   );
 
   if (result) {
     const cleaned = stripEmojis(result.replace(/^["']|["']$/g, ''));
-    console.log('🎯 Adventure Hook response:', cleaned);
+    console.log('🎯 Name Acknowledgment response:', cleaned);
     return cleaned || fallback;
   }
   return fallback;
 }
 
-// Beat 4: Bridge + Transition
-export async function generateBridgeTransition(
-  studentName: string,
-  studentResponse: string,
-  conversationHistory: Message[] = []
-): Promise<string> {
-  const fallback = `That's awesome! Alright ${studentName}, Spark's getting impatient — let's jump into our fraction adventure!`;
+// Beat 6: Spark Goofy Response — Spark responds to student with silliness
+export async function generateSparkGoofyResponse(studentName: string, studentSaid: string): Promise<string> {
+  const fallback = `Beep boop! Hi ${studentName}! I tried to wave but my arm fell off! Hehe!`;
 
-  if (!studentResponse.trim()) {
-    return `No worries! You're gonna love this once we get started. Let's jump in, ${studentName}!`;
+  if (!studentSaid.trim()) {
+    return "Beep boop! Hmm, I think my ears are broken!";
   }
 
-  const messages: { role: 'user' | 'assistant'; content: string }[] = [
-    ...conversationHistory.map(m => ({ role: m.role as 'user' | 'assistant', content: m.content })),
-    { role: 'user' as const, content: `Student name: ${studentName}. Student just said: "${studentResponse}". Acknowledge and transition to the lesson!` }
-  ];
-
   const result = await callAnthropic(
-    getBridgeTransitionPrompt(studentName),
-    messages,
-    100,
-    0.7
+    getSparkGoofyResponsePrompt(studentName),
+    [{ role: 'user', content: `Student said to Spark: "${studentSaid}"` }],
+    40,
+    0.9
   );
 
   if (result) {
     const cleaned = stripEmojis(result.replace(/^["']|["']$/g, ''));
-    console.log('🎯 Bridge Transition response:', cleaned);
+    console.log('🎯 Spark Goofy response:', cleaned);
     return cleaned || fallback;
   }
   return fallback;
+}
+
+export async function generateMicroConversationResponse(
+  studentResponse: string,
+  studentName: string,
+  context: string,
+  transitionTo: string,
+  microType: MicroConversationType,
+  fallback: string
+): Promise<string> {
+  try {
+    const systemPrompt = getMicroConversationPrompt(studentName, context, transitionTo, microType);
+    const result = await callAnthropic(
+      systemPrompt,
+      [{ role: 'user', content: studentResponse || '(no response)' }],
+      60,
+      0.8
+    );
+    const cleaned = stripEmojis(result ?? '').trim();
+    return cleaned || fallback;
+  } catch (error) {
+    console.warn('[MicroConversation] LLM failed, using fallback:', error);
+    return fallback;
+  }
 }
 
 export async function generateCheckpointResponse(

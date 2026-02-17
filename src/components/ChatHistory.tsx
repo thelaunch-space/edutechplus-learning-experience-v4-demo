@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { ChatMessage } from './ChatMessage';
 import type { ChatMessage as ChatMessageType } from '../store/sessionStore';
 import type { VoiceState } from '../types';
@@ -37,14 +37,25 @@ export function ChatHistory({ messages, currentMessage, voiceState }: ChatHistor
     <div className={styles.container} ref={scrollRef}>
       <div className={styles.messageList}>
         <div className={styles.spacer} />
-        {messages.map((msg) => (
-          <ChatMessage
-            key={msg.id}
-            role={msg.role}
-            content={msg.content}
-            isCurrentMessage={msg.content === currentMessage}
-          />
-        ))}
+        {messages.map((msg, index) => {
+          const prevMsg = index > 0 ? messages[index - 1] : null;
+          const showSeparator = prevMsg && prevMsg.nodeIndex !== msg.nodeIndex;
+
+          return (
+            <React.Fragment key={msg.id}>
+              {showSeparator && (
+                <div className={styles.nodeSeparator}>
+                  <span className={styles.separatorLine} />
+                </div>
+              )}
+              <ChatMessage
+                role={msg.role}
+                content={msg.content}
+                isCurrentMessage={msg.content === currentMessage}
+              />
+            </React.Fragment>
+          );
+        })}
         {/* Show word-by-word reveal for current message if not yet in history */}
         {showCurrentMessage && (
           <ChatMessage

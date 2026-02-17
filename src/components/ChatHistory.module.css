@@ -92,6 +92,22 @@
   color: rgba(255, 255, 255, 0.6);
 }
 
+/* Node separator — subtle line between different learning nodes */
+.nodeSeparator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 0;
+  margin: 4px 0;
+}
+
+.separatorLine {
+  display: block;
+  width: 60%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(0, 180, 255, 0.3), transparent);
+}
+
 /* Mobile adjustments */
 @media (max-width: 767px) {
   .container {

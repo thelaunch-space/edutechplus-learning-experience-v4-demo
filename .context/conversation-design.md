@@ -51,45 +51,46 @@ NOT a teaching character — appears via `minionMoment` fields embedded in regul
 
 ## Session Flow
 
-### Onboarding Phase (Node 0) — 5-Beat Structure (Feb 11 rewrite)
+### Onboarding Phase (Node 0) — 7-Beat FTUE Flow (Feb 17 rewrite)
 
-**Philosophy:** Scripted backbone, LLM intelligence at the joints. Script controls structure; LLM only fills in personalization. No open-ended loops.
+**Philosophy:** Scripted backbone, LLM intelligence at the joints. PTT training with visual FTUE hint. Spark gets a real interactive moment. Interface walkthrough before lesson starts.
 
-**5 Beats:**
+**7 Beats:**
 
-| Beat | What | Scripted/LLM | PTT? | Duration |
-|------|------|-------------|------|----------|
-| 1: Grand Entrance | Max + Spark intro (no fraction mention — save reveal for Beat 3) | Scripted | No | ~12s |
-| 2: Name Capture | "What's your name?" → hardened extractName() | Scripted | Yes (#1) | ~3s + PTT |
-| 3: Adventure Hook | Greet by name + pitch "fraction adventure" + learning outcomes + fun question | LLM (`generateAdventureHook`) | Yes (#2) | ~12s + PTT |
-| 4: Bridge + Transition | Acknowledge student response + build excitement + transition to lesson | LLM (`generateBridgeTransition`) | No | ~8s |
-| 5: Auto-advance | Hide minion, advance to Node 1 | Auto | No | instant |
+| Beat | What | Type | PTT? | LLM? |
+|------|------|------|------|------|
+| 1 | Max enters portal. Warm self-intro | Scripted | — | — |
+| 2 | PTT training: "Press the blue button like a walkie-talkie. Tell me your name!" + FTUE pulsing hint on button | Scripted | — | — |
+| 3 | Student says name (PTT #1). FTUE hint disappears. `extractName()` with retry | PTT | YES | — |
+| 4 | Max acknowledges name (LLM, 1 sentence). Spark slides in. "Say something to him!" | LLM + Scripted | — | YES |
+| 5 | Student talks to Spark (PTT #2) | PTT | YES | — |
+| 6 | Spark responds with goofy/silly LLM response (`speakAsSpark()`) | LLM | — | YES |
+| 7 | Max: interface walkthrough + lesson preview + "Let's gooo!" → auto-advance to Node 1 | Scripted | — | — |
 
-**Total: ~60-90 seconds, 2 PTT moments, 2 LLM calls.**
+**Total: ~40-45 seconds, 2 PTT moments, 2 LLM calls.**
 
-**Beat 3 prompt (`getAdventureHookPrompt`):** One-shot. MUST use "fraction adventure", MUST mention 2+ activities (pizza/cake/puzzles), MUST end with fun question. Plain text output (no JSON).
+**Beat 4 prompt (`getNameAcknowledgmentPrompt`):** Max greets by name. 1 sentence, under 15 words, no question, no Spark/fraction mention. Fallback: `"Hey [name], awesome to meet you!"`
 
-**Beat 4 prompt (`getBridgeTransitionPrompt`):** One-shot. MUST acknowledge what kid said, MUST transition. Handles curveballs: silly responses, reluctance, silence, off-topic. Plain text output (no JSON). MUST NOT ask another question.
+**Beat 6 prompt (`getSparkGoofyResponsePrompt`):** Spark persona. 1 sentence, under 20 words, must be silly/goofy/confused. Bad dad jokes, confused robot humor. Fallback empty: `"Beep boop! Hmm, I think my ears are broken!"`. Fallback LLM fail: `"Beep boop! Hi [name]! I tried to wave but my arm fell off! Hehe!"`
+
+**FTUE PTT Hint:** Pulsing blue ring + "Tap & hold to speak" label above PTT button. Appears on Beat 2, disappears when student starts recording on Beat 3. State: `showPTTHint` in sessionStore, passed to NavBar.
 
 **Name extraction (`extractName()`):** Hardened with garbage detection — catches single letters ("I"), common words ("no", "yes", "what", "um"), numbers, short gibberish. Re-asks once on failure, falls back to "Buddy".
 
-**Fallbacks per beat:**
-- Beat 3: `"Hey [Name]! You, me, and Spark are going on a fraction adventure today! We're gonna slice pizza, share cake, and solve cool fraction puzzles — it's gonna be so fun! What's your favorite thing to eat?"`
-- Beat 4: `"That's awesome! Alright [Name], Spark's getting impatient — let's jump into our fraction adventure!"`
-- Silent Beat 4: `"No worries! You're gonna love this once we get started. Let's jump in, [Name]!"`
+**Key design decisions (Feb 17):**
+- Spark NOT visible until Beat 4 (dramatic entrance when Max introduces him)
+- Student talks TO Spark (Beat 5) — real interactivity, not just watching
+- Interface walkthrough (Beat 7) sets expectations for what's coming
+- Fraction topic revealed naturally in Beat 7 walkthrough
 
 **Expression choreography:**
-- Beat 1: `greeting` (minion visible)
-- Beat 2: `greeting` (minion visible)
-- Beat 3 speaking: `celebration` → Beat 3 listening: `listening`
-- Beat 4: `giggling`
-- Beat 5: `neutral` (minion hides)
-
-**Key design decisions (Feb 11):**
-- Fraction topic reveal saved for Beat 3 (dramatic adventure pitch) — Beat 1 only introduces characters
-- LLM calls use plain text output (no JSON) — simpler, fewer parse failures
-- No while loop — exactly 2 LLM calls, linear flow
-- Each LLM call has ONE specific job (not multi-turn instructions)
+- Beat 1: `greeting` (Spark NOT visible)
+- Beat 2: `encouragement` (FTUE hint appears)
+- Beat 3: `listening` during PTT
+- Beat 4: `celebration` → `giggling` (Spark slides in)
+- Beat 5: `listening` during PTT
+- Beat 6: Spark speaking (via `speakAsSpark`)
+- Beat 7: `encouragement` → `neutral` (Spark hides, auto-advance)
 
 ### Per-Challenge Flow (video/applet/slide nodes)
 1. **PRE_CHALLENGE:** Max introduces content (scripted `preScript`, expression: `neutral`)
@@ -327,9 +328,42 @@ Two distinct ElevenLabs voices for auditory differentiation:
 
 **Post-question wrap-up:** 5 rotating phrases (no consecutive repeats) replace the hardcoded "Nice work! You're learning so fast." after dynamic question confetti.
 
+## Micro-Conversations (Feb 17, 2026)
+
+Single-turn LLM-powered exchanges injected into passive nodes to break dead zones. Each follows a fixed pattern — no loops, no follow-up questions.
+
+**Pattern:**
+1. Max asks a scripted question (TTS'd verbatim from `microConversation.prompt`)
+2. Student responds via PTT (1 turn)
+3. LLM generates 1 warm acknowledgment (60 token cap, no follow-up question)
+4. Flow continues normally
+
+**4 Micro-Conversation Types:**
+
+| Type | Purpose | LLM Instruction |
+|------|---------|-----------------|
+| `curiosity` | Prediction before new content | React with interest to their guess, don't reveal the answer |
+| `reaction` | After funny Spark moments | Laugh WITH them, share the moment, any answer works |
+| `recall` | Quick "do you remember?" check | If right: celebrate briefly. If wrong: give answer casually |
+| `personal` | Connect math to their world | React warmly to what THEY said, connect to fractions |
+
+**4 Injection Points (position field):**
+- `after_narration` — In `runSlideInteraction()`, after `slideNarration` on narration slides
+- `after_goofy` — In `runGoofyMomentInteraction()`, after Spark's minionLine
+- `after_minion` — In `runPreChallengeInteraction()`, after minionMoment plays
+- `after_prescript` — In `runPreChallengeInteraction()`, after preScript speaks
+
+**Configuration:** `microConversation?: MicroConversationConfig` on Challenge interface. Each config contains: `type`, `position`, `prompt` (scripted question), `context` (for LLM), `transitionTo` (for LLM bridging), `fallback` (if LLM fails/student silent).
+
+**LLM Prompt (`getMicroConversationPrompt`):** Type-specific instructions. Rules: 1 sentence under 20 words, no follow-up question, simple English, no emojis. Fallback if empty/nonsensical input.
+
+**Service Function:** `generateMicroConversationResponse()` in `openrouter.ts`. 60 max tokens, 0.8 temperature. Strips emojis. Falls back to config's `fallback` string on failure.
+
+**8 nodes with micro-conversations:** 1, 2, 6, 9, 10, 13, 14, 19.
+
 ## Source Material
 
 Full conversation scripts with opening questions, teaching points, follow-ups, and exit phrases are in:
 `fractions-module-content/content-context-docs/mathmate-conversation-design.md`
 
-**Last updated:** 2026-02-16 (voice differentiation added)
+**Last updated:** 2026-02-17 (7-beat FTUE onboarding rewrite)

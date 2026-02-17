@@ -8,9 +8,9 @@ export const challenges: Challenge[] = [
     type: 'onboarding',
     path: '',
     title: 'Meet Max & Spark',
-    duration: '1.5 min',
-    preScript: "Hey there! I'm Max, and I LOVE solving puzzles! Oh — and see this little guy? That's Spark! He's my robot buddy. He thinks he's super smart... but honestly, he gets confused by the silliest things. You'll see!",
-    postQuestion: "So, what's your name?",
+    duration: '2 min',
+    preScript: "Hey! I'm Max, your math tutor. I love teaching math — especially when it involves pizza and puzzles!",
+    postQuestion: '',
     contextInfo: 'Onboarding warm-up conversation. No assessment.',
     maxTurns: 5,
   },
@@ -24,7 +24,7 @@ export const challenges: Challenge[] = [
     title: 'Why Fractions?',
     duration: '1 min',
     preScript: "You know how sometimes you share food with friends? There's actually math behind fair sharing — and that's what we're learning today! Take a look.",
-    slideNarration: "Look at these friends sharing a cake! When you share food equally, you're already using fractions — you just didn't know it yet! Today we'll learn how to talk about halves, quarters, and more.",
+    slideNarration: '',  // Removed — slide visual already shows this info; preScript covers the intro
     postQuestion: '',
     contextInfo: 'Motivation slide showing why we learn fractions - sharing cake with friends.',
     correctnessFilter: '',
@@ -41,6 +41,14 @@ export const challenges: Challenge[] = [
       minionLine: "Wait wait wait... fractions? Is that like... fracturing a bone?!",
       tutorLine: "Ha! Not quite, Spark. But it IS about breaking things into pieces! Let's find out.",
     },
+    microConversation: {
+      type: 'curiosity',
+      position: 'after_narration',
+      prompt: "Before we jump in — what do you think a fraction is? Just guess!",
+      context: "Opening slide about fractions. Student hasn't learned anything yet — this is a pure prediction to spark curiosity.",
+      transitionTo: "The next video will show fractions in everyday life (pizza, chocolate bars).",
+      fallback: "Love that you're thinking about it! Let's find out together!",
+    },
   },
   // Node 2: Video 1 — What are Fractions?
   {
@@ -51,19 +59,20 @@ export const challenges: Challenge[] = [
     youtubeId: 'kD3wbmePp_8',
     title: 'What are Fractions?',
     duration: '2.5 min',
-    preScript: "Now that you know fractions are about sharing, let's see it in action! In this video, you'll watch a pizza get sliced up — and you'll learn a really cool math name for each slice. Pay attention!",
+    preScript: '',  // Removed — micro-conversation prompt serves as the intro before the video
     postQuestion: "You just learned that fractions have special names. If a pizza is cut into 4 equal slices, what is the fraction name for ONE slice?",
     contextInfo: "This video teaches basic fraction concepts using pizza and cake examples. Kids learn that fractions are parts of a whole.",
     correctnessFilter: "one fourth|quarter|1/4|one-fourth|a fourth",
     dynamicSlideTemplate: 'fraction-builder',
     dynamicSlideId: 'node-2-pizza-slice',
+    wrapUp: "You named your first fraction — one-fourth! Pizza math is just the beginning!",
     scaffolding: {
       probe1: "Fractions have special names! When there are 4 equal pieces, what's the fraction name for just ONE piece?",
       probe2: "Think about the number FOUR. Each piece is called a 'fourth'. So what do we call ONE of them?",
       hint: "Think about it — one piece, out of four. Put those together!",
       reveal: "It's one-fourth! Or you can say 'one quarter'. That's the special fraction name. Great job!"
     },
-    maxTurns: 4
+    maxTurns: 4,
   },
   // Node 3: Applet A1 — Cut and Glue Practice
   {
@@ -73,12 +82,13 @@ export const challenges: Challenge[] = [
     path: '/fractions-module-content/applets/A1. M2-Fraction Cut and Glue Practice/index.html',
     title: 'Cut and Glue Practice',
     duration: '4 min',
-    preScript: "In the video, you saw that fractions need equal parts. Now it's your turn! Cut this paper into equal pieces — every piece has to be the same size.",
+    preScript: "In the video, you saw fractions need equal parts. Now it's your turn — cut this paper into pieces that are all the same size!",
     postQuestion: "When we make fractions, what do we need to remember about the size of the pieces?",
     contextInfo: "Interactive paper cutting activity. Kids practice making equal parts (halves, quarters). They use virtual scissors and glue.",
     correctnessFilter: "equal|same size|equal size",
     dynamicSlideTemplate: 'tap-to-select',
     dynamicSlideId: 'node-3-fair-share',
+    wrapUp: "Equal parts — that's the secret to fractions! Let's keep building.",
     scaffolding: {
       probe1: "If you share a chocolate bar with your friend, would it be fair if one piece is big and one tiny?",
       probe2: "When we share equally, what must be true about each piece?",
@@ -123,7 +133,7 @@ export const challenges: Challenge[] = [
     path: '/fractions-module-content/applets/A2.M2-Fraction Paper Cut Snapshot/index.html',
     title: 'Fraction Patterns',
     duration: '2 min',
-    preScript: "You've been cutting things into equal parts — nice! But what happens when you cut into MORE pieces? You'll see one-half, one-fourth, and one-sixth side by side.",
+    preScript: "You've been cutting things into equal parts — nice! But what happens when you cut into MORE pieces? Watch what happens to the SIZE of each piece.",
     postQuestion: "Which has MORE pieces - 1/4 or 1/6?",
     contextInfo: "Visual comparison of fractions 1/2, 1/4, 1/6. Correct answer: 1/6 has more pieces (6 pieces vs 4 pieces).",
     correctnessFilter: "1/6|one sixth|six|1 6",
@@ -154,6 +164,14 @@ export const challenges: Challenge[] = [
       minionLine: "I tried to eat 5/4 of a cake once... it didn't end well! My tummy hurt for DAYS!",
       showMinion: true,
     },
+    microConversation: {
+      type: 'reaction',
+      position: 'after_goofy',
+      prompt: "Ha! Poor Spark ate way too much pizza! What do you think happened to Spark's tummy?",
+      context: "Spark just did something funny with pizza — a goofy comedy moment. This is purely for laughs and bonding.",
+      transitionTo: "The next node introduces equal vs unequal parts with a visual applet.",
+      fallback: "Ha, Spark's tummy is NOT happy! Silly robot. Okay, let's keep going!",
+    },
   },
   // Node 7: Applet A3 — Cake Fractions
   {
@@ -163,12 +181,13 @@ export const challenges: Challenge[] = [
     path: '/fractions-module-content/applets/A3. M2-Fraction Statement Cake Snapshot/index.html',
     title: 'Cake Fractions',
     duration: '3 min',
-    preScript: "Did you know the top and bottom numbers in a fraction have special math names? This cake activity will show you — pay close attention!",
+    preScript: "You've been cutting and comparing fractions — now let's learn the special math names for the top and bottom numbers! This cake activity will show you.",
     postQuestion: "What do we call the top number in a fraction?",
     contextInfo: "Cake-based vocabulary lesson. Teaches: equal parts (same size pieces), numerator (top number), denominator (bottom number).",
     correctnessFilter: "numerator",
     dynamicSlideTemplate: 'multiple-choice',
     dynamicSlideId: 'node-6-fraction-anatomy',
+    wrapUp: "Numerator — now that's a powerful word! You're learning real math vocabulary!",
     scaffolding: {
       probe1: "In 3/4, the 3 is on top. It counts how many pieces you have. What's its special name?",
       probe2: "The top number has a fancy math name. It counts how many pieces you took. What could it be called?",
@@ -195,7 +214,7 @@ export const challenges: Challenge[] = [
     isCheckpoint: true,
     checkpointLO: 'LO2: Comparing fractions and naming the numerator',
     checkpointId: 'lo2',
-    maxTurns: 4,
+    maxTurns: 5,
     correctnessFilter: '1/4|one fourth|one quarter|one-fourth',
     scaffolding: {
       probe1: "You ate 1 slice. There are 4 total. How do we write that as a fraction?",
@@ -232,6 +251,14 @@ export const challenges: Challenge[] = [
       minionLine: "Oooh! I know this one! The numerator is the... um... the... hmm... I forgot!",
       tutorLine: "Almost, buddy! Let's watch this next part and it'll all make sense!",
     },
+    microConversation: {
+      type: 'recall',
+      position: 'after_minion',
+      prompt: "Quick — do you remember what we call the equal parts when we split something? Take a guess!",
+      context: "Student has seen equal vs unequal parts in previous nodes. Testing if they remember the concept before a hands-on applet.",
+      transitionTo: "The applet will let them build fractions by splitting shapes into equal parts.",
+      fallback: "They're called equal parts! You'll be a pro at this after the next activity.",
+    },
   },
   // Node 10: Video 2 — Bigger Fractions
   {
@@ -242,12 +269,13 @@ export const challenges: Challenge[] = [
     youtubeId: 'pag3P1l3Tdk',
     title: 'Bigger Fractions',
     duration: '1.9 min',
-    preScript: "So far, all our fractions had a one on top — one-fourth, one-sixth. But what happens when you take MORE than one piece? Watch this video to find out!",
+    preScript: "You just saw objects cut into equal parts — with MORE than one piece colored in! This video shows how fractions get bigger. Watch what the top number does!",
     postQuestion: "Look at the fraction 2/4. What does the top number tell us?",
     contextInfo: "Advanced concept: numerators greater than 1. Examples: 2/4 (two quarters), 3/6 (three sixths).",
-    correctnessFilter: "two|2|two pieces|2 pieces|2 parts|two parts",
+    correctnessFilter: "two pieces|2 pieces|two parts|2 parts|we have two|we have 2|it's two|it's 2|tells us two|tells us 2|means two|means 2",
     dynamicSlideTemplate: 'multiple-choice',
     dynamicSlideId: 'node-9-what-does-2-mean',
+    wrapUp: "Two pieces — you just read a fraction with a bigger numerator. Nice!",
     scaffolding: {
       probe1: "Look at 2/4. The top number is 2. What does that 2 tell us?",
       probe2: "If the top number is 2, how many pieces do you have?",
@@ -255,7 +283,15 @@ export const challenges: Challenge[] = [
       scaffold: "The top number is 2. How many pieces is that?",
       reveal: "Two pieces! The 2 on top means you have 2 pieces. Well done!"
     },
-    maxTurns: 5
+    maxTurns: 5,
+    microConversation: {
+      type: 'curiosity',
+      position: 'after_prescript',
+      prompt: "We're about to learn two big math words. Can you guess what the top number in a fraction might be called?",
+      context: "Student is about to learn numerator and denominator. This prediction prompt builds anticipation.",
+      transitionTo: "The slide will reveal that the top number is the numerator and the bottom is the denominator.",
+      fallback: "Ooh, tough one! Let's find out what it's called!",
+    },
   },
   // Node 11: Applet A4 — Advanced Practice
   {
@@ -265,16 +301,17 @@ export const challenges: Challenge[] = [
     path: '/fractions-module-content/applets/A4.M2-Fraction Cut and Glue Practice 2/index.html',
     title: 'Advanced Practice',
     duration: '3 min',
-    preScript: "In the video, you saw fractions like two-fourths and three-sixths. Now it's your turn — color pieces and write the fractions yourself!",
+    preScript: "In the video, you saw fractions like two-fourths and three-sixths — the top number got bigger! Now color pieces and write the fractions yourself.",
     postQuestion: "If you colored 3 pieces out of 5, what fraction is that?",
     contextInfo: "Advanced cutting practice. Kids create fractions like 2/5, 3/5. They should say both numerator and denominator.",
     correctnessFilter: "3/5|three fifths|three-fifths|3 over 5|three over five",
     dynamicSlideTemplate: 'fraction-builder',
     dynamicSlideId: 'node-10-build-fraction',
+    wrapUp: "Three-fifths! You're building fractions like a pro now!",
     scaffolding: {
       probe1: "You colored 3 pieces. Total is 5 pieces. How do we write that?",
       probe2: "Remember: colored pieces go on TOP, total pieces go on BOTTOM. What do you get?",
-      hint: "It's 3 over 5. How do we write that as a fraction?",
+      hint: "Count the colored pieces — that's your top number. Count ALL pieces — that's your bottom number.",
       scaffold: "Three on top, five on bottom. Say the fraction!",
       reveal: "It's 3/5! Three pieces out of five. Excellent effort!"
     },
@@ -292,7 +329,7 @@ export const challenges: Challenge[] = [
     path: '',
     title: 'Level Up: Fraction Builder!',
     duration: '2 min',
-    preScript: "You can build fractions with bigger numbers now! Quick check — let's see!",
+    preScript: "You went from one-on-top fractions all the way to two-fourths and three-fifths — that's a huge leap! Let's see how much stuck with a quick check.",
     postQuestion: "If you colored 2 pieces out of 5, what fraction is that?",
     contextInfo: 'Checkpoint reviewing LO3: building fractions with numerators > 1, reading fractions like 2/5, 3/5.',
     isCheckpoint: true,
@@ -303,7 +340,7 @@ export const challenges: Challenge[] = [
     scaffolding: {
       probe1: "You colored 2 pieces. Total is 5. How do we write that?",
       probe2: "Colored pieces on top, total on bottom. What do you get?",
-      hint: "It's 2 over 5. How do we say that as a fraction?",
+      hint: "Count the colored pieces — that's your top number. Count ALL pieces — that's your bottom number.",
       reveal: "It's 2/5 — two-fifths! You're building fractions like a pro!"
     },
   },
@@ -329,7 +366,15 @@ export const challenges: Challenge[] = [
       reveal: ''
     },
     maxTurns: 0,
-    isQuestionSlide: false
+    isQuestionSlide: false,
+    microConversation: {
+      type: 'recall',
+      position: 'after_narration',
+      prompt: "Those are some big math words! I bet you remember one — what's the top number of a fraction called?",
+      context: "Student just heard the formal definition of fractions including numerator and denominator terms.",
+      transitionTo: "The next slide visually breaks down numerator and denominator using 1/4 as an example.",
+      fallback: "It's the numerator! That's a tough word — you'll remember it soon!",
+    },
   },
   // Node 14: Slide 4 — Numerator and Denominator
   {
@@ -358,6 +403,14 @@ export const challenges: Challenge[] = [
       minionLine: "Max... I keep forgetting which one is the numerator and which is the denominator...",
       tutorLine: "Easy trick — D for Down, D for Denominator! The denominator is always on the bottom.",
     },
+    microConversation: {
+      type: 'personal',
+      position: 'after_narration',
+      prompt: "So 1/4 means 1 part out of 4. Can you think of something you'd split into 4 pieces?",
+      context: "Student just saw 1/4 broken down visually. Connecting the abstract concept to their real world.",
+      transitionTo: "The next node is a goofy moment with Spark, then a checkpoint quiz on identifying fractions.",
+      fallback: "Pizza! Cake! Lots of yummy things come in four pieces. Let's keep going!",
+    },
   },
   // Node 15: Checkpoint LO4 — Fraction Vocabulary
   {
@@ -373,8 +426,8 @@ export const challenges: Challenge[] = [
     isCheckpoint: true,
     checkpointLO: 'LO4: Fraction vocabulary — numerator and denominator',
     checkpointId: 'lo4',
-    maxTurns: 4,
-    correctnessFilter: 'three|3|three pieces|3 pieces|how many|parts we have',
+    maxTurns: 5,
+    correctnessFilter: 'three pieces|3 pieces|three parts|3 parts|we have three|we have 3|it\'s three|it\'s 3|means three|means 3',
     scaffolding: {
       probe1: "The top number in a fraction counts something. What does the 3 count?",
       probe2: "Remember, the numerator tells us how many pieces we HAVE.",
@@ -392,16 +445,17 @@ export const challenges: Challenge[] = [
     slideUrl: '/fractions-module-content/slides/slide-5-discover-more-fractions.png',
     title: 'Discover More Fractions',
     duration: '2 min',
-    preScript: "You've been doing brilliantly! Here's a picture of a pizza — look carefully and see if you can figure out the fraction.",
+    preScript: "You just learned numerator and denominator — now use those words! Here's a pizza. Count the slices and build the fraction.",
     postQuestion: "If you have 2 slices out of 6 total slices, what fraction is that?",
     contextInfo: 'Quick check question - student should identify 2/6 as the fraction.',
     correctnessFilter: "2/6|two sixths|two-sixths|2 over 6|two over six",
     dynamicSlideTemplate: 'fraction-builder',
     dynamicSlideId: 'node-15-pizza-builder',
+    wrapUp: "Two-sixths! You can read any fraction now — almost there!",
     scaffolding: {
       probe1: "You have 2 slices. There are 6 total. Which number goes on top?",
       probe2: "The pieces you have go on top. The total goes on bottom. What do you get?",
-      hint: "It's 2 over 6. How do we write that as a fraction?",
+      hint: "Look at the pizza — count your slices, count all slices. Stack them!",
       scaffold: "Two on top, six on bottom. Say the fraction!",
       reveal: "It's 2/6! Two slices out of six. Great job!"
     },
@@ -417,16 +471,17 @@ export const challenges: Challenge[] = [
     youtubeId: '6M7MIfeL7ak',
     title: 'You Did It!',
     duration: '30 sec',
-    preScript: "You're almost at the finish line! Before we wrap up, here's a little surprise. Watch this!",
+    preScript: "You've sliced pizza, colored shapes, caught a sneaky math trap, and learned real math vocabulary — you've earned this! Watch this celebration video, then one final review question.",
     postQuestion: "Quick review! What's the bottom number called?",
     contextInfo: "Celebration video. End of session. Kid should feel accomplished and proud.",
     correctnessFilter: "denominator",
     dynamicSlideTemplate: 'multiple-choice',
     dynamicSlideId: 'node-16-bottom-number',
+    wrapUp: "Denominator — you remembered! You really are a fraction expert!",
     scaffolding: {
       probe1: "In 3/4, the 4 is on the bottom. It shows total pieces. What's its name?",
       probe2: "The bottom number tells you how many total pieces there are. What's the math word for that?",
-      hint: "You already know 'numerator' for the top. The bottom one sounds a bit similar — it names the total parts!",
+      hint: "Remember Spark's trick? D for Down, D for Denominator! What's the name for the bottom number?",
       reveal: "It's the denominator! The bottom number showing total pieces. Amazing work today!"
     },
     maxTurns: 4,
@@ -450,6 +505,7 @@ export const challenges: Challenge[] = [
     correctnessFilter: "2/6|two sixths|second|bottom|six",
     dynamicSlideTemplate: 'tap-to-select',
     dynamicSlideId: 'node-17-math-detective',
+    wrapUp: "You spotted the error! Nothing gets past you. One more to go!",
     scaffolding: {
       probe1: "Count the shaded parts in each diagram. Do they match the fractions written?",
       probe2: "Look carefully - does 2/6 really have 2 out of 6 parts shaded?",
@@ -487,6 +543,14 @@ export const challenges: Challenge[] = [
       minionLine: "WE DID IT! WE DID IT! We're fraction masters! ...Right, Max?",
       tutorLine: "Almost there, Spark! One last checkpoint and then you're officially a Fraction Master!",
     },
+    microConversation: {
+      type: 'curiosity',
+      position: 'after_narration',
+      prompt: "Here's a tricky one — which do you think is bigger, 1/2 or 1/4? What's your gut feeling?",
+      context: "Student is being introduced to comparing fractions. This is a prediction before they learn the visual method.",
+      transitionTo: "The next interactive applet will let them visually compare fraction sizes.",
+      fallback: "That's a brain-tickler! Let's find out together in the next activity!",
+    },
   },
   // Node 20: Checkpoint LO5 — Fraction Master
   {
@@ -502,12 +566,12 @@ export const challenges: Challenge[] = [
     isCheckpoint: true,
     checkpointLO: 'LO5: Applying fraction knowledge',
     checkpointId: 'lo5',
-    maxTurns: 4,
+    maxTurns: 5,
     correctnessFilter: '2/6|two sixths|two-sixths|2 over 6',
     scaffolding: {
       probe1: "You ate 2 pieces. Total is 6. What fraction is that?",
       probe2: "Pieces you ate go on top. Total pieces on bottom.",
-      hint: "It's 2 over 6. How do we say that?",
+      hint: "Pieces you ate go on top. Total pieces go on bottom. Say it!",
       scaffold: "Two pieces out of six — put that together as a fraction!",
       reveal: "It's 2/6 — two-sixths! You're a fraction master!"
     },

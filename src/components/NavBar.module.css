@@ -69,6 +69,65 @@
   opacity: 1;
 }
 
+/* FTUE hint wrapper */
+.pttWrapper {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.ftueHint {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translate(-50%, 0);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.ftueRing {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  border: 3px solid rgba(59, 130, 246, 0.6);
+  animation: ftuePulse 1.5s ease-in-out infinite;
+  top: calc(50% + 30px);
+}
+
+.ftueLabel {
+  position: absolute;
+  top: -36px;
+  white-space: nowrap;
+  background: rgba(15, 23, 42, 0.85);
+  color: #e0f2fe;
+  font-family: 'Nunito', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 6px 14px;
+  border-radius: 20px;
+  border: 1px solid rgba(59, 130, 246, 0.4);
+  box-shadow: 0 0 12px rgba(59, 130, 246, 0.3);
+}
+
+@keyframes ftuePulse {
+  0%, 100% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0.6;
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.25);
+    opacity: 1;
+  }
+}
+
 /* PTT circular button — centered */
 .pttButton {
   width: 60px;

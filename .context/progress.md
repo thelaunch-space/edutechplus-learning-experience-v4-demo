@@ -398,10 +398,88 @@ Claude has been repeatedly messing up the onboarding conversation design. Multip
 
 **Files modified:** `tts.ts`, `useVoiceInteraction.ts`, `challenges.ts`, `Confetti.tsx`
 
+### UI Overhaul v2 — 3-Panel Layout (Feb 16-17, 2026)
+
+**Branch:** `ui-overhaul-v2`
+
+**Committed (48b2848):**
+- 3-panel layout: top-panel (decorative header) + center-panel (content with frame border) + bottom-panel (NavBar)
+- Animated sprite characters: Max (7 expressions × 60 frames each) + Spark (4 expressions × 60 frames)
+- SpriteAnimator component with preloading, crossfade transitions, RAF-based animation loop
+- TutorCharacter with portal entry animation (75 frames at 30fps = 2.5s)
+- New assets in `/tutor-assets/new/`: main-bg.jpg, center-panel.png, center-panel-bg.jpg, top-panel.png, bottom-panel.png, tutor-sprites/, spark-sprites/, tutor-entry/
+- `isTutorEntering` gating: portal must complete before voice interactions start
+- Chat node separators in ChatHistory (visual dividers between learning nodes)
+
+**Uncommitted CSS fix (Feb 17):**
+- ✅ Center panel background overflow — added `overflow: hidden; border-radius: 12px` to `.centerPanel`, increased `.contentPane` border-radius to 12px. Prevents dotted grid (`center-panel-bg.jpg`) from bleeding past frame image corners.
+
+**🔴 OPEN BUG: Character visibility during goofy/minion moments**
+- Max and Spark characters disappear during goofy moments and minionMoment interactions
+- Characters ARE visible during onboarding
+- Sprites load successfully (200 status in Network tab, ~355kB each)
+- Code logic verified correct: `tutorVisible=true` throughout, `showMinion=true` set properly, z-index hierarchy correct (characterArea=20 > sidebar=10 > rightSide=5)
+- **Root cause unknown — needs DevTools Elements panel inspection.** Suspected CSS issue: stacking context, positioning, or clipping. NOT a logic bug.
+- **Next step:** Right-click bottom-left during goofy moment → Inspect → check if characterArea/minionArea divs exist with non-zero dimensions
+
+**Portal animation timing:** Verified correct, no changes needed. `isTutorEntering` properly gates all phase-transition effects.
+
+### Tier 2: Micro-Conversations (Feb 17, 2026) ✅
+
+**Goal:** Break 5 "dead zones" where students hear 5-8 consecutive AI speeches with zero input. Add LLM-powered single-turn micro-conversations to 8 passive nodes.
+
+**Pattern:** Max asks (scripted TTS) → Student speaks (1 PTT) → LLM acknowledges (1 Haiku call, 60 tokens max) → flow continues. No loops, no follow-up questions.
+
+**8 micro-conversations added:**
+
+| Node | Type | Position | Dead Zone Fixed |
+|------|------|----------|----------------|
+| 1 (Slide: Why Fractions?) | curiosity | after_narration | DZ1 |
+| 2 (Video: What are Fractions?) | personal | after_prescript | DZ1 |
+| 6 (Goofy: Spark's Joke) | reaction | after_goofy | DZ2 |
+| 9 (Slide: What are Fractions?) | recall | after_minion | DZ3 |
+| 10 (Video: Bigger Fractions) | curiosity | after_prescript | DZ3 |
+| 13 (Slide: Fraction Definition) | recall | after_narration | DZ4 |
+| 14 (Slide: Numerator & Denominator) | personal | after_narration | DZ4 |
+| 19 (Slide: Snapshot: More Parts) | curiosity | after_narration | DZ5 |
+
+**Files modified:**
+- `src/types/index.ts` — Added `MicroConversationType`, `MicroConversationPosition`, `MicroConversationConfig` types + `microConversation?` field on Challenge
+- `src/config/prompts.ts` — Added `getMicroConversationPrompt()` with 4 type-specific instruction sets
+- `src/services/openrouter.ts` — Added `generateMicroConversationResponse()` (60 token cap, 0.8 temp)
+- `src/config/challenges.ts` — Added `microConversation` configs to 8 nodes
+- `src/hooks/useVoiceInteraction.ts` — Added `runMicroConversation()` helper + 4 injection points (after_narration in slides, after_goofy in goofy, after_minion and after_prescript in pre-challenge)
+
+**Result:** Every dead zone broken. Every zero-input node gets 1 PTT moment. Longest passive stretch drops from 8 speeches (~2 min) to 3 speeches (~20s). 8 additional Haiku calls per session.
+
+### FTUE Onboarding Rewrite — 7-Beat Flow (Feb 17, 2026)
+
+**Problem:** Old 5-beat onboarding lacked PTT training, gave Spark no interactive moment, didn't explain the interface, didn't preview learning outcomes.
+
+**Solution:** 7-beat FTUE flow:
+
+| Beat | What | PTT? | LLM? |
+|------|------|------|------|
+| 1 | Max warm self-intro | — | — |
+| 2 | PTT training + FTUE pulsing hint on button | — | — |
+| 3 | Student says name (PTT #1), hint disappears | YES | — |
+| 4 | Max acknowledges name (LLM), Spark slides in | — | YES |
+| 5 | Student talks to Spark (PTT #2) | YES | — |
+| 6 | Spark responds with goofy LLM response | — | YES |
+| 7 | Interface walkthrough + "Let's gooo!" → auto-advance | — | — |
+
+**New prompts:** `getNameAcknowledgmentPrompt()` (1 sentence, 15 words), `getSparkGoofyResponsePrompt()` (silly robot persona, 20 words)
+**New service functions:** `generateNameAcknowledgment()` (temp 0.8, 40 tokens), `generateSparkGoofyResponse()` (temp 0.9, 40 tokens)
+**New UI state:** `showPTTHint` in sessionStore → pulsing ring + label on PTT button during Beat 2
+**Dead code removed:** `getAdventureHookPrompt`, `getBridgeTransitionPrompt`, `generateAdventureHook`, `generateBridgeTransition`
+
+**Files modified:** `prompts.ts`, `openrouter.ts`, `useVoiceInteraction.ts`, `challenges.ts`, `sessionStore.ts`, `NavBar.tsx`, `NavBar.module.css`, `App.tsx`
+**Context files updated:** `conversation-design.md`, `progress.md`
+
 ### ⏳ Next Up
 
-1. **UI asset replacement** — Waiting for new character animations, ScreenFrame.png, Panel.png from design team
-2. **FTUE rewrite** — Deferred. Onboarding 5-beat structure works but could be more engaging
+1. **🔴 Fix character visibility bug** — DevTools investigation during goofy/minion moments (see open bug above)
+2. **UI asset replacement** — Waiting for new character animations, ScreenFrame.png, Panel.png from design team
 3. **useVoiceInteraction.ts refactor** — Split 1,543-line file into per-flow modules
 4. **Dead component cleanup** — Delete VideoPlayer, Waveform, VoiceInteraction, SlideViewer
 
@@ -445,4 +523,4 @@ Claude has been repeatedly messing up the onboarding conversation design. Multip
 
 See `.context/feature-wishlist.md` for detailed feature list.
 
-**Last updated:** 2026-02-16
+**Last updated:** 2026-02-17

@@ -35,6 +35,7 @@ function App() {
     tutorExpression,
     setTutorExpression,
     showMinion,
+    showPTTHint,
     checkpointFrame,
     questionSlideFrame,
     questionSlideState,
@@ -374,6 +375,7 @@ function App() {
               isPTTActive={voiceState === 'STUDENT_RECORDING'}
               showSkip={phase === 'IN_CHALLENGE' && (challenge?.type === 'video' || challenge?.type === 'applet')}
               voiceState={voiceState}
+              showPTTHint={showPTTHint}
             />
           </div>
         </div>

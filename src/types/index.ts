@@ -140,6 +140,18 @@ export const INITIAL_QUESTION_SLIDE_STATE: QuestionSlideState = {
   countedPieces: [],
 };
 
+export type MicroConversationType = 'curiosity' | 'reaction' | 'recall' | 'personal';
+export type MicroConversationPosition = 'after_narration' | 'after_goofy' | 'after_minion' | 'after_prescript';
+
+export interface MicroConversationConfig {
+  type: MicroConversationType;
+  position: MicroConversationPosition;
+  prompt: string;        // Max's scripted question (TTS'd verbatim)
+  context: string;       // Background for LLM to generate good acknowledgment
+  transitionTo: string;  // What comes next (so LLM can bridge naturally)
+  fallback: string;      // Used if LLM fails or student is silent
+}
+
 export interface Challenge {
   id: string;
   number: number;
@@ -152,6 +164,7 @@ export interface Challenge {
   hasDynamicSlide?: boolean;  // True if this challenge uses interactive dynamic slide for post-challenge
   dynamicSlideTemplate?: DynamicSlideTemplate;  // Which template to use for dynamic question slides
   dynamicSlideId?: string;   // Key into dynamicSlideContent config
+  wrapUp?: string;           // Node-specific wrap-up text after confetti
   title: string;
   duration: string;
   preScript: string;
@@ -166,6 +179,7 @@ export interface Challenge {
   checkpointId?: CheckpointId;
   goofyScript?: GoofyMomentScript;
   minionMoment?: MinionMoment;
+  microConversation?: MicroConversationConfig;
 }
 
 export interface EvaluationResult {

@@ -24,7 +24,7 @@ Math Mate is a voice-guided learning experience for Grade 4 fractions. An AI com
 | `src/services/tts.ts` | Text-to-speech service |
 | `src/store/sessionStore.ts` | Session state + conversation history (allMessages array) |
 | `src/types/index.ts` | TypeScript type definitions (includes `'slide'` content type) |
-| `src/App.tsx` | Main app with two-pane responsive layout, conditional chat visibility |
+| `src/App.tsx` | Main app with 3-panel layout (sidebar + top/center/bottom panels), character rendering, portal gating |
 | `src/components/ChatMessage.tsx` | WhatsApp-style chat bubbles (green for user, white for assistant) |
 | `src/components/ChatHistory.tsx` | Message list with auto-scroll, typing indicators |
 | `src/components/ChatPane.tsx` | Chat UI integrating history + PTT button |
@@ -33,6 +33,10 @@ Math Mate is a voice-guided learning experience for Grade 4 fractions. An AI com
 | `src/components/FractionCompareSlide/` | Dynamic interactive slide for Node 4 (5-frame state machine with tap interactions) |
 | `src/components/DynamicSlides/` | 3 reusable dynamic question slide templates: FractionBuilder, MultipleChoice, TapToSelect |
 | `src/config/dynamicSlideContent.ts` | Content configs for all 8 dynamic question slides (per-node visual + text definitions) |
+| `src/components/TutorCharacter.tsx` | Max character with 7 expressions, portal entry animation, crossfade transitions |
+| `src/components/MinionCharacter.tsx` | Spark robot companion with 4 expressions, slide-in entrance |
+| `src/components/SpriteAnimator/` | RAF-based sprite animation engine with preloading (used by both characters) |
+| `src/components/NavBar.tsx` | Bottom panel NavBar with PTT button and Skip/Next controls |
 | `src/components/` | Other React components with CSS Modules |
 
 ## Context Files

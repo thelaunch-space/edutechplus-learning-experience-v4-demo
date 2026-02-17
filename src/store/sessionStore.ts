@@ -14,6 +14,7 @@ export interface ChatMessage {
   role: 'user' | 'assistant';
   content: string;
   timestamp: number;
+  nodeIndex: number;
 }
 
 interface SessionState {
@@ -83,6 +84,10 @@ interface SessionState {
   showMinion: boolean;
   setShowMinion: (show: boolean) => void;
 
+  // FTUE PTT hint
+  showPTTHint: boolean;
+  setShowPTTHint: (show: boolean) => void;
+
   // Dynamic question slide state (for FractionBuilder, MultipleChoice, TapToSelect templates)
   questionSlideFrame: QuestionSlideFrame;
   setQuestionSlideFrame: (frame: QuestionSlideFrame) => void;
@@ -140,7 +145,8 @@ export const useSessionStore = create<SessionState>((set, get) => ({
         id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
         role,
         content,
-        timestamp: Date.now()
+        timestamp: Date.now(),
+        nodeIndex: state.currentChallengeIndex,
       }
     ]
   })),
@@ -207,6 +213,7 @@ export const useSessionStore = create<SessionState>((set, get) => ({
     tutorExpression: 'neutral',
     checkpointFrame: 'intro',
     showMinion: false,
+    showPTTHint: false,
     questionSlideFrame: 'question',
     questionSlideState: { ...INITIAL_QUESTION_SLIDE_STATE },
   }),
@@ -251,6 +258,10 @@ export const useSessionStore = create<SessionState>((set, get) => ({
   // Minion visibility
   showMinion: false,
   setShowMinion: (show) => set({ showMinion: show }),
+
+  // FTUE PTT hint
+  showPTTHint: false,
+  setShowPTTHint: (show) => set({ showPTTHint: show }),
 
   // Dynamic question slide state
   questionSlideFrame: 'question' as QuestionSlideFrame,

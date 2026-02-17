@@ -9,6 +9,7 @@ interface NavBarProps {
   isPTTActive: boolean;
   showSkip: boolean;
   voiceState: VoiceState;
+  showPTTHint?: boolean;
 }
 
 function getPTTImage(voiceState: VoiceState, isPTTActive: boolean): string {
@@ -17,7 +18,7 @@ function getPTTImage(voiceState: VoiceState, isPTTActive: boolean): string {
   return '/tutor-assets/new/Push.png';
 }
 
-export function NavBar({ onSkip, onPTTStart, onPTTEnd, showPTT, isPTTActive, showSkip, voiceState }: NavBarProps) {
+export function NavBar({ onSkip, onPTTStart, onPTTEnd, showPTT, isPTTActive, showSkip, voiceState, showPTTHint }: NavBarProps) {
   return (
     <div className={styles.navbar}>
       {/* Empty left side for balance */}
@@ -26,20 +27,28 @@ export function NavBar({ onSkip, onPTTStart, onPTTEnd, showPTT, isPTTActive, sho
       {/* PTT button — always centered */}
       <div className={styles.center}>
         {showPTT && (
-          <button
-            className={`${styles.pttButton} ${isPTTActive ? styles.pttActive : ''}`}
-            onPointerDown={onPTTStart}
-            onPointerUp={onPTTEnd}
-            onPointerLeave={onPTTEnd}
-            onContextMenu={(e) => e.preventDefault()}
-          >
-            <img
-              src={getPTTImage(voiceState, isPTTActive)}
-              alt="Hold to talk"
-              className={styles.pttImage}
-              draggable={false}
-            />
-          </button>
+          <div className={styles.pttWrapper}>
+            {showPTTHint && !isPTTActive && (
+              <div className={styles.ftueHint}>
+                <div className={styles.ftueRing} />
+                <div className={styles.ftueLabel}>Tap & hold to speak</div>
+              </div>
+            )}
+            <button
+              className={`${styles.pttButton} ${isPTTActive ? styles.pttActive : ''}`}
+              onPointerDown={onPTTStart}
+              onPointerUp={onPTTEnd}
+              onPointerLeave={onPTTEnd}
+              onContextMenu={(e) => e.preventDefault()}
+            >
+              <img
+                src={getPTTImage(voiceState, isPTTActive)}
+                alt="Hold to talk"
+                className={styles.pttImage}
+                draggable={false}
+              />
+            </button>
+          </div>
         )}
       </div>
 

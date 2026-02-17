@@ -58,6 +58,37 @@
 | No post-node wrap-up | After confetti, immediate advance to next node with no transitional beat | Added "Nice work! You're learning so fast. Let's keep going!" with `celebration` expression |
 | All template timeouts silent | Auto-complete on timeout just showed answer with no speech | Added timeout speech for all 3 templates: "No worries! Let me show you." / "Let me help! Watch..." |
 
+## Bugs Fixed — UI Overhaul v2 (Feb 17, 2026)
+
+| Bug | Cause | Fix |
+|-----|-------|-----|
+| Center panel background overflow | `.centerPanel` had no overflow clipping; dotted grid from `center-panel-bg.jpg` bled past frame image (`center-panel.png`) rounded corners | Added `overflow: hidden; border-radius: 12px` to `.centerPanel`, increased `.contentPane` border-radius from 6px to 12px |
+
+## 🔴 Open Bug — Character Visibility During Goofy/Minion Moments (Feb 17, 2026)
+
+**Symptom:** Max and Spark characters not visible during goofy nodes and minionMoment interactions. Characters ARE visible during onboarding.
+
+**What's been verified:**
+- Sprite images load successfully (200 status, ~355kB each)
+- Code logic correct: `tutorVisible=true`, `showMinion=true`, z-index hierarchy (characterArea=20 > sidebar=10 > rightSide=5)
+- Character DOM elements should exist (SpriteAnimator mounted, preloading frames)
+- Expression crossfade is only 250ms — not long enough to explain permanent invisibility
+- Portal animation timing correct (`isTutorEntering` gating works)
+
+**What hasn't been checked (needs DevTools):**
+- Are `.characterArea`/`.minionArea` divs present in DOM during goofy moments?
+- Do they have non-zero computed dimensions?
+- Are they positioned correctly (not off-screen)?
+- Is something creating an unexpected stacking context that covers them?
+- Is TutorCharacter stuck in `charState === 'hidden'` (returning null)?
+
+**Suspected causes:**
+- Stacking context issue from 3-panel layout covering characters despite z-index
+- Characters clipped by parent overflow
+- Component returning null due to unexpected state transition
+
+**Next step:** Right-click bottom-left area during goofy moment → Inspect Element → check characterArea computed styles.
+
 ## Known Issues (as of Feb 11, 2026)
 
 ### 🔴 Onboarding Flow — Conversation Design Failures
