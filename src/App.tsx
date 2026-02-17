@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import { useSessionStore } from './store/sessionStore';
 import { useVoiceInteraction } from './hooks/useVoiceInteraction';
 import { useMicrophone } from './hooks/useMicrophone';
@@ -61,6 +61,10 @@ function App() {
 
   const [isWelcome, setIsWelcome] = useState(true);
 
+  // Track whether Max is mid-portal-animation — interactions wait for this
+  const [isTutorEntering, setIsTutorEntering] = useState(true);
+  const prevTutorVisibleRef = useRef(true);
+
   // Guards to prevent React StrictMode from running effects twice
   const hasRunOnboarding = useRef(false);
   const hasRunPreChallenge = useRef<number | null>(null);
@@ -81,6 +85,31 @@ function App() {
   // Also show during question slide Q&A (nodes 15, 17 — type=slide with dynamicSlideTemplate)
   const showDynamicQuestionSlide = challenge?.type === 'slide' && challenge?.dynamicSlideTemplate && phase === 'IN_CHALLENGE';
 
+  // Determine character visibility — hide during video/applet playback
+  const isContentPlaying = phase === 'IN_CHALLENGE' && (challenge?.type === 'video' || challenge?.type === 'applet');
+  const tutorVisible = !isContentPlaying;
+
+  // When tutor goes from hidden → visible, mark as entering (animation starting)
+  useEffect(() => {
+    if (tutorVisible && !prevTutorVisibleRef.current) {
+      setIsTutorEntering(true);
+    }
+    prevTutorVisibleRef.current = tutorVisible;
+  }, [tutorVisible]);
+
+  // Called when TutorCharacter portal animation finishes
+  const handleTutorEntryComplete = useCallback(() => {
+    setIsTutorEntering(false);
+  }, []);
+
+  // Derive Spark expression from context (without touching voice hook)
+  const sparkExpression = (() => {
+    if (showConfetti) return 'celebration';
+    if (tutorExpression === 'giggling') return 'giggling';
+    if (tutorExpression === 'nudging') return 'nudging';
+    return 'neutral';
+  })();
+
   // Handle welcome screen start
   const handleStart = async () => {
     console.log('🎤 App: Requesting microphone permission...');
@@ -89,18 +118,19 @@ function App() {
     setPhase('ONBOARDING');
   };
 
-  // Auto-run onboarding interaction when phase changes to ONBOARDING
+  // Auto-run onboarding interaction — waits for portal animation to finish
   useEffect(() => {
     console.log(`🔄 App: Phase changed to ${phase}`);
-    if (phase === 'ONBOARDING' && !isWelcome && !hasRunOnboarding.current) {
+    if (phase === 'ONBOARDING' && !isWelcome && !hasRunOnboarding.current && !isTutorEntering) {
       console.log('🚀 App: Starting onboarding interaction');
       hasRunOnboarding.current = true;
       runOnboardingInteraction();
     }
-  }, [phase, isWelcome]);
+  }, [phase, isWelcome, isTutorEntering]);
 
   // Auto-run pre-challenge interaction OR slide interaction
   useEffect(() => {
+    if (isTutorEntering) return;
     if (phase === 'PRE_CHALLENGE') {
       const currentChallenge = getCurrentChallenge();
 
@@ -131,10 +161,11 @@ function App() {
         runPreChallengeInteraction();
       }
     }
-  }, [phase, currentChallengeIndex, getCurrentChallenge, runPreChallengeInteraction, runSlideInteraction, runDynamicQuestionInteraction]);
+  }, [phase, currentChallengeIndex, isTutorEntering, getCurrentChallenge, runPreChallengeInteraction, runSlideInteraction, runDynamicQuestionInteraction]);
 
   // Auto-run checkpoint interaction
   useEffect(() => {
+    if (isTutorEntering) return;
     if (phase === 'PRE_CHALLENGE') {
       const currentChallenge = getCurrentChallenge();
       if (currentChallenge?.type === 'checkpoint' && hasRunCheckpoint.current !== currentChallengeIndex) {
@@ -142,10 +173,11 @@ function App() {
         runCheckpointInteraction();
       }
     }
-  }, [phase, currentChallengeIndex]);
+  }, [phase, currentChallengeIndex, isTutorEntering]);
 
   // Auto-run goofy moment interaction
   useEffect(() => {
+    if (isTutorEntering) return;
     if (phase === 'PRE_CHALLENGE') {
       const currentChallenge = getCurrentChallenge();
       if (currentChallenge?.type === 'goofy' && hasRunGoofy.current !== currentChallengeIndex) {
@@ -153,10 +185,11 @@ function App() {
         runGoofyMomentInteraction();
       }
     }
-  }, [phase, currentChallengeIndex]);
+  }, [phase, currentChallengeIndex, isTutorEntering]);
 
   // Auto-run post-challenge interaction (or dynamic slide interaction)
   useEffect(() => {
+    if (isTutorEntering) return;
     if (phase === 'POST_CHALLENGE' && hasRunPostChallenge.current !== currentChallengeIndex) {
       const currentChallenge = getCurrentChallenge();
 
@@ -181,7 +214,7 @@ function App() {
         runPostChallengeInteraction();
       }
     }
-  }, [phase, currentChallengeIndex, getCurrentChallenge, runPostChallengeInteraction, runFractionCompareInteraction, runDynamicQuestionInteraction]);
+  }, [phase, currentChallengeIndex, isTutorEntering, getCurrentChallenge, runPostChallengeInteraction, runFractionCompareInteraction, runDynamicQuestionInteraction]);
 
   // Handle challenge completion
   const handleChallengeComplete = () => {
@@ -204,6 +237,7 @@ function App() {
     hasRunCheckpoint.current = null;
     hasRunGoofy.current = null;
     hasRunDynamicQuestion.current = null;
+    setIsTutorEntering(true);
     resetSession();
     setIsWelcome(true);
   };
@@ -260,91 +294,103 @@ function App() {
         />
       </div>
 
-      {/* Right side — MediaBox + NavBar */}
+      {/* Right side — 3-panel layout */}
       <div className={styles.rightSide}>
-       <div className={styles.mediaBoxWrapper}>
-        <img src="/tutor-assets/MediaBox.png" alt="" className={styles.mediaBoxImg} draggable={false} />
-        <div className={styles.contentPane}>
-          {/* Onboarding welcome content */}
-          {challenge?.type === 'onboarding' && <OnboardingWelcome />}
+        <div className={styles.panelStack}>
+          {/* Top panel */}
+          <div className={styles.topPanel} />
 
-          {/* Video content */}
-          {challenge?.type === 'video' && phase === 'IN_CHALLENGE' && (
-            challenge.youtubeId ? (
-              <YouTubePlayer videoId={challenge.youtubeId} onComplete={handleChallengeComplete} />
-            ) : null
-          )}
+          {/* Center panel — content area */}
+          <div className={styles.centerPanel}>
+            <div className={styles.contentPane}>
+              {/* Onboarding welcome content */}
+              {challenge?.type === 'onboarding' && <OnboardingWelcome />}
 
-          {/* Applet content */}
-          {challenge?.type === 'applet' && phase === 'IN_CHALLENGE' && (
-            <AppletContainer src={challenge.path} onComplete={handleChallengeComplete} />
-          )}
+              {/* Video content */}
+              {challenge?.type === 'video' && phase === 'IN_CHALLENGE' && (
+                challenge.youtubeId ? (
+                  <YouTubePlayer videoId={challenge.youtubeId} onComplete={handleChallengeComplete} />
+                ) : null
+              )}
 
-          {/* Slide content — static image (only if no dynamic template) */}
-          {challenge?.type === 'slide' && phase === 'IN_CHALLENGE' && !challenge.dynamicSlideTemplate && (
-            <div className={styles.slideContainer}>
-              <img src={challenge.slideUrl} alt={challenge.title} className={styles.slideImage} />
+              {/* Applet content */}
+              {challenge?.type === 'applet' && phase === 'IN_CHALLENGE' && (
+                <AppletContainer src={challenge.path} onComplete={handleChallengeComplete} />
+              )}
+
+              {/* Slide content — static image (only if no dynamic template) */}
+              {challenge?.type === 'slide' && phase === 'IN_CHALLENGE' && !challenge.dynamicSlideTemplate && (
+                <div className={styles.slideContainer}>
+                  <img src={challenge.slideUrl} alt={challenge.title} className={styles.slideImage} />
+                </div>
+              )}
+
+              {/* Checkpoint content */}
+              {challenge?.type === 'checkpoint' && challenge.checkpointId && (
+                <CheckpointSlide checkpointId={challenge.checkpointId} frame={checkpointFrame} />
+              )}
+
+              {/* Dynamic slide for Node with hasDynamicSlide */}
+              {showDynamicSlide && (
+                <FractionCompareSlide
+                  frame={dynamicSlideFrame}
+                  interactionState={slideInteractionState}
+                  onLeftTap={handleLeftTap}
+                  onRightTap={handleRightTap}
+                  onLeftHighlight={handleLeftHighlight}
+                  onRightHighlight={handleRightHighlight}
+                />
+              )}
+
+              {/* Dynamic question slides (new templates — FractionBuilder, MultipleChoice, TapToSelect) */}
+              {(showDynamicQuestion || showDynamicQuestionSlide) && challenge?.dynamicSlideTemplate && challenge?.dynamicSlideId && (
+                <DynamicSlideRenderer
+                  template={challenge.dynamicSlideTemplate}
+                  slideId={challenge.dynamicSlideId}
+                  frame={questionSlideFrame}
+                  state={questionSlideState}
+                  onPieceTap={handlePieceTap}
+                  onChoiceTap={handleChoiceTap}
+                  onOptionTap={handleOptionTap}
+                />
+              )}
+
+              {/* Static slide backdrop during POST_CHALLENGE Q&A for regular nodes */}
+              {phase === 'POST_CHALLENGE' && !showDynamicSlide && !showDynamicQuestion && challenge?.type !== 'checkpoint' && challenge?.slideUrl && (
+                <div className={styles.slideContainer}>
+                  <img src={challenge.slideUrl} alt={challenge.title} className={styles.slideImage} />
+                </div>
+              )}
             </div>
-          )}
+          </div>
 
-          {/* Checkpoint content */}
-          {challenge?.type === 'checkpoint' && challenge.checkpointId && (
-            <CheckpointSlide checkpointId={challenge.checkpointId} frame={checkpointFrame} />
-          )}
-
-          {/* Dynamic slide for Node with hasDynamicSlide */}
-          {showDynamicSlide && (
-            <FractionCompareSlide
-              frame={dynamicSlideFrame}
-              interactionState={slideInteractionState}
-              onLeftTap={handleLeftTap}
-              onRightTap={handleRightTap}
-              onLeftHighlight={handleLeftHighlight}
-              onRightHighlight={handleRightHighlight}
+          {/* Bottom panel — NavBar lives here */}
+          <div className={styles.bottomPanel}>
+            <NavBar
+              onSkip={handleSkip}
+              onPTTStart={handlePTTStart}
+              onPTTEnd={handlePTTEnd}
+              showPTT={voiceState === 'WAITING_FOR_STUDENT' || voiceState === 'STUDENT_RECORDING'}
+              isPTTActive={voiceState === 'STUDENT_RECORDING'}
+              showSkip={phase === 'IN_CHALLENGE' && (challenge?.type === 'video' || challenge?.type === 'applet')}
+              voiceState={voiceState}
             />
-          )}
-
-          {/* Dynamic question slides (new templates — FractionBuilder, MultipleChoice, TapToSelect) */}
-          {(showDynamicQuestion || showDynamicQuestionSlide) && challenge?.dynamicSlideTemplate && challenge?.dynamicSlideId && (
-            <DynamicSlideRenderer
-              template={challenge.dynamicSlideTemplate}
-              slideId={challenge.dynamicSlideId}
-              frame={questionSlideFrame}
-              state={questionSlideState}
-              onPieceTap={handlePieceTap}
-              onChoiceTap={handleChoiceTap}
-              onOptionTap={handleOptionTap}
-            />
-          )}
-
-          {/* Static slide backdrop during POST_CHALLENGE Q&A for regular nodes */}
-          {phase === 'POST_CHALLENGE' && !showDynamicSlide && !showDynamicQuestion && challenge?.type !== 'checkpoint' && challenge?.slideUrl && (
-            <div className={styles.slideContainer}>
-              <img src={challenge.slideUrl} alt={challenge.title} className={styles.slideImage} />
-            </div>
-          )}
+          </div>
         </div>
-
-        {/* Nav bar on the MediaBox panel */}
-        <NavBar
-          onSkip={handleSkip}
-          onPTTStart={handlePTTStart}
-          onPTTEnd={handlePTTEnd}
-          showPTT={voiceState === 'WAITING_FOR_STUDENT' || voiceState === 'STUDENT_RECORDING'}
-          isPTTActive={voiceState === 'STUDENT_RECORDING'}
-          showSkip={phase === 'IN_CHALLENGE' && (challenge?.type === 'video' || challenge?.type === 'applet')}
-        />
-       </div>
       </div>
 
       {/* Character at bottom-left */}
       <div className={styles.characterArea}>
-        <TutorCharacter expression={tutorExpression} />
+        <TutorCharacter
+          expression={tutorExpression}
+          visible={tutorVisible}
+          onEntryComplete={handleTutorEntryComplete}
+        />
       </div>
 
       {/* Minion to the left of character */}
       <div className={styles.minionArea}>
-        <MinionCharacter visible={showMinion} />
+        <MinionCharacter visible={showMinion} expression={sparkExpression} />
       </div>
     </div>
   );

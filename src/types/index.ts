@@ -9,7 +9,7 @@ export type SessionPhase =
 export type CheckpointFrame = 'intro' | 'question' | 'scaffold' | 'celebration';
 
 // Checkpoint identifiers
-export type CheckpointId = 'lo1' | 'lo2' | 'lo3';
+export type CheckpointId = 'lo1' | 'lo2' | 'lo3' | 'lo4' | 'lo5';
 
 // Dynamic slide frame states for FractionCompareSlide
 export type SlideFrame =
@@ -30,11 +30,18 @@ export interface SlideInteractionState {
 // Tutor expression states (maps to character PNGs)
 export type TutorExpression = 'neutral' | 'greeting' | 'celebration' | 'encouragement' | 'giggling' | 'listening' | 'nudging';
 
-// Goofy moment script
+// Goofy moment script (legacy standalone goofy nodes)
 export interface GoofyMomentScript {
   tutorLine: string;
   minionLine?: string;
   showMinion: boolean;
+}
+
+// Minion moment — embedded Spark interjection before a node's preScript
+// Minion speaks first, tutor responds. Plays before preScript.
+export interface MinionMoment {
+  minionLine: string;   // Spark/minion speaks first
+  tutorLine: string;    // Max/tutor responds
 }
 
 export type VoiceState =
@@ -50,7 +57,7 @@ export interface Scaffolding {
   probe1: string;      // Turn 1: Probing question
   probe2: string;      // Turn 2: Different probe angle
   hint: string;        // Turn 3: Directional hint
-  scaffold: string;    // Turn 4: Strong scaffold (fill-in-blank)
+  scaffold?: string;   // Turn 4: Strong scaffold (optional — some nodes skip straight to reveal)
   reveal: string;      // Turn 5: Warm answer reveal
 }
 
@@ -158,6 +165,7 @@ export interface Challenge {
   checkpointLO?: string;
   checkpointId?: CheckpointId;
   goofyScript?: GoofyMomentScript;
+  minionMoment?: MinionMoment;
 }
 
 export interface EvaluationResult {

@@ -1,4 +1,5 @@
 import styles from './NavBar.module.css';
+import type { VoiceState } from '../types';
 
 interface NavBarProps {
   onSkip: () => void;
@@ -7,9 +8,16 @@ interface NavBarProps {
   showPTT: boolean;
   isPTTActive: boolean;
   showSkip: boolean;
+  voiceState: VoiceState;
 }
 
-export function NavBar({ onSkip, onPTTStart, onPTTEnd, showPTT, isPTTActive, showSkip }: NavBarProps) {
+function getPTTImage(voiceState: VoiceState, isPTTActive: boolean): string {
+  if (isPTTActive) return '/tutor-assets/new/Push2.png';
+  if (voiceState === 'WAITING_FOR_STUDENT') return '/tutor-assets/new/Push1.png';
+  return '/tutor-assets/new/Push.png';
+}
+
+export function NavBar({ onSkip, onPTTStart, onPTTEnd, showPTT, isPTTActive, showSkip, voiceState }: NavBarProps) {
   return (
     <div className={styles.navbar}>
       {/* Empty left side for balance */}
@@ -26,7 +34,7 @@ export function NavBar({ onSkip, onPTTStart, onPTTEnd, showPTT, isPTTActive, sho
             onContextMenu={(e) => e.preventDefault()}
           >
             <img
-              src="/tutor-assets/Button.png"
+              src={getPTTImage(voiceState, isPTTActive)}
               alt="Hold to talk"
               className={styles.pttImage}
               draggable={false}
@@ -39,8 +47,18 @@ export function NavBar({ onSkip, onPTTStart, onPTTEnd, showPTT, isPTTActive, sho
       <div className={`${styles.side} ${styles.sideRight}`}>
         {showSkip && (
           <button className={styles.skipButton} onClick={onSkip}>
-            Next
-            <span className={styles.skipArrow}>&rarr;</span>
+            <img
+              src="/tutor-assets/new/buttonA1.png"
+              alt="Next"
+              className={styles.skipImage}
+              draggable={false}
+            />
+            <img
+              src="/tutor-assets/new/buttonA2.png"
+              alt="Next"
+              className={`${styles.skipImage} ${styles.skipImageHover}`}
+              draggable={false}
+            />
           </button>
         )}
       </div>

@@ -1,4 +1,4 @@
-import { MATH_MATE_SYSTEM_PROMPT, GREETING_SYSTEM_PROMPT, getAdventureHookPrompt, getBridgeTransitionPrompt, getContextPrompt, getEvaluationPrompt, getCheckpointPrompt, FALLBACK_RESPONSES } from '../config/prompts';
+import { getAdventureHookPrompt, getBridgeTransitionPrompt, getEvaluationPrompt, getCheckpointPrompt } from '../config/prompts';
 import type { Message, EvaluationResult, Scaffolding } from '../types';
 
 // Anthropic API — direct browser access with CORS header
@@ -80,51 +80,13 @@ async function callAnthropic(
   }
 }
 
-export async function generateResponse(
-  studentResponse: string,
-  studentName: string,
-  challengeNumber: number,
-  question: string,
-  contextInfo: string,
-  conversationHistory: Message[] = []
-): Promise<string> {
-  if (!studentResponse.trim()) return FALLBACK_RESPONSES.silent;
-
-  const contextPrompt = getContextPrompt(studentName, challengeNumber, question, contextInfo);
-  const systemPrompt = MATH_MATE_SYSTEM_PROMPT + '\n\n' + contextPrompt;
-
-  const messages: { role: 'user' | 'assistant'; content: string }[] = [
-    ...conversationHistory.map(m => ({ role: m.role as 'user' | 'assistant', content: m.content })),
-    { role: 'user' as const, content: `Student said: "${studentResponse}"` }
-  ];
-
-  const result = await callAnthropic(systemPrompt, messages, 50, 0.7);
-  if (result) {
-    console.log('Max response:', result);
-    return result;
-  }
-  return FALLBACK_RESPONSES.error;
-}
-
-export async function generateGreeting(studentName: string): Promise<string> {
-  const fallback = `Hi ${studentName || 'friend'}! Ready to learn fractions? We'll use yummy pizzas and cake!`;
-
-  const result = await callAnthropic(
-    GREETING_SYSTEM_PROMPT,
-    [{ role: 'user', content: `The student's name is "${studentName}".` }],
-    30,
-    0.7
-  );
-  return result || fallback;
-}
-
 // Helper to get the right scaffolding response based on turn
 function getScaffoldingForTurn(scaffolding: Scaffolding, turnNumber: number): string {
   switch (turnNumber) {
     case 0: return scaffolding.probe1;
     case 1: return scaffolding.probe2;
     case 2: return scaffolding.hint;
-    case 3: return scaffolding.scaffold;
+    case 3: return scaffolding.scaffold || scaffolding.reveal;
     default: return scaffolding.reveal;
   }
 }
@@ -205,7 +167,7 @@ export async function generateEvaluatedResponse(
       return { response: parsed.response || turnScaffolding, isCorrect, shouldEnd };
     }
   } catch (parseError) {
-    console.warn('Failed to parse JSON response:', parseError);
+    console.warn('Failed to parse JSON response:', parseError, '\nRaw content:', content);
   }
 
   return { response: content, isCorrect: clientSideCorrect, shouldEnd: clientSideCorrect };
@@ -299,7 +261,7 @@ export async function generateCheckpointResponse(
       };
     }
   } catch (parseError) {
-    console.warn('Failed to parse checkpoint JSON response:', parseError);
+    console.warn('Failed to parse checkpoint JSON response:', parseError, '\nRaw content:', content);
   }
 
   return { response: content, isCorrect: false, shouldEnd: false };

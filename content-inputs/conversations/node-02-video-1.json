@@ -6,15 +6,14 @@
     "isNarrationOnly": true
   },
   "postConversation": {
-    "question": "If a pizza has 4 equal slices, what do we call ONE slice?",
+    "question": "You just learned that fractions have special names. If a pizza is cut into 4 equal slices, what is the fraction name for ONE slice?",
     "correctnessFilter": "one fourth|quarter|1/4|one-fourth|a fourth",
     "scaffolding": {
       "probes": [
-        "Fractions have special names! When there are 4 equal pieces, what's the special name for just ONE piece?",
+        "Fractions have special names! When there are 4 equal pieces, what's the fraction name for just ONE piece?",
         "Think about the number FOUR. Each piece is called a 'fourth'. So what do we call ONE of them?",
-        "One piece out of four. The fraction name starts with 'one-f...'",
-        "The word is one-FOURTH. Can you say that?",
-        "It's one-fourth! Or you can say 'one quarter'. Great job!"
+        "Think about it — one piece, out of four. Put those together!",
+        "It's one-fourth! Or you can say 'one quarter'. That's the special fraction name. Great job!"
       ]
     },
     "isNarrationOnly": false

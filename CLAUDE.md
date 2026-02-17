@@ -2,7 +2,7 @@
 
 ## Quick Context
 
-Math Mate is a voice-guided learning experience for Grade 4 fractions. An AI companion guides students through 20 nodes (onboarding + videos + applets + slides + checkpoints + goofy moments) with multi-turn Socratic conversations, evaluating understanding and scaffolding when students struggle. Built for EdutechPlus B2C mobile app — no teacher present.
+Math Mate is a voice-guided learning experience for Grade 4 fractions. An AI companion guides students through 21 nodes (onboarding + videos + applets + slides + checkpoints + goofy moments) with multi-turn Socratic conversations, evaluating understanding and scaffolding when students struggle. Built for EdutechPlus B2C mobile app — no teacher present.
 
 ## Tech Stack
 
@@ -16,7 +16,7 @@ Math Mate is a voice-guided learning experience for Grade 4 fractions. An AI com
 
 | File | Purpose |
 |------|---------|
-| `src/config/challenges.ts` | 20 node definitions (onboarding, videos, applets, slides, checkpoints, goofy) with questions, correctness filters, scaffolding |
+| `src/config/challenges.ts` | 21 node definitions (onboarding, videos, applets, slides, checkpoints, goofy) with questions, correctness filters, scaffolding |
 | `src/config/prompts.ts` | LLM system prompts (Socratic evaluation) |
 | `src/hooks/useVoiceInteraction.ts` | Voice interaction + PTT + multi-turn loop + slide interaction |
 | `src/services/openrouter.ts` | Anthropic LLM service (Claude Haiku 4.5) — file retains legacy name |
@@ -28,7 +28,6 @@ Math Mate is a voice-guided learning experience for Grade 4 fractions. An AI com
 | `src/components/ChatMessage.tsx` | WhatsApp-style chat bubbles (green for user, white for assistant) |
 | `src/components/ChatHistory.tsx` | Message list with auto-scroll, typing indicators |
 | `src/components/ChatPane.tsx` | Chat UI integrating history + PTT button |
-| `src/components/SlideViewer.tsx` | Full-screen slide renderer for narration/question slides |
 | `src/components/YouTubePlayer.tsx` | YouTube embed with Skip button |
 | `src/components/AppletContainer.tsx` | iframe wrapper for interactive applets |
 | `src/components/FractionCompareSlide/` | Dynamic interactive slide for Node 4 (5-frame state machine with tap interactions) |
@@ -38,18 +37,29 @@ Math Mate is a voice-guided learning experience for Grade 4 fractions. An AI com
 
 ## Context Files
 
+### Evergreen (always relevant)
+
 | File | Read when... |
 |------|-------------|
 | `.context/prd.md` | You need product requirements, user persona, or architecture overview |
 | `.context/progress.md` | You need iteration history or current project status |
 | `.context/conversation-design.md` | You're touching voice/LLM logic, prompts, or challenge flow |
-| `.context/feedback.md` | You need client feedback context or decision rationale |
 | `.context/bugs-and-recurring-issues.md` | You're debugging or investigating unexpected behavior |
 | `.context/feature-wishlist.md` | You need to know what's planned or deferred |
 | `.context/learning-journey.md` | You need the complete content roadmap (20 nodes) and implementation status |
-| `.context/framework-wip.md` | You need to understand what content teams control (client-friendly doc) |
-| `.context/framework-technical.md` | You're building the scalable platform (schemas, architecture, migration) |
-| `.context/iteration-5-requirements.md` | You're working on Iteration 5 features (UI overhaul, onboarding, expressions, checkpoints) |
+
+### Per-iteration (scoped)
+
+| File | Read when... |
+|------|-------------|
+| `.context/client-feedback/iteration-*.md` | You need raw client feedback or meeting notes for a specific iteration |
+
+### Platform (deferred — future scalable build)
+
+| File | Read when... |
+|------|-------------|
+| `.context/platform/framework-client-facing.md` | You need to understand what content teams control (client-friendly doc) |
+| `.context/platform/framework-technical.md` | You're building the scalable platform (schemas, architecture, migration) |
 
 ## Dev Commands
 
@@ -80,4 +90,4 @@ Requires `.env` with: `VITE_DEEPGRAM_KEY`, `VITE_ANTHROPIC_KEY`, `VITE_ELEVENLAB
 
 ## ⚠️ Start-of-Session Reminder
 
-**Refactor `useVoiceInteraction.ts` first** — 1,543 lines, largest file by far. Contains all 6 interaction flows (onboarding, pre-challenge, post-challenge, dynamic question, checkpoint, goofy). Split into per-flow modules (e.g. `flows/onboarding.ts`, `flows/dynamicQuestion.ts`) before adding more features. Also delete 3 dead components: `VideoPlayer.tsx`, `Waveform.tsx`, `VoiceInteraction.tsx`.
+**Refactor `useVoiceInteraction.ts` first** — 1,543 lines, largest file by far. Contains all 6 interaction flows (onboarding, pre-challenge, post-challenge, dynamic question, checkpoint, goofy). Split into per-flow modules (e.g. `flows/onboarding.ts`, `flows/dynamicQuestion.ts`) before adding more features. Also delete 4 dead components: `VideoPlayer.tsx`, `Waveform.tsx`, `VoiceInteraction.tsx`, `SlideViewer.tsx` — plus dead exports (`generateGreeting`, `GREETING_PROMPT`, `goofyMoments.ts`, stale `SessionState` in types). See `.context/progress.md` "Dead Code Candidates" section for full list.

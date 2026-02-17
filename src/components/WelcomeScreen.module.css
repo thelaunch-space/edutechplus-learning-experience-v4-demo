@@ -7,7 +7,7 @@
   padding: clamp(16px, 5vw, 24px);
   position: relative;
   overflow: hidden;
-  background: url('/tutor-assets/BG.jpg') center center / cover no-repeat;
+  background: url('/tutor-assets/new/main-bg.jpg') center center / cover no-repeat;
 }
 
 .content {
