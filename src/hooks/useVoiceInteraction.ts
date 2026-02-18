@@ -63,8 +63,7 @@ function extractName(transcript: string): string {
 
 interface UseVoiceInteractionReturn {
   voiceState: VoiceState;
-  lastTranscript: string;
-  lastResponse: string;
+  currentSpeaker: 'max' | 'spark';
   displayedText: string; // Word-by-word revealed text
   error: string | null;
 
@@ -88,8 +87,7 @@ interface UseVoiceInteractionReturn {
 
 export function useVoiceInteraction(): UseVoiceInteractionReturn {
   const [voiceState, setVoiceState] = useState<VoiceState>('IDLE');
-  const [lastTranscript, setLastTranscript] = useState('');
-  const [lastResponse, setLastResponse] = useState('');
+  const [currentSpeaker, setCurrentSpeaker] = useState<'max' | 'spark'>('max');
   const [displayedText, setDisplayedText] = useState('');
   const [error, setError] = useState<string | null>(null);
 
@@ -127,8 +125,9 @@ export function useVoiceInteraction(): UseVoiceInteractionReturn {
   const speak = useCallback(async (text: string): Promise<void> => {
     try {
       console.log('🎤 Voice: Max speaking:', text.substring(0, 50) + '...');
+      setCurrentSpeaker('max');
       setVoiceState('MATH_MATE_SPEAKING');
-      setLastResponse(text);
+
       setDisplayedText(''); // Clear previous text
 
       // DON'T add to chat history here - wait until speaking is done
@@ -157,7 +156,7 @@ export function useVoiceInteraction(): UseVoiceInteractionReturn {
       await playbackDone;
 
       // NOW add to chat history (after word-by-word reveal is complete)
-      addChatMessage('assistant', text);
+      addChatMessage('assistant', text, 'max');
 
       // Clear displayedText since it's now in allMessages
       setDisplayedText('');
@@ -175,8 +174,9 @@ export function useVoiceInteraction(): UseVoiceInteractionReturn {
   const speakAsSpark = useCallback(async (text: string): Promise<void> => {
     try {
       console.log('🤖 Voice: Spark speaking:', text.substring(0, 50) + '...');
+      setCurrentSpeaker('spark');
       setVoiceState('MATH_MATE_SPEAKING');
-      setLastResponse(text);
+
       setDisplayedText('');
 
       const words = text.split(' ');
@@ -192,7 +192,7 @@ export function useVoiceInteraction(): UseVoiceInteractionReturn {
       }
 
       await playbackDone;
-      addChatMessage('assistant', text);
+      addChatMessage('assistant', text, 'spark');
       setDisplayedText('');
       console.log('✅ Voice: Spark finished speaking');
       setVoiceState('IDLE');
@@ -288,7 +288,7 @@ export function useVoiceInteraction(): UseVoiceInteractionReturn {
       setVoiceState('PROCESSING');
       console.log('🔄 Transcribing audio...');
       const transcript = await transcribeAudio(audioBlob);
-      setLastTranscript(transcript);
+
 
       return transcript;
     } catch (err) {
@@ -314,7 +314,7 @@ export function useVoiceInteraction(): UseVoiceInteractionReturn {
     setTutorExpression('listening');
     const transcript = await listenAndTranscribe();
     if (transcript.trim()) {
-      addChatMessage('user', transcript);
+      addChatMessage('user', transcript, 'student');
     }
     setTutorExpression('neutral');
 
@@ -363,8 +363,10 @@ export function useVoiceInteraction(): UseVoiceInteractionReturn {
       // ========================================
       console.log('🎤 Beat 2: PTT Training');
       setTutorExpression('encouragement');
-      await speak("See that blue button down there? Press and hold it like a walkie-talkie to talk to me. Try it now — tell me your name!");
+      // Show PTT hint BEFORE speaking about it so the button is visible
       setShowPTTHint(true);
+      await new Promise(resolve => setTimeout(resolve, 300));
+      await speak("See that blue button down there? Press and hold it like a walkie-talkie to talk to me. Try it now — tell me your name!");
 
       // ========================================
       // BEAT 3: STUDENT SAYS NAME (PTT #1)
@@ -375,7 +377,7 @@ export function useVoiceInteraction(): UseVoiceInteractionReturn {
       console.log('📝 Beat 3: Got transcript:', nameTranscript);
 
       if (nameTranscript.trim()) {
-        addChatMessage('user', nameTranscript);
+        addChatMessage('user', nameTranscript, 'student');
       }
 
       // Extract name with hardened logic — catches garbage
@@ -386,7 +388,7 @@ export function useVoiceInteraction(): UseVoiceInteractionReturn {
 
         const retryTranscript = await listenAndTranscribe();
         if (retryTranscript.trim()) {
-          addChatMessage('user', retryTranscript);
+          addChatMessage('user', retryTranscript, 'student');
         }
 
         name = extractName(retryTranscript);
@@ -427,7 +429,7 @@ export function useVoiceInteraction(): UseVoiceInteractionReturn {
       console.log('📝 Beat 5: Got transcript:', sparkTranscript);
 
       if (sparkTranscript.trim()) {
-        addChatMessage('user', sparkTranscript);
+        addChatMessage('user', sparkTranscript, 'student');
       }
 
       // ========================================
@@ -667,7 +669,7 @@ export function useVoiceInteraction(): UseVoiceInteractionReturn {
 
           // Add student's response to unified chat history
           if (transcript.trim()) {
-            addChatMessage('user', transcript);
+            addChatMessage('user', transcript, 'student');
           }
 
           // Get conversation history for context
@@ -813,7 +815,7 @@ export function useVoiceInteraction(): UseVoiceInteractionReturn {
 
         // Add student's response to unified chat history
         if (transcript.trim()) {
-          addChatMessage('user', transcript);
+          addChatMessage('user', transcript, 'student');
         }
 
         // Get conversation history for context
@@ -937,7 +939,7 @@ export function useVoiceInteraction(): UseVoiceInteractionReturn {
 
       // Add student's response to chat
       if (transcript.trim()) {
-        addChatMessage('user', transcript);
+        addChatMessage('user', transcript, 'student');
       }
 
       // Check if correct using correctness filter (with null check)
@@ -1045,7 +1047,7 @@ export function useVoiceInteraction(): UseVoiceInteractionReturn {
         const compareTranscript = await listenAndTranscribe();
 
         if (compareTranscript.trim()) {
-          addChatMessage('user', compareTranscript);
+          addChatMessage('user', compareTranscript, 'student');
         }
 
         // Check for "6" in answer
@@ -1180,7 +1182,7 @@ export function useVoiceInteraction(): UseVoiceInteractionReturn {
 
         // Add to chat
         if (transcript.trim()) {
-          addChatMessage('user', transcript);
+          addChatMessage('user', transcript, 'student');
         }
 
         // Get conversation history
@@ -1329,7 +1331,7 @@ export function useVoiceInteraction(): UseVoiceInteractionReturn {
       console.log('📝 DynamicQuestion: Got transcript:', transcript);
 
       if (transcript.trim()) {
-        addChatMessage('user', transcript);
+        addChatMessage('user', transcript, 'student');
       }
 
       // Check correctness using filter
@@ -1710,8 +1712,7 @@ export function useVoiceInteraction(): UseVoiceInteractionReturn {
 
   return {
     voiceState,
-    lastTranscript,
-    lastResponse,
+    currentSpeaker,
     displayedText,
     error,
     runOnboardingInteraction,

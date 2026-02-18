@@ -1,4 +1,3 @@
-import { MathMateAvatar } from './MathMateAvatar';
 import styles from './CompletionScreen.module.css';
 
 interface CompletionScreenProps {
@@ -25,8 +24,6 @@ export function CompletionScreen({ studentName, onRestart }: CompletionScreenPro
 
       <div className={styles.content}>
         <div className={styles.trophy}>🏆</div>
-
-        <MathMateAvatar state="IDLE" size="large" />
 
         <h1 className={styles.title}>Amazing Job, {studentName}!</h1>
         <p className={styles.subtitle}>

@@ -7,10 +7,11 @@ import styles from './ChatHistory.module.css';
 interface ChatHistoryProps {
   messages: ChatMessageType[];
   currentMessage?: string; // For word-by-word reveal of current message
-  voiceState: VoiceState; // NEW: pass voice state for typing indicator
+  voiceState: VoiceState; // Pass voice state for typing indicator
+  currentSpeaker: 'max' | 'spark'; // Who is currently speaking (for live message)
 }
 
-export function ChatHistory({ messages, currentMessage, voiceState }: ChatHistoryProps) {
+export function ChatHistory({ messages, currentMessage, voiceState, currentSpeaker }: ChatHistoryProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
 
@@ -26,7 +27,7 @@ export function ChatHistory({ messages, currentMessage, voiceState }: ChatHistor
 
   // Determine typing indicator text
   const getTypingText = () => {
-    if (voiceState === 'MATH_MATE_SPEAKING') return 'Max is talking...';
+    if (voiceState === 'MATH_MATE_SPEAKING') return currentSpeaker === 'spark' ? 'Spark is talking...' : 'Max is talking...';
     if (voiceState === 'PROCESSING') return 'Max is thinking...';
     return null;
   };
@@ -51,6 +52,7 @@ export function ChatHistory({ messages, currentMessage, voiceState }: ChatHistor
               <ChatMessage
                 role={msg.role}
                 content={msg.content}
+                speaker={msg.speaker}
                 isCurrentMessage={msg.content === currentMessage}
               />
             </React.Fragment>
@@ -61,6 +63,7 @@ export function ChatHistory({ messages, currentMessage, voiceState }: ChatHistor
           <ChatMessage
             role="assistant"
             content={currentMessage}
+            speaker={currentSpeaker}
             isCurrentMessage={true}
           />
         )}

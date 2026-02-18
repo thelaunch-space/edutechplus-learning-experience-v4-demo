@@ -27,8 +27,9 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
-/* User bubble — semi-transparent cyan/teal */
-.user .bubble {
+/* Student bubble — semi-transparent cyan/teal */
+.user .bubble,
+.student .bubble {
   background: rgba(0, 200, 255, 0.15);
   color: #fff;
   border: 1px solid rgba(0, 200, 255, 0.4);
@@ -36,7 +37,7 @@
   backdrop-filter: blur(8px);
 }
 
-/* Assistant bubble — semi-transparent white/light blue */
+/* Default assistant bubble */
 .assistant .bubble {
   background: rgba(255, 255, 255, 0.12);
   color: rgba(255, 255, 255, 0.95);
@@ -45,16 +46,58 @@
   backdrop-filter: blur(8px);
 }
 
+/* Max bubble — blue/teal tint */
+.max.assistant .bubble {
+  background: rgba(0, 140, 220, 0.15);
+  border-color: rgba(0, 180, 255, 0.35);
+}
+
+/* Spark bubble — orange/amber tint */
+.spark.assistant .bubble {
+  background: rgba(245, 158, 11, 0.15);
+  border-color: rgba(245, 158, 11, 0.35);
+}
+
 /* Current message being spoken - subtle pulse */
 .current {
   animation: pulse 2s ease-in-out infinite;
 }
 
-/* Avatar for Math Mate */
+/* ===== SPEAKER AVATARS ===== */
 .avatar {
-  font-size: 18px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
   flex-shrink: 0;
-  margin-top: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 1px;
+}
+
+.avatarInitial {
+  font-family: var(--font-display, 'Fredoka', sans-serif);
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+/* Max avatar — blue circle */
+.avatarMax {
+  background: linear-gradient(135deg, #0088ff, #00c8ff);
+  box-shadow: 0 0 8px rgba(0, 180, 255, 0.4);
+}
+.avatarMax .avatarInitial {
+  color: #fff;
+}
+
+/* Spark avatar — orange circle */
+.avatarSpark {
+  background: linear-gradient(135deg, #e67e00, #ffb347);
+  box-shadow: 0 0 8px rgba(255, 160, 50, 0.4);
+}
+.avatarSpark .avatarInitial {
+  color: #fff;
 }
 
 /* Message content */

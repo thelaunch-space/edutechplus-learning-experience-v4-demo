@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef, useCallback } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useSessionStore } from './store/sessionStore';
 import { useVoiceInteraction } from './hooks/useVoiceInteraction';
 import { useMicrophone } from './hooks/useMicrophone';
@@ -11,8 +11,6 @@ import { ChatPane } from './components/ChatPane';
 import { LandscapePrompt } from './components/LandscapePrompt';
 import { Confetti } from './components/Confetti';
 import { FractionCompareSlide } from './components/FractionCompareSlide/FractionCompareSlide';
-import { TutorCharacter } from './components/TutorCharacter';
-import { MinionCharacter } from './components/MinionCharacter';
 import { NavBar } from './components/NavBar';
 import { CheckpointSlide } from './components/CheckpointSlide/CheckpointSlide';
 import { OnboardingWelcome } from './components/OnboardingWelcome';
@@ -33,9 +31,6 @@ function App() {
     dynamicSlideFrame,
     slideInteractionState,
     updateSlideInteraction,
-    tutorExpression,
-    setTutorExpression,
-    showMinion,
     showPTTHint,
     checkpointFrame,
     questionSlideFrame,
@@ -45,6 +40,7 @@ function App() {
 
   const {
     voiceState,
+    currentSpeaker,
     displayedText,
     runOnboardingInteraction,
     runPreChallengeInteraction,
@@ -63,10 +59,6 @@ function App() {
 
   const [isLoading, setIsLoading] = useState(true);
   const [isWelcome, setIsWelcome] = useState(true);
-
-  // Track whether Max is mid-portal-animation — interactions wait for this
-  const [isTutorEntering, setIsTutorEntering] = useState(true);
-  const prevTutorVisibleRef = useRef(true);
 
   // Guards to prevent React StrictMode from running effects twice
   const hasRunOnboarding = useRef(false);
@@ -88,31 +80,6 @@ function App() {
   // Also show during question slide Q&A (nodes 15, 17 — type=slide with dynamicSlideTemplate)
   const showDynamicQuestionSlide = challenge?.type === 'slide' && challenge?.dynamicSlideTemplate && phase === 'IN_CHALLENGE';
 
-  // Determine character visibility — hide during video/applet playback
-  const isContentPlaying = phase === 'IN_CHALLENGE' && (challenge?.type === 'video' || challenge?.type === 'applet');
-  const tutorVisible = !isContentPlaying;
-
-  // When tutor goes from hidden → visible, mark as entering (animation starting)
-  useEffect(() => {
-    if (tutorVisible && !prevTutorVisibleRef.current) {
-      setIsTutorEntering(true);
-    }
-    prevTutorVisibleRef.current = tutorVisible;
-  }, [tutorVisible]);
-
-  // Called when TutorCharacter portal animation finishes
-  const handleTutorEntryComplete = useCallback(() => {
-    setIsTutorEntering(false);
-  }, []);
-
-  // Derive Spark expression from context (without touching voice hook)
-  const sparkExpression = (() => {
-    if (showConfetti) return 'celebration';
-    if (tutorExpression === 'giggling') return 'giggling';
-    if (tutorExpression === 'nudging') return 'nudging';
-    return 'neutral';
-  })();
-
   // Handle welcome screen start
   const handleStart = async () => {
     console.log('🎤 App: Requesting microphone permission...');
@@ -121,19 +88,18 @@ function App() {
     setPhase('ONBOARDING');
   };
 
-  // Auto-run onboarding interaction — waits for portal animation to finish
+  // Auto-run onboarding interaction
   useEffect(() => {
     console.log(`🔄 App: Phase changed to ${phase}`);
-    if (phase === 'ONBOARDING' && !isWelcome && !hasRunOnboarding.current && !isTutorEntering) {
+    if (phase === 'ONBOARDING' && !isWelcome && !hasRunOnboarding.current) {
       console.log('🚀 App: Starting onboarding interaction');
       hasRunOnboarding.current = true;
       runOnboardingInteraction();
     }
-  }, [phase, isWelcome, isTutorEntering]);
+  }, [phase, isWelcome]);
 
   // Auto-run pre-challenge interaction OR slide interaction
   useEffect(() => {
-    if (isTutorEntering) return;
     if (phase === 'PRE_CHALLENGE') {
       const currentChallenge = getCurrentChallenge();
 
@@ -144,12 +110,11 @@ function App() {
           console.log(`🚀 App: Starting dynamic question slide for challenge ${currentChallengeIndex + 1}`);
           hasRunSlide.current = currentChallengeIndex;
           hasRunDynamicQuestion.current = currentChallengeIndex;
-          // Speak preScript, show slide, then run dynamic interaction
+          // Show slide FIRST, then speak preScript, then run dynamic interaction
           (async () => {
-            setTutorExpression('neutral');
-            await speak(currentChallenge.preScript);
-            await new Promise(resolve => setTimeout(resolve, 1000));
             setPhase('IN_CHALLENGE');
+            await new Promise(resolve => setTimeout(resolve, 300));
+            await speak(currentChallenge.preScript);
             await new Promise(resolve => setTimeout(resolve, 500));
             runDynamicQuestionInteraction();
           })();
@@ -164,11 +129,10 @@ function App() {
         runPreChallengeInteraction();
       }
     }
-  }, [phase, currentChallengeIndex, isTutorEntering, getCurrentChallenge, runPreChallengeInteraction, runSlideInteraction, runDynamicQuestionInteraction]);
+  }, [phase, currentChallengeIndex, getCurrentChallenge, runPreChallengeInteraction, runSlideInteraction, runDynamicQuestionInteraction]);
 
   // Auto-run checkpoint interaction
   useEffect(() => {
-    if (isTutorEntering) return;
     if (phase === 'PRE_CHALLENGE') {
       const currentChallenge = getCurrentChallenge();
       if (currentChallenge?.type === 'checkpoint' && hasRunCheckpoint.current !== currentChallengeIndex) {
@@ -176,11 +140,10 @@ function App() {
         runCheckpointInteraction();
       }
     }
-  }, [phase, currentChallengeIndex, isTutorEntering]);
+  }, [phase, currentChallengeIndex]);
 
   // Auto-run goofy moment interaction
   useEffect(() => {
-    if (isTutorEntering) return;
     if (phase === 'PRE_CHALLENGE') {
       const currentChallenge = getCurrentChallenge();
       if (currentChallenge?.type === 'goofy' && hasRunGoofy.current !== currentChallengeIndex) {
@@ -188,11 +151,10 @@ function App() {
         runGoofyMomentInteraction();
       }
     }
-  }, [phase, currentChallengeIndex, isTutorEntering]);
+  }, [phase, currentChallengeIndex]);
 
   // Auto-run post-challenge interaction (or dynamic slide interaction)
   useEffect(() => {
-    if (isTutorEntering) return;
     if (phase === 'POST_CHALLENGE' && hasRunPostChallenge.current !== currentChallengeIndex) {
       const currentChallenge = getCurrentChallenge();
 
@@ -217,7 +179,7 @@ function App() {
         runPostChallengeInteraction();
       }
     }
-  }, [phase, currentChallengeIndex, isTutorEntering, getCurrentChallenge, runPostChallengeInteraction, runFractionCompareInteraction, runDynamicQuestionInteraction]);
+  }, [phase, currentChallengeIndex, getCurrentChallenge, runPostChallengeInteraction, runFractionCompareInteraction, runDynamicQuestionInteraction]);
 
   // Handle challenge completion
   const handleChallengeComplete = () => {
@@ -240,7 +202,6 @@ function App() {
     hasRunCheckpoint.current = null;
     hasRunGoofy.current = null;
     hasRunDynamicQuestion.current = null;
-    setIsTutorEntering(true);
     resetSession();
     setIsLoading(true);
     setIsWelcome(true);
@@ -300,6 +261,7 @@ function App() {
           messages={allMessages}
           currentMessage={displayedText}
           voiceState={voiceState}
+          currentSpeaker={currentSpeaker}
         />
       </div>
 
@@ -389,19 +351,6 @@ function App() {
         </div>
       </div>
 
-      {/* Character at bottom-left */}
-      <div className={styles.characterArea}>
-        <TutorCharacter
-          expression={tutorExpression}
-          visible={tutorVisible}
-          onEntryComplete={handleTutorEntryComplete}
-        />
-      </div>
-
-      {/* Minion to the left of character */}
-      <div className={styles.minionArea}>
-        <MinionCharacter visible={showMinion} expression={sparkExpression} />
-      </div>
     </div>
   );
 }

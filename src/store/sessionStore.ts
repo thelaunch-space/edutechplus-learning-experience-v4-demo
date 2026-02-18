@@ -15,6 +15,7 @@ export interface ChatMessage {
   content: string;
   timestamp: number;
   nodeIndex: number;
+  speaker: 'max' | 'spark' | 'student';
 }
 
 interface SessionState {
@@ -43,8 +44,7 @@ interface SessionState {
 
   // Unified chat history for UI display (across all phases)
   allMessages: ChatMessage[];
-  addChatMessage: (role: 'user' | 'assistant', content: string) => void;
-  clearChatMessages: () => void;
+  addChatMessage: (role: 'user' | 'assistant', content: string, speaker?: 'max' | 'spark' | 'student') => void;
 
   // Turn tracking for multi-turn conversations
   currentTurn: number;
@@ -63,7 +63,6 @@ interface SessionState {
 
   // Session controls
   resetSession: () => void;
-  skipToChallenge: (index: number) => void;
 
   // Dynamic slide state (for FractionCompareSlide)
   dynamicSlideFrame: SlideFrame;
@@ -138,7 +137,7 @@ export const useSessionStore = create<SessionState>((set, get) => ({
 
   // Unified chat history for UI
   allMessages: [],
-  addChatMessage: (role, content) => set((state) => ({
+  addChatMessage: (role, content, speaker?) => set((state) => ({
     allMessages: [
       ...state.allMessages,
       {
@@ -147,10 +146,10 @@ export const useSessionStore = create<SessionState>((set, get) => ({
         content,
         timestamp: Date.now(),
         nodeIndex: state.currentChallengeIndex,
+        speaker: speaker ?? (role === 'user' ? 'student' : 'max'),
       }
     ]
   })),
-  clearChatMessages: () => set({ allMessages: [] }),
 
   // Turn tracking
   currentTurn: 0,
@@ -217,11 +216,6 @@ export const useSessionStore = create<SessionState>((set, get) => ({
     questionSlideFrame: 'question',
     questionSlideState: { ...INITIAL_QUESTION_SLIDE_STATE },
   }),
-  skipToChallenge: (index) => set({
-    currentChallengeIndex: Math.min(index, challenges.length - 1),
-    phase: 'PRE_CHALLENGE'
-  }),
-
   // Dynamic slide state
   dynamicSlideFrame: 'question',
   setDynamicSlideFrame: (frame) => set({ dynamicSlideFrame: frame }),
@@ -247,17 +241,17 @@ export const useSessionStore = create<SessionState>((set, get) => ({
     }
   }),
 
-  // Tutor expression
+  // Tutor expression (no-op — characters removed in iteration 6)
   tutorExpression: 'neutral' as TutorExpression,
-  setTutorExpression: (expression) => set({ tutorExpression: expression }),
+  setTutorExpression: (_expression) => {},
 
   // Checkpoint slide state
   checkpointFrame: 'intro' as CheckpointFrame,
   setCheckpointFrame: (frame) => set({ checkpointFrame: frame }),
 
-  // Minion visibility
+  // Minion visibility (no-op — characters removed in iteration 6)
   showMinion: false,
-  setShowMinion: (show) => set({ showMinion: show }),
+  setShowMinion: (_show) => {},
 
   // FTUE PTT hint
   showPTTHint: false,

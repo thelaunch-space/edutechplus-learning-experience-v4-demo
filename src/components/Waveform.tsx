@@ -4,6 +4,7 @@ import styles from './Waveform.module.css';
 interface WaveformProps {
   variant: 'speaking' | 'recording' | 'idle' | 'waiting';
   size?: 'medium' | 'large';
+  speaker?: 'max' | 'spark';
 }
 
 const BAR_COUNT = {
@@ -11,7 +12,7 @@ const BAR_COUNT = {
   large: 9,
 };
 
-export function Waveform({ variant, size = 'large' }: WaveformProps) {
+export function Waveform({ variant, size = 'large', speaker }: WaveformProps) {
   const [heights, setHeights] = useState<number[]>(Array(BAR_COUNT[size]).fill(20));
   const barCount = BAR_COUNT[size];
 
@@ -101,7 +102,7 @@ export function Waveform({ variant, size = 'large' }: WaveformProps) {
   };
 
   return (
-    <div className={`${styles.container} ${styles[size]} ${getVariantClass()}`}>
+    <div className={`${styles.container} ${styles[size]} ${getVariantClass()} ${speaker ? styles[speaker] : ''}`}>
       {heights.map((height, i) => (
         <div
           key={i}

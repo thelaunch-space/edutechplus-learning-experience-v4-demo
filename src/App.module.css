@@ -104,68 +104,6 @@
   border-radius: 8px;
 }
 
-/* Character area — bottom-left, overlapping sidebar/content boundary */
-.characterArea {
-  position: absolute;
-  bottom: 0;
-  left: 16%;
-  z-index: 20;
-  pointer-events: none;
-  transform: translateX(-50%);
-}
-
-/* Minion area — left of character */
-.minionArea {
-  position: absolute;
-  bottom: 0;
-  left: 4%;
-  z-index: 19;
-  pointer-events: none;
-}
-
-/* ===== DEBUG PANEL ===== */
-.debug {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background: rgba(0, 0, 0, 0.95);
-  backdrop-filter: blur(10px);
-  padding: 10px 16px;
-  display: flex;
-  gap: 12px;
-  align-items: center;
-  flex-wrap: wrap;
-  font-family: 'SF Mono', Monaco, 'Courier New', monospace;
-  font-size: 11px;
-  color: rgba(255, 255, 255, 0.8);
-  z-index: 1000;
-  border-top: 2px solid rgba(0, 180, 255, 0.4);
-}
-
-.debug button {
-  padding: 6px 12px;
-  font-family: var(--font-display);
-  font-size: 12px;
-  font-weight: 600;
-  background: linear-gradient(135deg, #0088ff 0%, #00c8ff 100%);
-  color: #fff;
-  border-radius: 100px;
-  box-shadow: 0 2px 0 #0066cc;
-  transition: all 0.15s ease;
-}
-
-.debug button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 0 #0066cc;
-  background: linear-gradient(135deg, #00aaff 0%, #00ddff 100%);
-}
-
-.debug button:active {
-  transform: translateY(1px);
-  box-shadow: 0 1px 0 #0066cc;
-}
-
 /* Desktop default — sidebar visible */
 @media (max-width: 767px) {
   .appContainer {
@@ -188,26 +126,5 @@
   .rightSide {
     width: 100%;
     height: 65vh;
-  }
-
-  .characterArea {
-    display: none;
-  }
-
-  .minionArea {
-    display: none;
-  }
-}
-
-@media (max-width: 380px) {
-
-  .debug {
-    padding: 8px 12px;
-    gap: 8px;
-  }
-
-  .debug button {
-    padding: 5px 10px;
-    font-size: 11px;
   }
 }

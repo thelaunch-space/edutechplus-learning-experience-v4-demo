@@ -75,6 +75,32 @@
   }
 }
 
+/* ===== SPEAKER COLOUR OVERRIDES ===== */
+
+/* Max — blue/teal gradient + glow */
+.max.speaking .bar {
+  background: linear-gradient(to top, #0077cc, #00d4ff);
+  box-shadow: 0 0 18px rgba(0, 180, 255, 0.5);
+}
+.max.speaking .bar:nth-child(odd) {
+  background: linear-gradient(to top, #0099ee, #7dd3fc);
+}
+.max.idle .bar {
+  background: linear-gradient(to top, rgba(0, 140, 220, 0.3), rgba(0, 200, 255, 0.5));
+}
+
+/* Spark — orange/amber gradient + glow */
+.spark.speaking .bar {
+  background: linear-gradient(to top, #e67e00, #ffb347);
+  box-shadow: 0 0 18px rgba(255, 160, 50, 0.5);
+}
+.spark.speaking .bar:nth-child(odd) {
+  background: linear-gradient(to top, #f59e0b, #fcd34d);
+}
+.spark.idle .bar {
+  background: linear-gradient(to top, rgba(245, 158, 11, 0.3), rgba(252, 211, 77, 0.5));
+}
+
 /* Responsive sizing */
 @media (max-width: 600px) {
   .large {
