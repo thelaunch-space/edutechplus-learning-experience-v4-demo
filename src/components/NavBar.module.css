@@ -1,13 +1,14 @@
-/* NavBar — positioned in the bottom panel area */
+/* NavBar — centered in the bottom panel area */
 .navbar {
   position: absolute;
-  bottom: 6%;
+  top: 50%;
   left: 0;
   right: 0;
+  transform: translateY(-50%);
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 10px 24px;
+  padding: 8px 24px;
   z-index: 30;
 }
 
@@ -69,7 +70,7 @@
   opacity: 1;
 }
 
-/* FTUE hint wrapper */
+/* ===== PTT WRAPPER ===== */
 .pttWrapper {
   position: relative;
   display: flex;
@@ -77,86 +78,228 @@
   align-items: center;
 }
 
+/* ===== PTT BUTTON — Rectangular comm station ===== */
+.pttButton {
+  position: relative;
+  width: 160px;
+  height: 72px;
+  border-radius: 14px;
+  border: 2px solid rgba(59, 130, 246, 0.5);
+  background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+  cursor: pointer;
+  padding: 8px 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
+  transition: transform 0.15s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  box-shadow:
+    0 0 12px rgba(59, 130, 246, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  /* Scanline texture overlay */
+  background-image:
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 3px,
+      rgba(59, 130, 246, 0.03) 3px,
+      rgba(59, 130, 246, 0.03) 4px
+    ),
+    linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+  /* Standby breathing glow */
+  animation: standbyBreath 3s ease-in-out infinite;
+}
+
+@keyframes standbyBreath {
+  0%, 100% {
+    box-shadow: 0 0 12px rgba(59, 130, 246, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  }
+}
+
+.pttButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 24px rgba(59, 130, 246, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  border-color: rgba(59, 130, 246, 0.7);
+  animation: none;
+}
+
+/* ===== PTT ACTIVE (Recording) ===== */
+.pttActive {
+  background: linear-gradient(180deg, #991b1b 0%, #7f1d1d 100%);
+  background-image:
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 3px,
+      rgba(239, 68, 68, 0.05) 3px,
+      rgba(239, 68, 68, 0.05) 4px
+    ),
+    linear-gradient(180deg, #991b1b 0%, #7f1d1d 100%);
+  border-color: rgba(239, 68, 68, 0.7);
+  transform: scale(0.97);
+  animation: recordingPulse 1s ease-in-out infinite;
+}
+
+@keyframes recordingPulse {
+  0%, 100% {
+    box-shadow: 0 0 16px rgba(239, 68, 68, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 28px rgba(239, 68, 68, 0.6);
+  }
+}
+
+.pttActive:hover {
+  transform: scale(0.97);
+  animation: recordingPulse 1s ease-in-out infinite;
+}
+
+/* ===== PTT Labels ===== */
+.micIcon {
+  font-size: 18px;
+  line-height: 1;
+}
+
+.pttMainLabel {
+  font-family: 'Nunito', sans-serif;
+  font-size: 14px;
+  font-weight: 800;
+  color: #e0f2fe;
+  line-height: 1.1;
+  letter-spacing: 0.02em;
+}
+
+.pttSubLabel {
+  font-family: 'Nunito', sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+  color: rgba(148, 163, 184, 0.8);
+  line-height: 1;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+/* ===== REC indicator ===== */
+.recIndicator {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-family: 'Nunito', sans-serif;
+  font-size: 11px;
+  font-weight: 800;
+  color: #fca5a5;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.recDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ef4444;
+  animation: recBlink 0.8s ease-in-out infinite;
+}
+
+@keyframes recBlink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.2; }
+}
+
+/* ===== FTUE HINT (callout pill + bouncing arrow + ring pulse) ===== */
 .ftueHint {
   position: absolute;
-  top: 0;
+  bottom: calc(100% + 12px);
   left: 50%;
-  transform: translate(-50%, 0);
+  transform: translateX(-50%);
   display: flex;
   flex-direction: column;
   align-items: center;
   pointer-events: none;
   z-index: 10;
+  animation: ftueEnter 0.5s ease-out both;
 }
 
-.ftueRing {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
-  border: 3px solid rgba(59, 130, 246, 0.6);
-  animation: ftuePulse 1.5s ease-in-out infinite;
-  top: calc(50% + 30px);
+@keyframes ftueEnter {
+  0% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(8px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
 }
 
 .ftueLabel {
-  position: absolute;
-  top: -36px;
   white-space: nowrap;
-  background: rgba(15, 23, 42, 0.85);
+  background: rgba(15, 23, 42, 0.92);
   color: #e0f2fe;
   font-family: 'Nunito', sans-serif;
   font-size: 13px;
   font-weight: 700;
-  padding: 6px 14px;
+  padding: 6px 16px;
   border-radius: 20px;
-  border: 1px solid rgba(59, 130, 246, 0.4);
-  box-shadow: 0 0 12px rgba(59, 130, 246, 0.3);
+  border: 1px solid rgba(59, 130, 246, 0.5);
+  box-shadow: 0 0 16px rgba(59, 130, 246, 0.3);
+}
+
+.ftueArrow {
+  color: rgba(59, 130, 246, 0.8);
+  font-size: 16px;
+  line-height: 1;
+  margin-top: 4px;
+  animation: ftueBounce 1s ease-in-out infinite;
+}
+
+@keyframes ftueBounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(5px); }
+}
+
+/* FTUE ring — pulses around the button */
+.ftueRing {
+  position: absolute;
+  top: calc(100% + 12px);
+  left: 50%;
+  width: 176px;
+  height: 88px;
+  border-radius: 18px;
+  border: 3px solid rgba(59, 130, 246, 0.5);
+  transform: translate(-50%, 0);
+  animation: ftuePulse 1.5s ease-in-out infinite;
+  pointer-events: none;
 }
 
 @keyframes ftuePulse {
   0%, 100% {
-    transform: translate(-50%, -50%) scale(1);
-    opacity: 0.6;
+    transform: translate(-50%, 0) scale(1);
+    opacity: 0.5;
   }
   50% {
-    transform: translate(-50%, -50%) scale(1.25);
+    transform: translate(-50%, 0) scale(1.08);
     opacity: 1;
   }
 }
 
-/* PTT circular button — centered */
-.pttButton {
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  border: none;
-  background: transparent;
-  cursor: pointer;
-  padding: 0;
-  transition: transform 0.15s ease;
-  user-select: none;
-  -webkit-user-select: none;
-  touch-action: none;
+/* FTUE state on button itself — extra glow */
+.pttFtue {
+  animation: standbyBreath 3s ease-in-out infinite, ftueGlow 1.5s ease-in-out infinite;
 }
 
-.pttButton:hover {
-  transform: scale(1.08);
-}
-
-.pttButton:active,
-.pttActive {
-  transform: scale(0.95);
-}
-
-.pttImage {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  pointer-events: none;
+@keyframes ftueGlow {
+  0%, 100% {
+    border-color: rgba(59, 130, 246, 0.5);
+  }
+  50% {
+    border-color: rgba(59, 130, 246, 0.9);
+  }
 }
 
 /* Responsive */
@@ -171,7 +314,15 @@
   }
 
   .pttButton {
-    width: 52px;
-    height: 52px;
+    width: 136px;
+    height: 62px;
+  }
+
+  .pttMainLabel {
+    font-size: 12px;
+  }
+
+  .pttSubLabel {
+    font-size: 9px;
   }
 }

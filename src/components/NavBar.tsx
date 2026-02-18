@@ -12,13 +12,7 @@ interface NavBarProps {
   showPTTHint?: boolean;
 }
 
-function getPTTImage(voiceState: VoiceState, isPTTActive: boolean): string {
-  if (isPTTActive) return '/tutor-assets/new/Push2.png';
-  if (voiceState === 'WAITING_FOR_STUDENT') return '/tutor-assets/new/Push1.png';
-  return '/tutor-assets/new/Push.png';
-}
-
-export function NavBar({ onSkip, onPTTStart, onPTTEnd, showPTT, isPTTActive, showSkip, voiceState, showPTTHint }: NavBarProps) {
+export function NavBar({ onSkip, onPTTStart, onPTTEnd, showPTT, isPTTActive, showSkip, showPTTHint }: NavBarProps) {
   return (
     <div className={styles.navbar}>
       {/* Empty left side for balance */}
@@ -28,25 +22,38 @@ export function NavBar({ onSkip, onPTTStart, onPTTEnd, showPTT, isPTTActive, sho
       <div className={styles.center}>
         {showPTT && (
           <div className={styles.pttWrapper}>
+            {/* FTUE callout pill + bouncing arrow */}
             {showPTTHint && !isPTTActive && (
               <div className={styles.ftueHint}>
+                <div className={styles.ftueLabel}>Press &amp; hold to talk</div>
+                <div className={styles.ftueArrow}>&#x25BC;</div>
                 <div className={styles.ftueRing} />
-                <div className={styles.ftueLabel}>Tap & hold to speak</div>
               </div>
             )}
+
             <button
-              className={`${styles.pttButton} ${isPTTActive ? styles.pttActive : ''}`}
+              className={`${styles.pttButton} ${isPTTActive ? styles.pttActive : ''} ${showPTTHint && !isPTTActive ? styles.pttFtue : ''}`}
               onPointerDown={onPTTStart}
               onPointerUp={onPTTEnd}
               onPointerLeave={onPTTEnd}
               onContextMenu={(e) => e.preventDefault()}
             >
-              <img
-                src={getPTTImage(voiceState, isPTTActive)}
-                alt="Hold to talk"
-                className={styles.pttImage}
-                draggable={false}
-              />
+              {isPTTActive ? (
+                <>
+                  <span className={styles.recIndicator}>
+                    <span className={styles.recDot} />
+                    REC
+                  </span>
+                  <span className={styles.pttMainLabel}>Recording</span>
+                  <span className={styles.pttSubLabel}>Release when done</span>
+                </>
+              ) : (
+                <>
+                  <span className={styles.micIcon}>&#x1F3A4;</span>
+                  <span className={styles.pttMainLabel}>Hold to Speak</span>
+                  <span className={styles.pttSubLabel}>Press &amp; hold</span>
+                </>
+              )}
             </button>
           </div>
         )}

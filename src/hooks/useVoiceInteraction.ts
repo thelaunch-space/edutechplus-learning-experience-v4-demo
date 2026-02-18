@@ -119,6 +119,7 @@ export function useVoiceInteraction(): UseVoiceInteractionReturn {
     setCheckpointFrame,
     setQuestionSlideFrame,
     resetQuestionSlideState,
+    setShowScreenHighlight,
   } = useSessionStore();
 
   // Speak text using TTS with word-by-word reveal synchronized to audio
@@ -365,8 +366,8 @@ export function useVoiceInteraction(): UseVoiceInteractionReturn {
       setTutorExpression('encouragement');
       // Show PTT hint BEFORE speaking about it so the button is visible
       setShowPTTHint(true);
-      await new Promise(resolve => setTimeout(resolve, 300));
-      await speak("See that blue button down there? Press and hold it like a walkie-talkie to talk to me. Try it now — tell me your name!");
+      await new Promise(resolve => setTimeout(resolve, 700));
+      await speak("See that button down there? Press and hold it like a walkie-talkie to talk to me. Try it now — tell me your name!");
 
       // ========================================
       // BEAT 3: STUDENT SAYS NAME (PTT #1)
@@ -444,10 +445,20 @@ export function useVoiceInteraction(): UseVoiceInteractionReturn {
 
       // ========================================
       // BEAT 7: INTERFACE WALKTHROUGH + AUTO-ADVANCE
+      // Show-first: highlight right panel, pause, THEN speak
       // ========================================
       console.log('🎤 Beat 7: Interface walkthrough + auto-advance');
       setTutorExpression('encouragement');
-      await speak("On the right side, you'll see videos, games, and puzzles. I'll guide you through everything. We're gonna learn about fractions today — let's gooo!");
+
+      // Show overlay + nudge FIRST so student sees the right panel highlighted
+      setShowScreenHighlight(true);
+      await new Promise(resolve => setTimeout(resolve, 1500));
+
+      // NOW speak about it
+      await speak("See that screen on your right? That's where I'll show you videos, games, and puzzles. I'll guide you through everything. We're gonna learn about fractions today — let's gooo!");
+
+      // Clear overlay
+      setShowScreenHighlight(false);
 
       setShowMinion(false);
       setTutorExpression('neutral');
@@ -466,6 +477,7 @@ export function useVoiceInteraction(): UseVoiceInteractionReturn {
       setStudentName('Friend');
       setShowMinion(false);
       setShowPTTHint(false);
+      setShowScreenHighlight(false);
       setTutorExpression('neutral');
       const isComplete = goToNextChallenge();
       if (isComplete) {
@@ -474,7 +486,7 @@ export function useVoiceInteraction(): UseVoiceInteractionReturn {
         setPhase('PRE_CHALLENGE');
       }
     }
-  }, [speak, speakAsSpark, listenAndTranscribe, setStudentName, setPhase, addChatMessage, getCurrentChallenge, setTutorExpression, setShowMinion, setShowPTTHint, goToNextChallenge, setVoiceState]);
+  }, [speak, speakAsSpark, listenAndTranscribe, setStudentName, setPhase, addChatMessage, getCurrentChallenge, setTutorExpression, setShowMinion, setShowPTTHint, setShowScreenHighlight, goToNextChallenge, setVoiceState]);
 
   // Pre-challenge interaction (Max introduces the challenge)
   const runPreChallengeInteraction = useCallback(async (): Promise<void> => {

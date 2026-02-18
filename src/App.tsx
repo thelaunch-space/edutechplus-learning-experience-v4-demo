@@ -12,6 +12,7 @@ import { LandscapePrompt } from './components/LandscapePrompt';
 import { Confetti } from './components/Confetti';
 import { FractionCompareSlide } from './components/FractionCompareSlide/FractionCompareSlide';
 import { NavBar } from './components/NavBar';
+import { CharacterPanel } from './components/CharacterPanel';
 import { CheckpointSlide } from './components/CheckpointSlide/CheckpointSlide';
 import { OnboardingWelcome } from './components/OnboardingWelcome';
 import { DynamicSlideRenderer } from './components/DynamicSlides/DynamicSlideRenderer';
@@ -32,6 +33,7 @@ function App() {
     slideInteractionState,
     updateSlideInteraction,
     showPTTHint,
+    showScreenHighlight,
     checkpointFrame,
     questionSlideFrame,
     questionSlideState,
@@ -265,11 +267,23 @@ function App() {
         />
       </div>
 
+      {/* Screen highlight overlay (Beat 7 FTUE) */}
+      {showScreenHighlight && (
+        <>
+          <div className={styles.screenHighlightOverlay} />
+          <div className={styles.screenHighlightNudge}>
+            <span className={styles.nudgeArrow}>&#x27A1;</span> Check out the screen!
+          </div>
+        </>
+      )}
+
       {/* Right side — 3-panel layout */}
-      <div className={styles.rightSide}>
+      <div className={`${styles.rightSide} ${showScreenHighlight ? styles.rightSideHighlighted : ''}`}>
         <div className={styles.panelStack}>
-          {/* Top panel */}
-          <div className={styles.topPanel} />
+          {/* Top panel — character avatar + visualizer */}
+          <div className={styles.topPanel}>
+            <CharacterPanel voiceState={voiceState} currentSpeaker={currentSpeaker} />
+          </div>
 
           {/* Center panel — content area */}
           <div className={styles.centerPanel}>
@@ -341,7 +355,7 @@ function App() {
               onSkip={handleSkip}
               onPTTStart={handlePTTStart}
               onPTTEnd={handlePTTEnd}
-              showPTT={voiceState === 'WAITING_FOR_STUDENT' || voiceState === 'STUDENT_RECORDING'}
+              showPTT={voiceState === 'WAITING_FOR_STUDENT' || voiceState === 'STUDENT_RECORDING' || showPTTHint}
               isPTTActive={voiceState === 'STUDENT_RECORDING'}
               showSkip={phase === 'IN_CHALLENGE' && (challenge?.type === 'video' || challenge?.type === 'applet')}
               voiceState={voiceState}

@@ -26,17 +26,12 @@
   pointer-events: auto;
 }
 
-/* Waveform area — fixed height above chat */
-.waveformArea {
-  flex-shrink: 0;
-  border-bottom: 1px solid rgba(0, 180, 255, 0.15);
-}
-
 /* History wrapper (scrollable middle section) */
 .historyWrapper {
   flex: 1;
   min-height: 0;
   overflow: hidden;
+  padding-top: 12px;
   padding-bottom: 16px;
 }
 

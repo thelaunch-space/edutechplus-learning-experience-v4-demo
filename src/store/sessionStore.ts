@@ -87,6 +87,10 @@ interface SessionState {
   showPTTHint: boolean;
   setShowPTTHint: (show: boolean) => void;
 
+  // Screen highlight overlay (Beat 7 FTUE)
+  showScreenHighlight: boolean;
+  setShowScreenHighlight: (show: boolean) => void;
+
   // Dynamic question slide state (for FractionBuilder, MultipleChoice, TapToSelect templates)
   questionSlideFrame: QuestionSlideFrame;
   setQuestionSlideFrame: (frame: QuestionSlideFrame) => void;
@@ -213,6 +217,7 @@ export const useSessionStore = create<SessionState>((set, get) => ({
     checkpointFrame: 'intro',
     showMinion: false,
     showPTTHint: false,
+    showScreenHighlight: false,
     questionSlideFrame: 'question',
     questionSlideState: { ...INITIAL_QUESTION_SLIDE_STATE },
   }),
@@ -256,6 +261,10 @@ export const useSessionStore = create<SessionState>((set, get) => ({
   // FTUE PTT hint
   showPTTHint: false,
   setShowPTTHint: (show) => set({ showPTTHint: show }),
+
+  // Screen highlight overlay (Beat 7 FTUE)
+  showScreenHighlight: false,
+  setShowScreenHighlight: (show) => set({ showScreenHighlight: show }),
 
   // Dynamic question slide state
   questionSlideFrame: 'question' as QuestionSlideFrame,
